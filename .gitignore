@@ -131,3 +131,7 @@ dmypy.json
 # Individual editor specific
 .vscode/
 .idea/
+
+# Mac specific
+**/.DS_Store
+.DS_Store
