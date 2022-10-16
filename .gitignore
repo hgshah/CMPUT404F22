@@ -131,8 +131,6 @@ dmypy.json
 # virtualenv
 venv/
 
-.DS_Store
-
 # Created by https://www.gitignore.io
 
 ### OSX ###
