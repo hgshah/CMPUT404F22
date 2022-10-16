@@ -82,7 +82,7 @@ DATABASES = {
 }
 
 # Our custom user
-# AUTH_USER_MODEL = "authors.models.Author"
+AUTH_USER_MODEL = "authors.Author"
 
 
 # Password validation
