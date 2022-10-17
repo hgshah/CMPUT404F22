@@ -15,14 +15,16 @@ class AuthorView(GenericAPIView):
         # todo(turnip): pagination
         # todo(turnip): single author
         authors = Author.objects.all()
-        serializer = AuthorSerializer(authors, many=True)
+        serializer = AuthorSerializer(
+            authors,
+            many=True,
+            context={
+                "url": request.get_full_path_info(),
+                "port": request.get_port(),
+                "host": request.get_host()
+            })
         # todo(turnip): there might be a better way doing this that can make it surface in the auto docs via serializer
         return Response({
             'type': 'authors',
             'items': serializer.data
         })
-        # formatted_list = []
-        # for el in Author.objects.all():
-        #     formatted_list.append(el.as_json())
-        # data = {"data": formatted_list}
-        # return Response(status=200, data=data)

@@ -24,8 +24,7 @@ class Author(AbstractUser):
 
     display_name = models.TextField(blank=True)
     github = models.TextField(blank=True)
-    # todo(turnip): uncomment when ready
-    # profile_image = ???
+    profile_image = models.ImageField(blank=True)
 
     objects = AuthorManager()
 
