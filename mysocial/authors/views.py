@@ -9,7 +9,7 @@ from authors.serializers.author_serializer import AuthorSerializer
 
 class AuthorView(GenericAPIView):
     def get_queryset(self):
-        return Author.objects.all()
+        return None
 
     def get(self, request: HttpRequest, author_id: str = None) -> HttpResponse:
         # todo(turnip): pagination

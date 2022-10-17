@@ -16,6 +16,8 @@ class Author(AbstractUser):
         :ivar is_staff: bool
         :ivar is_active: bool
         :ivar date_joined: datetime
+
+    from: https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
     """
 
     # Remove this unnecessary fields
@@ -32,3 +34,8 @@ class Author(AbstractUser):
     @staticmethod
     def get_serializer_field_name():
         return "author"
+
+    def __str__(self):
+        return self.display_name if self.display_name else self.username
+
+
