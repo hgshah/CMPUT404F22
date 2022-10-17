@@ -28,3 +28,7 @@ class Author(AbstractUser):
     # profile_image = ???
 
     objects = AuthorManager()
+
+    @staticmethod
+    def get_serializer_field_name():
+        return "author"
