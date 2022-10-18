@@ -38,7 +38,7 @@ class AuthorView(GenericAPIView):
     @staticmethod
     def _get_author(request: Request, author_id: str) -> HttpResponse:
         try:
-            author = Author.objects.get(id=author_id)
+            author = Author.objects.get(official_id=author_id)
         except Author.DoesNotExist:
             return HttpResponseNotFound()
         serializer = AuthorSerializer(

@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .author_manager import AuthorManager
@@ -23,12 +24,15 @@ class Author(AbstractUser):
     first_name = None
     last_name = None
 
+    official_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     host = models.TextField()
     display_name = models.TextField(blank=True)
     github = models.TextField(blank=True)
     profile_image = models.ImageField(blank=True)
 
     objects = AuthorManager()
+
+    REQUIRED_FIELDS = ['email', 'host', 'password']
 
     @staticmethod
     def get_serializer_field_name():

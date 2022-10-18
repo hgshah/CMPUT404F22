@@ -8,6 +8,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     Note: We can generalize this btw to use in every serializer out there!
     """
     type = serializers.SerializerMethodField('get_type')
+    id = serializers.SerializerMethodField('get_id')
     displayName = serializers.CharField(source='display_name')
     profileImage = serializers.CharField(source='profile_image')
     url = serializers.SerializerMethodField('get_url')
@@ -16,8 +17,12 @@ class AuthorSerializer(serializers.ModelSerializer):
         return model.get_serializer_field_name()
 
     def get_url(self, model: Author):
+        # they're the same as id, for now
+        return self.get_id(model)
+
+    def get_id(self, model: Author):
         # the path after host may vary, e.g. authors/ vs authors/id
-        return f"{model.host}/{Author.URL_PATH}/{model.id}"
+        return f"{model.host}/{Author.URL_PATH}/{model.official_id}"
 
     class Meta:
         model = Author
