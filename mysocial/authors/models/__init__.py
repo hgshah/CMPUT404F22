@@ -1,1 +1,1 @@
-from .authors import Author
+from .author import Author
