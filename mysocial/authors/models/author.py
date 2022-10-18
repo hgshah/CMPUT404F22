@@ -17,11 +17,13 @@ class Author(AbstractUser):
         :ivar is_active: bool
         :ivar date_joined: datetime
     """
+    URL_PATH = "authors"
 
     # Remove this unnecessary fields
     first_name = None
     last_name = None
 
+    host = models.TextField()
     display_name = models.TextField(blank=True)
     github = models.TextField(blank=True)
     profile_image = models.ImageField(blank=True)
