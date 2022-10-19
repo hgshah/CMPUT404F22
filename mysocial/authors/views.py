@@ -1,4 +1,4 @@
-from django.http.response import HttpResponse, HttpResponseNotFound
+from django.http.response import HttpResponse, HttpResponseNotFound, HttpResponseBadRequest
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -38,7 +38,7 @@ class AuthorView(GenericAPIView):
     @staticmethod
     def _get_author(request: Request, author_id: str) -> HttpResponse:
         try:
-            author = Author.objects.get(id=author_id)
+            author = Author.objects.get(official_id=author_id)
         except Author.DoesNotExist:
             return HttpResponseNotFound()
         serializer = AuthorSerializer(
