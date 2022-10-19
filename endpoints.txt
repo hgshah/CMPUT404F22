@@ -9,3 +9,6 @@ POST /authors/{AUTHOR_UUID}/posts/
     "contentType": text/plain,
     "unlisted": false
 }
+
+TO GET ALL PUBLIC POSTS:
+GET /posts/public
