@@ -28,7 +28,7 @@ class Author(AbstractUser):
     host = models.TextField()
     display_name = models.TextField(blank=True)
     github = models.TextField(blank=True)
-    profile_image = models.ImageField(blank=True)
+    profile_image = models.ImageField(null=True, blank=True, upload_to='images/profile-images/')
 
     objects = AuthorManager()
 
