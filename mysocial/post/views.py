@@ -20,11 +20,40 @@ class PublicPostView(GenericAPIView):
             public_posts = Post.objects.filter(
                 visibility = Visibility.PUBLIC
             )
+
+            serializer = PostSerializer(public_posts, many=True)
+            return Response(serializer.data)
         except Exception as e:
             logger.info(e)
             return HttpResponseNotFound()
-        serializer = PostSerializer(public_posts, many=True)
-        return Response(serializer.data)
+
+class PostView(GenericAPIView):
+    def get(self, request: Request, *args, **kwargs) -> HttpResponse:
+        try:
+            post = Post.objects.get(official_id=kwargs['post_id'])
+
+            serializer = PostSerializer(post)
+            return Response(serializer.data)
+        except Exception as e:
+            logger.info(e)
+            return HttpResponseNotFound()
+    
+    def delete(self, request: Request, *args, **kwargs) -> HttpResponse:
+        try:
+            # check if logged in users id == authors id on about to delete post
+            post_author_id = Author.objects.get(official_id = kwargs['author_id']).official_id
+            if post_author_id != self.request.user.official_id:
+                return HttpResponse(status=status.HTTP_403_FORBIDDEN)
+
+            post = Post.objects.get(official_id=kwargs['post_id'])
+            post.delete()
+
+            serializer = PostSerializer(post)
+            return Response(serializer.data)
+
+        except Exception as e:
+            logger.info(e)
+            return HttpResponseNotFound()
 
 class CreationPostView(GenericAPIView):
     serializer_class = CreatePostSerializer
