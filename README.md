@@ -9,6 +9,41 @@ Before you start:
 Start your virtual env!
 pip install -r requirements.txt
 
+Switching to PostgresDB (MACOS)
+https://daily-dev-tips.com/posts/installing-postgresql-on-a-mac-with-homebrew/
+Installing postgres
+
+1. brew update
+
+2. brew install postgresql
+
+To start the database:
+3. brew services start postgresql
+
+4. psql postgres
+
+5. CREATE DATABASE mysocialdb;
+
+6. CREATE ROLE mysocialuser WITH LOGIN PASSWORD 'password';
+
+7. ALTER ROLE mysocialuser CREATEDB;
+
+exit out of psql (command + z)
+
+8. python manage.py makemigrations
+
+9. python manage.py migrate
+
+10. python manage.py createsuperuser
+
+To start the database:
+brew services start postgresql
+
+To stop the database:
+brew services stop postgresql
+
+You must run the postgres database as you're running the server!
+
 References:
 Amanda
 https://stackoverflow.com/questions/5255913/kwargs-in-django
