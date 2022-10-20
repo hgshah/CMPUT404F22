@@ -31,6 +31,10 @@ class Post(models.Model):
     description = models.CharField(max_length=500, blank=True)
     unlisted = models.BooleanField(default=False)
 
+    # comments
+    count = models.PositiveIntegerField(default = 0, blank = True)
+    # size = models.PositiveIntegerField(default = 0, blank = True)
+
     author = models.ForeignKey('authors.Author', on_delete = models.CASCADE)
 
     visibility = models.CharField(choices = Visibility.choices, default = Visibility.PUBLIC, max_length = 20)

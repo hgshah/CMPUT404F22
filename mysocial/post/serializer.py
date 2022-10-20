@@ -1,8 +1,12 @@
 from rest_framework import serializers
-from authors.models import Author
 from authors.serializers.author_serializer import AuthorSerializer 
 from .models import Post, ContentType, Visibility
+from comment.models import Comment
 import logging 
+
+import logging, json
+from urllib.request import urlopen
+
 logger = logging.getLogger("mylogger")
 
 class PostSerializer(serializers.ModelSerializer):
@@ -12,6 +16,8 @@ class PostSerializer(serializers.ModelSerializer):
     source = serializers.URLField()
     origin = serializers.URLField()
     #categories = serializers.ListField()
+    count = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
     published = serializers.DateTimeField()
     description = serializers.CharField()
     unlisted = serializers.BooleanField()
@@ -27,9 +33,15 @@ class PostSerializer(serializers.ModelSerializer):
         author_id = AuthorSerializer(obj.author).data["id"]
         return f"{author_id}/posts/{obj.official_id}"
 
+    def get_comments(self, obj):
+        return f"{self.get_id(obj)}/comments"
+    
+    def get_count(self, obj):
+        return Comment.objects.filter(post=obj).count()
+
     class Meta:
         model = Post
-        fields = ('type', 'title', 'id', 'source', 'origin', 'description','contentType', 'author', 'published', 'visibility', 'unlisted')
+        fields = ('type', 'title', 'id', 'source', 'origin','count', 'comments', 'description','contentType', 'author', 'published', 'visibility', 'unlisted')
 
 class CreatePostSerializer(serializers.ModelSerializer,):
     def create(self, validated_data):

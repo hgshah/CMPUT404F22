@@ -1,4 +1,3 @@
-from venv import create
 from django.http.response import HttpResponse, HttpResponseNotFound
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
@@ -8,7 +7,8 @@ from django.core.paginator import Paginator
 from authors.models import Author
 from .models import Post, Visibility
 from rest_framework import status
-import logging
+import logging, json
+from urllib.request import urlopen
 from common import PaginationHelper
 
 logger = logging.getLogger("mylogger")
@@ -31,7 +31,6 @@ class PostView(GenericAPIView):
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
         try:
             post = Post.objects.get(official_id=kwargs['post_id'])
-
             serializer = PostSerializer(post)
             return Response(serializer.data)
         except Exception as e:
@@ -61,6 +60,7 @@ class PostView(GenericAPIView):
             serializer = CreatePostSerializer(instance = self.get_object(), data=request.data, partial = True)
             if serializer.is_valid():
                 post = serializer.save()
+
                 return Response(PostSerializer(post).data, status = status.HTTP_200_OK)
             
         except Exception as e:
@@ -111,6 +111,8 @@ class PublicPostView(GenericAPIView):
         except Exception as e:
             logger.info(e)
             return HttpResponseNotFound()
+
+# /authors/{AUTHOR_ID}/posts/
 class CreationPostView(GenericAPIView):
     def get_serializer_class(self):
         if self.request.method == 'POST' or self.request.method == 'PUT':

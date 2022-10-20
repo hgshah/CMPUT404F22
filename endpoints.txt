@@ -47,3 +47,13 @@ PUT /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     "contentType": text/plain,
     "unlisted": false
 }
+
+TO GET A POST'S COMMENTS:
+GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}/comments
+
+TO CREATE A COMMENT ON A POST:
+POST /authors/{AUTHOR_UUID}/posts/{POST_UUID}/comments
+{
+    "comment": "test",
+    "contentType": text/plain
+}
