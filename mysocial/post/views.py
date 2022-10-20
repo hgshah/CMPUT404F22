@@ -4,10 +4,11 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from .serializer import PostSerializer, CreatePostSerializer
+from django.core.paginator import Paginator
 from authors.models import Author
 from .models import Post, Visibility
 from rest_framework import status
-import logging, uuid
+import logging
 
 logger = logging.getLogger("mylogger")
 
@@ -54,6 +55,8 @@ class PostView(GenericAPIView):
     # update the post whose id is post_id
     def post(self, request: Request, *args, **kwargs) -> HttpResponse:
         try:
+            if self.authorize_user(kwargs['author_id']) == False:
+                return HttpResponse(status=status.HTTP_403_FORBIDDEN)
             serializer = CreatePostSerializer(instance = self.get_object(), data=request.data, partial = True)
             if serializer.is_valid():
                 post = serializer.save()
@@ -65,9 +68,6 @@ class PostView(GenericAPIView):
 
     # update or create post whose id is post_id
     def put(self, request: Request, *args, **kwargs) -> HttpResponse:
-        if self.authorize_user(kwargs['author_id']) == False:
-            return HttpResponse(status=status.HTTP_403_FORBIDDEN)
-
         instance = self.get_object_or_none()
         if instance == None:
             return self.create_post(request, **kwargs)
@@ -112,7 +112,7 @@ class PublicPostView(GenericAPIView):
             return HttpResponseNotFound()
 class CreationPostView(GenericAPIView):
     serializer_class = CreatePostSerializer
-
+    
     def post(self, request, *args, **kwargs):
         logger.info("PLEASE")
         try:
@@ -125,3 +125,4 @@ class CreationPostView(GenericAPIView):
         except Exception as e:
             logger.info(e)
             return HttpResponseNotFound()
+
