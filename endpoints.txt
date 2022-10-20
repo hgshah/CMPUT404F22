@@ -1,0 +1,11 @@
+TO CREATE A POST:
+POST /authors/{AUTHOR_UUID}/posts/
+{
+    "title": "test",
+    "description": "test",
+    "visibility": friend,
+    "source": "sourceurl",
+    "origin": "originURL",
+    "contentType": text/plain,
+    "unlisted": false
+}
