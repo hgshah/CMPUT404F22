@@ -7,7 +7,8 @@ from .serializer import PostSerializer, CreatePostSerializer
 from authors.models import Author
 from .models import Post, Visibility
 from rest_framework import status
-import logging, uuid
+import logging
+from common import PaginationHelper
 
 logger = logging.getLogger("mylogger")
 
@@ -111,12 +112,29 @@ class PublicPostView(GenericAPIView):
             logger.info(e)
             return HttpResponseNotFound()
 class CreationPostView(GenericAPIView):
-    serializer_class = CreatePostSerializer
+    def get_serializer_class(self):
+        if self.request.method == 'POST' or self.request.method == 'PUT':
+            return CreatePostSerializer
+        else:
+            return PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.all()
+    
+    def get(self, request, *args, **kwargs):
+        posts = Post.objects.all().order_by('-published')
+        serializer = PostSerializer(posts, many = True)
+        data = serializer.data
+        data, err = PaginationHelper.paginate_serialized_data(request, data)
+
+        if err is not None:
+            return HttpResponseNotFound()
+        else:
+            return Response({'type': 'posts', 'items': data})
 
     def post(self, request, *args, **kwargs):
-        logger.info("PLEASE")
         try:
-            serializer = self.serializer_class(data=request.data)
+            serializer = CreatePostSerializer(data=request.data)
             if serializer.is_valid():
                 data = serializer.data
                 data['author'] = Author.objects.get(official_id = kwargs['author_id'])
@@ -125,3 +143,5 @@ class CreationPostView(GenericAPIView):
         except Exception as e:
             logger.info(e)
             return HttpResponseNotFound()
+    
+
