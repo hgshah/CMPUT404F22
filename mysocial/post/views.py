@@ -1,3 +1,4 @@
+from venv import create
 from django.http.response import HttpResponse, HttpResponseNotFound
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
@@ -12,7 +13,7 @@ logger = logging.getLogger("mylogger")
 
 class PostView(GenericAPIView):
     def get_serializer_class(self):
-        if self.request.method == 'POST':
+        if self.request.method == 'POST' or self.request.method == 'PUT':
             return CreatePostSerializer
         else:
             return PostSerializer
@@ -64,19 +65,34 @@ class PostView(GenericAPIView):
 
     # update or create post whose id is post_id
     def put(self, request: Request, *args, **kwargs) -> HttpResponse:
-        try:
-            Post.objects.get(kwargs['post_id'])
-            self.post(request, args, kwargs)
-        except Exception as e:
-            logger.info(e)
-            PublicPostView.post(request, args, kwargs)
+        if self.authorize_user(kwargs['author_id']) == False:
+            return HttpResponse(status=status.HTTP_403_FORBIDDEN)
+
+        instance = self.get_object_or_none()
+        if instance == None:
+            return self.create_post(request, **kwargs)
+        else:
+            return self.post(request, *args, **kwargs)
+
+    def create_post(self, request, **kwargs):
+        serializer = CreatePostSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.data
+            data['official_id'] = kwargs['post_id']
+            data['author'] = Author.objects.get(official_id = kwargs['author_id'])
+            post = serializer.create(validated_data=data)
+            return Response(PostSerializer(post).data, status = status.HTTP_200_OK)
+        else:
+            return HttpResponseNotFound()
 
     def authorize_user(self, post_author_id):
         return post_author_id == self.request.user.official_id
-    
 
-
-
+    def get_object_or_none(self):
+        try: 
+            return self.get_object()
+        except:
+            return None
 
 
 class PublicPostView(GenericAPIView):
@@ -98,13 +114,14 @@ class CreationPostView(GenericAPIView):
     serializer_class = CreatePostSerializer
 
     def post(self, request, *args, **kwargs):
+        logger.info("PLEASE")
         try:
             serializer = self.serializer_class(data=request.data)
             if serializer.is_valid():
                 data = serializer.data
                 data['author'] = Author.objects.get(official_id = kwargs['author_id'])
                 post = serializer.create(validated_data=data)
-            return Response(PostSerializer(post).data, status = status.HTTP_200_OK)
+                return Response(PostSerializer(post).data, status = status.HTTP_200_OK)
         except Exception as e:
             logger.info(e)
             return HttpResponseNotFound()
