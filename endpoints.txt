@@ -1,3 +1,4 @@
+---------------------------- POSTS ---------------------
 TO CREATE A POST:
 POST /authors/{AUTHOR_UUID}/posts/
 {
@@ -9,6 +10,9 @@ POST /authors/{AUTHOR_UUID}/posts/
     "contentType": text/plain,
     "unlisted": false
 }
+
+TO GET POSTS BY AN AUTHOR:
+GET /authors/{AUTHOR_UUID}/posts?page={INT}&size={INT}
 
 TO GET ALL PUBLIC POSTS:
 GET /posts/public
