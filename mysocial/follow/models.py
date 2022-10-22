@@ -13,10 +13,8 @@ class Follow(models.Model):
 
     @staticmethod
     def get_serializer_field_name():
-        return "follow"
+        return "Follow"
 
     def __str__(self):
         status = "wants to follow" if self.is_pending else "follows"
         return f"{self.actor} {status} {self.target}"
-
-

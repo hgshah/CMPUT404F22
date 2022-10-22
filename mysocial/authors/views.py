@@ -1,11 +1,15 @@
-from django.http.response import HttpResponse, HttpResponseNotFound, HttpResponseBadRequest
+import logging
+
+from django.http.response import HttpResponse, HttpResponseNotFound
 from rest_framework.generics import GenericAPIView
-from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.response import Response
 
 from authors.models import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from common import PaginationHelper
+
+logger = logging.getLogger(__name__)
 
 
 class AuthorView(GenericAPIView):
@@ -27,7 +31,7 @@ class AuthorView(GenericAPIView):
         data, err = PaginationHelper.paginate_serialized_data(request, data)
 
         if err is not None:
-            print("AuthorView: _get_all_authors:", err)
+            logger.info("AuthorView: _get_all_authors:", err)
             return HttpResponseNotFound()
 
         return Response({

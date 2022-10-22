@@ -1,17 +1,17 @@
 from rest_framework import serializers
 
 from authors.serializers.author_serializer import AuthorSerializer
-from friendships.models import Follow
+from follow.models import Follow
 
 
-class FollowSerializer(serializers.ModelSerializer):
+class FollowRequestSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField('get_type')
     summary = serializers.SerializerMethodField('get_summary')
-    target = AuthorSerializer(read_only=True)
+    target = AuthorSerializer(source='', read_only=True)
     actor = AuthorSerializer(read_only=True)
 
     def get_type(self, model):
-        return model.get_serializer_field_name()
+        return "Follow"
 
     def get_summary(self, model):
         return str(model)
