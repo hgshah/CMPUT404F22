@@ -10,7 +10,7 @@ from common import PaginationHelper
 
 class AuthorView(GenericAPIView):
     def get_queryset(self):
-        return Author.objects.all()
+        return None
 
     @staticmethod
     def _get_all_authors(request: Request) -> HttpResponse:
