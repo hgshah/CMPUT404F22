@@ -9,14 +9,14 @@ from rest_framework.response import Response
 from authors.models import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from common import PaginationHelper
+from follow.follow_util import FollowUtil
 from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestSerializer
 
 logger = logging.getLogger(__name__)
 
 
-# todo(turnip): destroy
-# todo(turnip): following <- can be reused by the author endpoint
+# todo(turnip): Refactor when tests are available
 
 class OutgoingRequestView(GenericAPIView):
     def get_queryset(self):
@@ -137,8 +137,7 @@ class FollowersView(GenericAPIView):
         except Author.DoesNotExist:
             return HttpResponseNotFound()
         # reference: https://stackoverflow.com/a/9727050/17836168
-        follow_ids = Follow.objects.values_list('actor', flat=True).filter(target=user, has_accepted=True)
-        followers = Author.objects.filter(official_id__in=follow_ids)
+        followers = FollowUtil.get_followers(user)
         serializers = AuthorSerializer(followers, many=True)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
         if err is not None:
@@ -175,3 +174,29 @@ class FollowersView(GenericAPIView):
             logger.error(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
         return Response(data=data, status=201)
+
+
+class RealFriendsView(GenericAPIView):
+    def get_queryset(self):
+        return None
+
+    def get_serializer_class(self):
+        return FollowRequestSerializer
+
+    @staticmethod
+    def get(request: Request, author_id: str = None) -> HttpResponse:
+        """Get friends for an Author"""
+        user = None
+        try:
+            user = Author.objects.get(official_id=author_id)
+        except Author.DoesNotExist:
+            return HttpResponseNotFound()
+        friends = FollowUtil.get_real_friends(actor=user)
+        serializers = AuthorSerializer(friends, many=True)
+        data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
+        if err is not None:
+            return HttpResponseNotFound()
+        return Response(data={
+            'type': 'realFriends',
+            'items': data,
+        })
