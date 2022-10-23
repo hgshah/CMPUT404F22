@@ -125,3 +125,10 @@ AUTHORS
 
 ### GET A SPECIFIC AUTHOR
 ```GET /authors/{AUTHOR_UUID}/```
+
+
+--------------------------
+FRIENDS
+==========================
+### GET ALL FRIENDS
+```GET /authors/{AUTHOR_UUID}/friends/```
