@@ -41,6 +41,5 @@ class Author(AbstractUser):
         return "author"
 
     def __str__(self):
-        return self.display_name if self.display_name else self.username
-
-
+        display_name = self.display_name if self.display_name else self.username
+        return f'{display_name} ({self.official_id})'

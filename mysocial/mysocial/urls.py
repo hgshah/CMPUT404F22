@@ -21,5 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('post.urls')),
     path('', include('comment.urls')),
-    path('follows/', include('follow.urls')),
+    path('', include('follow.urls')),
 ]

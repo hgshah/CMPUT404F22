@@ -7,8 +7,8 @@ from follow.models import Follow
 class FollowRequestSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField('get_type')
     summary = serializers.SerializerMethodField('get_summary')
-    target = AuthorSerializer(source='', read_only=True)
     actor = AuthorSerializer(read_only=True)
+    object = AuthorSerializer(source='target', read_only=True)
 
     def get_type(self, model):
         return "Follow"
@@ -19,4 +19,4 @@ class FollowRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         # todo(turnip): url, host, profile image
-        fields = ('type', 'summary', 'is_pending', 'target', 'actor')
+        fields = ('type', 'summary', 'is_pending', 'object', 'actor')
