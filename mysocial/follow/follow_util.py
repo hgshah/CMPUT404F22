@@ -1,5 +1,4 @@
 import logging
-from itertools import chain
 
 from authors.models import Author
 from follow.models import Follow
@@ -53,8 +52,8 @@ class FollowUtil:
         # then, intersect at A and B, those are real friends
         follower_ids = Follow.objects.values_list('actor', flat=True).filter(target=actor, has_accepted=True)
         following_ids = Follow.objects.values_list('target', flat=True).filter(actor=actor, has_accepted=True)
-        # reference: https://stackoverflow.com/a/48327252/17836168
-        friend_ids = list(chain(following_ids, follower_ids))
+        # reference: https://stackoverflow.com/a/6369558/17836168
+        friend_ids = set(follower_ids).intersection(following_ids)
         return Author.objects.filter(official_id__in=friend_ids)
 
     @staticmethod
