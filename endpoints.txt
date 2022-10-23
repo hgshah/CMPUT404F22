@@ -1,3 +1,4 @@
+---------------------------- POSTS ---------------------
 TO CREATE A POST:
 POST /authors/{AUTHOR_UUID}/posts/
 {
@@ -10,6 +11,9 @@ POST /authors/{AUTHOR_UUID}/posts/
     "unlisted": false
 }
 
+TO GET POSTS BY AN AUTHOR:
+GET /authors/{AUTHOR_UUID}/posts?page={INT}&size={INT}
+
 TO GET ALL PUBLIC POSTS:
 GET /posts/public
 
@@ -19,3 +23,27 @@ DELETE /authors/{AUTHOR_UUID}/posts/{POST_UUID}
 
 TO GET A SPECIFIC POST BY SPECIFIC AUTHOR:
 GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
+
+TO UPDATE A POST:
+POST /authors/{AUTHOR_UUID}/posts/{POST_UUID}
+{
+    "title": "test",
+    "description": "test",
+    "visibility": friend,
+    "source": "sourceurl",
+    "origin": "originURL",
+    "contentType": text/plain,
+    "unlisted": false
+}
+
+TO UPDATE OR CREATE A POST:
+PUT /authors/{AUTHOR_UUID}/posts/{POST_UUID}
+{
+    "title": "test",
+    "description": "test",
+    "visibility": friend,
+    "source": "sourceurl",
+    "origin": "originURL",
+    "contentType": text/plain,
+    "unlisted": false
+}
