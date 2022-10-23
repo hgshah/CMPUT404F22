@@ -22,7 +22,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def get_id(self, model: Author):
         # the path after host may vary, e.g. authors/ vs authors/id
-        return f"{model.host}/{Author.URL_PATH}/{model.official_id}"
+        return f"http://{model.host}/{Author.URL_PATH}/{model.official_id}"
 
     class Meta:
         model = Author
