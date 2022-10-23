@@ -9,3 +9,13 @@ POST /authors/{AUTHOR_UUID}/posts/
     "contentType": text/plain,
     "unlisted": false
 }
+
+TO GET ALL PUBLIC POSTS:
+GET /posts/public
+
+TO DELETE A POST:
+You must be logged in as the correct author to delete!
+DELETE /authors/{AUTHOR_UUID}/posts/{POST_UUID}
+
+TO GET A SPECIFIC POST BY SPECIFIC AUTHOR:
+GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
