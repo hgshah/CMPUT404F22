@@ -70,11 +70,11 @@ FOLLOWS
 ```GET /follows/incoming/```
 
 ### TO GET A SPECIFIC FOLLOW REQUEST
-```GET /follows/incoming/<FOLLOW_UUID>/```
+```GET /follows/<FOLLOW_UUID>/```
 
 ### TO ACCEPT A FOLLOW REQUEST
 ```
-PUT /follows/incoming/<FOLLOW_UUID>/
+PUT /follows/<FOLLOW_UUID>/
 {
     "has_accepted": true
 }
@@ -93,7 +93,7 @@ If `has_accepted` was false, the server sends back a 400 Bad Request Error.
 You have to use DELETE to delete a request.
 
 ### TO CANCEL OR DECLINE A SPECIFIC FOLLOW REQUEST
-```DELETE /follows/incoming/<FOLLOW_UUID>/```
+```DELETE /follows/<FOLLOW_UUID>/```
 
 Note that a user can only delete a request if they are either the actor or object.
 

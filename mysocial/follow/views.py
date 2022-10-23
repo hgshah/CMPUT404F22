@@ -48,7 +48,7 @@ class IncomingRequestView(GenericAPIView):
         return Response(data=data)
 
 
-class IncomingRequestIndividualView(GenericAPIView):
+class IndividualRequestView(GenericAPIView):
     def get_queryset(self):
         return None
 
@@ -60,8 +60,9 @@ class IncomingRequestIndividualView(GenericAPIView):
         """Get an individual follow request"""
         try:
             follow = Follow.objects.get(id=follow_id)
-            if follow.target != request.user:
-                # instead of forbidden, it's not found because there was no such request for user
+            if follow.target != request.user and follow.actor != request.user:
+                # Only the two accounts should be able to delete an account
+                # Returning not found due to security concerns
                 return HttpResponseNotFound()
             serializers = FollowRequestSerializer(follow)
             return Response(data=serializers.data)
@@ -80,14 +81,13 @@ class IncomingRequestIndividualView(GenericAPIView):
         """
         try:
             follow = Follow.objects.get(id=follow_id)
-            if follow.target != request.user:
-                # Other accounts cannot modify a follow on your behalf
-                # Do not say not forbidden cause that implies the existence of this request
-                # This is a security issue
+            if follow.target != request.user and follow.actor != request.user:
+                # Only the two accounts should be able to delete an account
+                # Returning not found due to security concerns
                 return HttpResponseNotFound()
             if Follow.FIELD_NAME_HAS_ACCEPTED not in request.data \
                     and request.data[Follow.FIELD_NAME_HAS_ACCEPTED]:
-                # You cannot make a follow back into has_accepted = True, you have to delete it.
+                # You cannot make a follow back into has_accepted = False, you have to delete it.
                 return HttpResponseBadRequest()
 
             follow.has_accepted = True
