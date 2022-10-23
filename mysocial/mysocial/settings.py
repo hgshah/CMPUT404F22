@@ -96,15 +96,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mysocial.wsgi.application'
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': 'mysocialdb',
+        'USER': 'mysocialuser',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '5432',                         
+   }
 }
 
 # Our custom user
