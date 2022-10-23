@@ -1,7 +1,7 @@
 import logging
 
 from django.db import IntegrityError
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -82,7 +82,9 @@ class IncomingRequestIndividualView(GenericAPIView):
             follow = Follow.objects.get(id=follow_id)
             if follow.target != request.user:
                 # Other accounts cannot modify a follow on your behalf
-                return HttpResponseForbidden()
+                # Do not say not forbidden cause that implies the existence of this request
+                # This is a security issue
+                return HttpResponseNotFound()
             if Follow.FIELD_NAME_HAS_ACCEPTED not in request.data \
                     and request.data[Follow.FIELD_NAME_HAS_ACCEPTED]:
                 # You cannot make a follow back into has_accepted = True, you have to delete it.
@@ -92,6 +94,26 @@ class IncomingRequestIndividualView(GenericAPIView):
             follow.save()
             serializers = FollowRequestSerializer(follow)
             return Response(data=serializers.data)
+        except Follow.DoesNotExist:
+            return HttpResponseNotFound()
+        except Exception as e:
+            logger.error(f'IncomingRequestPutView: put: unknown error: {e}')
+            return HttpResponseBadRequest()
+
+    @staticmethod
+    def delete(request: Request, follow_id: str = None) -> HttpResponse:
+        """
+        Delete, decline, or cancel a follow request
+        """
+        try:
+            follow = Follow.objects.get(id=follow_id)
+            if follow.target != request.user and follow.actor != request.user:
+                # Only the two accounts should be able to delete an account
+                # Returning not found due to security concerns
+                return HttpResponseNotFound()
+
+            follow.delete()
+            return Response(status=204)
         except Follow.DoesNotExist:
             return HttpResponseNotFound()
         except Exception as e:
@@ -152,4 +174,4 @@ class FollowersView(GenericAPIView):
         except Exception as e:
             logger.error(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data)
+        return Response(data=data, status=201)

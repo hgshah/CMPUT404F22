@@ -92,6 +92,11 @@ Note that this request assumes that the data is:
 If `has_accepted` was false, the server sends back a 400 Bad Request Error.
 You have to use DELETE to delete a request.
 
+### TO CANCEL OR DECLINE A SPECIFIC FOLLOW REQUEST
+```DELETE /follows/incoming/<FOLLOW_UUID>/```
+
+Note that a user can only delete a request if they are either the actor or object.
+
 ### TO GET ALL FOLLOWERS
 GET /authors/{AUTHOR_UUID}/followers
 
