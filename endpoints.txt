@@ -57,3 +57,61 @@ POST /authors/{AUTHOR_UUID}/posts/{POST_UUID}/comments
     "comment": "test",
     "contentType": text/plain
 }
+
+
+--------------------------
+FOLLOWS
+===========================
+
+### TO GET ALL OUTGOING FOLLOW REQUESTS
+```GET /follows/outgoing/```
+
+### TO GET ALL INCOMING FOLLOW REQUESTS
+```GET /follows/incoming/```
+
+### TO GET A SPECIFIC FOLLOW REQUEST
+```GET /follows/incoming/<FOLLOW_UUID>/```
+
+### TO ACCEPT A FOLLOW REQUEST
+```
+PUT /follows/incoming/<FOLLOW_UUID>/
+{
+    "has_accepted": true
+}
+```
+
+Note that this request assumes that the data is:
+```
+{
+    "actor": {FOLLOW.ACTOR},
+    "object": {CURRENT_USER}
+    "has_accepted": true
+}
+```
+
+If `has_accepted` was false, the server sends back a 400 Bad Request Error.
+You have to use DELETE to delete a request.
+
+### TO GET ALL FOLLOWERS
+GET /authors/{AUTHOR_UUID}/followers
+
+### TO CREATE A FOLLOW REQUEST
+```POST /authors/{AUTHOR_UUID}/followers/```
+
+Note that this request assumes that the data is:
+```
+{
+    "actor": {CURRENT_USER},
+    "object": {AUTHOR_UUID}
+    "has_accepted": false
+}
+```
+
+--------------------------
+AUTHORS
+==========================
+### GET ALL AUTHORS
+```GET /authors/```
+
+### GET A SPECIFIC AUTHOR
+```GET /authors/{AUTHOR_UUID}/```

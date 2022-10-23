@@ -18,5 +18,4 @@ class FollowRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
-        # todo(turnip): url, host, profile image
         fields = ('type', 'summary', 'has_accepted', 'object', 'actor')

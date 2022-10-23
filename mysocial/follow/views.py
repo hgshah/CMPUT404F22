@@ -15,9 +15,7 @@ from follow.serializers.follow_serializer import FollowRequestSerializer
 logger = logging.getLogger(__name__)
 
 
-# todo(turnip): create
 # todo(turnip): destroy
-# todo(turnip): followers <- can be reused by the author endpoint
 # todo(turnip): following <- can be reused by the author endpoint
 
 class OutgoingRequestView(GenericAPIView):
@@ -26,6 +24,7 @@ class OutgoingRequestView(GenericAPIView):
 
     @staticmethod
     def get(request: Request) -> HttpResponse:
+        """Get all outgoing follow requests that were not accepted yet"""
         relationships = Follow.objects.filter(actor=request.user, has_accepted=False)
         serializers = FollowRequestSerializer(relationships, many=True)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
@@ -40,6 +39,7 @@ class IncomingRequestView(GenericAPIView):
 
     @staticmethod
     def get(request: Request) -> HttpResponse:
+        """Get all incoming follow requests"""
         relationships = Follow.objects.filter(target=request.user, has_accepted=False)
         serializers = FollowRequestSerializer(relationships, many=True)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
@@ -48,7 +48,7 @@ class IncomingRequestView(GenericAPIView):
         return Response(data=data)
 
 
-class IncomingRequestPutView(GenericAPIView):
+class IncomingRequestIndividualView(GenericAPIView):
     def get_queryset(self):
         return None
 
@@ -57,6 +57,7 @@ class IncomingRequestPutView(GenericAPIView):
 
     @staticmethod
     def get(request: Request, follow_id: str = None) -> HttpResponse:
+        """Get an individual follow request"""
         try:
             follow = Follow.objects.get(id=follow_id)
             if follow.target != request.user:
@@ -73,8 +74,9 @@ class IncomingRequestPutView(GenericAPIView):
     @staticmethod
     def put(request: Request, follow_id: str = None) -> HttpResponse:
         """
+        Accept a follow request
         Only the target or object can accept the actor's request.
-        This is only one way. You cannot make a follow back into has_accepted = True, you have to delete it.
+        This is only one way. You cannot make a follow back into has_accepted = False, you have to delete it.
         """
         try:
             follow = Follow.objects.get(id=follow_id)
@@ -106,7 +108,7 @@ class FollowersView(GenericAPIView):
 
     @staticmethod
     def get(request: Request, author_id: str = None) -> HttpResponse:
-        """Get followers for author_id"""
+        """Get followers for an Author"""
         user = None
         try:
             user = Author.objects.get(official_id=author_id)
@@ -127,7 +129,7 @@ class FollowersView(GenericAPIView):
     @staticmethod
     def post(request: Request, author_id: str = None) -> HttpResponse:
         """
-        Action: actor follows target
+        Create a follow request for the author
         Only the current authenticated user can send request for itself
         - In other words, you can't follow request on behalf of another user
         """
@@ -146,7 +148,7 @@ class FollowersView(GenericAPIView):
         except Author.DoesNotExist:
             return HttpResponseNotFound()
         except IntegrityError:
-            return HttpResponseBadRequest('You\'re already following this account')
+            return HttpResponseBadRequest('You\'re either following this account or have already made a follow request')
         except Exception as e:
             logger.error(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
