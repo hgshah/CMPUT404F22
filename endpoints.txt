@@ -97,6 +97,11 @@ You have to use DELETE to delete a request.
 
 Note that a user can only delete a request if they are either the actor or object.
 
+### TO UNFOLLOW OR REMOVE SOMEONE FOLLOWING YOU
+```DELETE /follows/<FOLLOW_UUID>/```
+
+Note that a user can only delete a request if they are either the actor or object.
+
 ### TO GET ALL FOLLOWERS
 GET /authors/{AUTHOR_UUID}/followers
 
