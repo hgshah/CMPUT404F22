@@ -145,6 +145,7 @@ User B wants to follow User A.
 Note: You don't need a JSON body for this one, but this creates this object in the database:
 ```
 {
+    "type", "Follow"
     "id": {FOLLOW_ID}, # generated
     "actor": {USER_B}, # assumed User B
     "object": {USER_A}
@@ -163,7 +164,8 @@ Note 1: This endpoint assumes that these are follow requests only for the logged
     "type": "followRequests",
     [
         {
-            "id": {FOLLOW_ID}
+            "type", "Follow",
+            "id": {FOLLOW_ID},
             "actor": {USER_B},
             "object": {USER_A}
             "has_accepted": false
