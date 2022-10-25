@@ -20,5 +20,4 @@ urlpatterns = [
     path('authors/', include('authors.urls')),
     path('admin/', admin.site.urls),
     path('', include('post.urls')),
-    path('likes/', include('likes.urls')),
 ]
