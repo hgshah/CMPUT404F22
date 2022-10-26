@@ -145,11 +145,13 @@ class FollowersView(GenericAPIView):
         # reference: https://stackoverflow.com/a/9727050/17836168
         followers = FollowUtil.get_followers(user)
         serializers = AuthorSerializer(followers, many=True)
+        target_serializer = AuthorSerializer(user)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
         if err is not None:
             return HttpResponseNotFound()
         return Response(data={
             'type': 'followers',
+            'object': target_serializer.data,
             'items': data,
         })
 

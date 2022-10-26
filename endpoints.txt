@@ -214,3 +214,8 @@ This returns:
 4.B. The follow request is now gone for User B if you look at the follow request endpoint
 ```GET /follows/outgoing/```
 Note: not really in the user story
+
+/authors/{USER_A_ID}/followers/
+/follows/incoming/
+/follows/<FOLLOW_UUID>/
+/authors/{USER_A_ID}/followers/
