@@ -25,6 +25,9 @@ class OutgoingRequestView(GenericAPIView):
     @staticmethod
     def get(request: Request) -> HttpResponse:
         """Get all outgoing follow requests that were not accepted yet"""
+        if not request.user.is_authenticated():
+            return HttpResponseNotFound()
+
         relationships = Follow.objects.filter(actor=request.user, has_accepted=False)
         serializers = FollowRequestSerializer(relationships, many=True)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
@@ -43,6 +46,9 @@ class IncomingRequestView(GenericAPIView):
     @staticmethod
     def get(request: Request) -> HttpResponse:
         """Get all incoming follow requests"""
+        if not request.user.is_authenticated:
+            return HttpResponseNotFound()
+
         relationships = Follow.objects.filter(target=request.user, has_accepted=False)
         serializers = FollowRequestSerializer(relationships, many=True)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
@@ -64,6 +70,9 @@ class IndividualRequestView(GenericAPIView):
     @staticmethod
     def get(request: Request, follow_id: str = None) -> HttpResponse:
         """Get an individual follow request"""
+        if not request.user.is_authenticated:
+            return HttpResponseNotFound()
+
         try:
             follow = Follow.objects.get(id=follow_id)
             if follow.target != request.user and follow.actor != request.user:
@@ -85,6 +94,9 @@ class IndividualRequestView(GenericAPIView):
         Only the target or object can accept the actor's request.
         This is only one way. You cannot make a follow back into has_accepted = False, you have to delete it.
         """
+        if not request.user.is_authenticated:
+            return HttpResponseNotFound()
+
         try:
             follow = Follow.objects.get(id=follow_id)
             if follow.target != request.user:
@@ -111,6 +123,9 @@ class IndividualRequestView(GenericAPIView):
         """
         Delete, decline, or cancel a follow request
         """
+        if not request.user.is_authenticated:
+            return HttpResponseNotFound()
+
         try:
             follow = Follow.objects.get(id=follow_id)
             if follow.target != request.user and follow.actor != request.user:
@@ -162,6 +177,9 @@ class FollowersView(GenericAPIView):
         Only the current authenticated user can send request for itself
         - In other words, you can't follow request on behalf of another user
         """
+        if not request.user.is_authenticated:
+            return HttpResponseNotFound()
+
         actor = request.user
         target = None
         data = None
