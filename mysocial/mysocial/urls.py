@@ -20,4 +20,6 @@ urlpatterns = [
     path('authors/', include('authors.urls')),
     path('admin/', admin.site.urls),
     path('', include('post.urls')),
+    path('', include('comment.urls')),
+    path('', include('follow.urls')),
 ]
