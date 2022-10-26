@@ -9,7 +9,7 @@ from rest_framework import status
 from .models import Like
 from authors.models import Author
 from post.models import Post
-#need to import comments for likes
+from comment.models import Comment
 
 # serializing
 from rest_framework import serializers
@@ -116,13 +116,14 @@ class PostLikesView(GenericAPIView):
             print(e)
             return HttpResponseNotFound
 
-#TODO need comments
 class CommentLikesView(GenericAPIView):
     def get(self, request: Request, *args, **kwargs):
         try:
-
-            return Response()
+            comment = Comment.objects.get(official_id=kwargs['comment_id'])
+            comment_likes = Like.objects.filter(object=request.get_full_path()[:-5])
+            ser = LikesSerializer(comment_likes, True)
+            return Response(ser.data)
 
         except Exception as e:
             print(e)
-            return HttpResponseForbidden
+            return HttpResponseNotFound
