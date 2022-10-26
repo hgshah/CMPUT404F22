@@ -1,7 +1,7 @@
 import logging
 
 from django.db import IntegrityError
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -9,14 +9,14 @@ from rest_framework.response import Response
 from authors.models import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from common import PaginationHelper
+from follow.follow_util import FollowUtil
 from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestSerializer
 
 logger = logging.getLogger(__name__)
 
 
-# todo(turnip): destroy
-# todo(turnip): following <- can be reused by the author endpoint
+# todo(turnip): Refactor when tests are available
 
 class OutgoingRequestView(GenericAPIView):
     def get_queryset(self):
@@ -30,7 +30,10 @@ class OutgoingRequestView(GenericAPIView):
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
         if err is not None:
             return HttpResponseNotFound()
-        return Response(data=data)
+        return Response(data={
+            'type': 'followRequests',
+            'items': data,
+        })
 
 
 class IncomingRequestView(GenericAPIView):
@@ -45,10 +48,13 @@ class IncomingRequestView(GenericAPIView):
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
         if err is not None:
             return HttpResponseNotFound()
-        return Response(data=data)
+        return Response(data={
+            'type': 'followRequests',
+            'items': data,
+        })
 
 
-class IncomingRequestIndividualView(GenericAPIView):
+class IndividualRequestView(GenericAPIView):
     def get_queryset(self):
         return None
 
@@ -60,8 +66,9 @@ class IncomingRequestIndividualView(GenericAPIView):
         """Get an individual follow request"""
         try:
             follow = Follow.objects.get(id=follow_id)
-            if follow.target != request.user:
-                # instead of forbidden, it's not found because there was no such request for user
+            if follow.target != request.user and follow.actor != request.user:
+                # Only the two accounts should be able to delete an account
+                # Returning not found due to security concerns
                 return HttpResponseNotFound()
             serializers = FollowRequestSerializer(follow)
             return Response(data=serializers.data)
@@ -81,17 +88,38 @@ class IncomingRequestIndividualView(GenericAPIView):
         try:
             follow = Follow.objects.get(id=follow_id)
             if follow.target != request.user:
-                # Other accounts cannot modify a follow on your behalf
-                return HttpResponseForbidden()
+                # Only the two accounts should be able to delete an account
+                # Returning not found due to security concerns
+                return HttpResponseNotFound()
             if Follow.FIELD_NAME_HAS_ACCEPTED not in request.data \
                     and request.data[Follow.FIELD_NAME_HAS_ACCEPTED]:
-                # You cannot make a follow back into has_accepted = True, you have to delete it.
+                # You cannot make a follow back into has_accepted = False, you have to delete it.
                 return HttpResponseBadRequest()
 
             follow.has_accepted = True
             follow.save()
             serializers = FollowRequestSerializer(follow)
             return Response(data=serializers.data)
+        except Follow.DoesNotExist:
+            return HttpResponseNotFound()
+        except Exception as e:
+            logger.error(f'IncomingRequestPutView: put: unknown error: {e}')
+            return HttpResponseBadRequest()
+
+    @staticmethod
+    def delete(request: Request, follow_id: str = None) -> HttpResponse:
+        """
+        Delete, decline, or cancel a follow request
+        """
+        try:
+            follow = Follow.objects.get(id=follow_id)
+            if follow.target != request.user and follow.actor != request.user:
+                # Only the two accounts should be able to delete an account
+                # Returning not found due to security concerns
+                return HttpResponseNotFound()
+
+            follow.delete()
+            return Response(status=204)
         except Follow.DoesNotExist:
             return HttpResponseNotFound()
         except Exception as e:
@@ -115,8 +143,7 @@ class FollowersView(GenericAPIView):
         except Author.DoesNotExist:
             return HttpResponseNotFound()
         # reference: https://stackoverflow.com/a/9727050/17836168
-        follow_ids = Follow.objects.values_list('actor', flat=True).filter(target=user, has_accepted=True)
-        followers = Author.objects.filter(official_id__in=follow_ids)
+        followers = FollowUtil.get_followers(user)
         serializers = AuthorSerializer(followers, many=True)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
         if err is not None:
@@ -152,4 +179,30 @@ class FollowersView(GenericAPIView):
         except Exception as e:
             logger.error(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data)
+        return Response(data=data, status=201)
+
+
+class RealFriendsView(GenericAPIView):
+    def get_queryset(self):
+        return None
+
+    def get_serializer_class(self):
+        return FollowRequestSerializer
+
+    @staticmethod
+    def get(request: Request, author_id: str = None) -> HttpResponse:
+        """Get friends for an Author"""
+        user = None
+        try:
+            user = Author.objects.get(official_id=author_id)
+        except Author.DoesNotExist:
+            return HttpResponseNotFound()
+        friends = FollowUtil.get_real_friends(actor=user)
+        serializers = AuthorSerializer(friends, many=True)
+        data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
+        if err is not None:
+            return HttpResponseNotFound()
+        return Response(data={
+            'type': 'realFriends',
+            'items': data,
+        })
