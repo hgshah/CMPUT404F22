@@ -18,4 +18,4 @@ class FollowRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
-        fields = ('type', 'summary', 'has_accepted', 'object', 'actor')
+        fields = ('type', 'id', 'summary', 'has_accepted', 'object', 'actor')

@@ -9,6 +9,7 @@ app_name = 'follows'
 urlpatterns = [
     path(f'{app_name}/incoming/', views.IncomingRequestView.as_view()),
     path(f'{app_name}/outgoing/', views.OutgoingRequestView.as_view()),
-    path(f'{app_name}/<int:follow_id>', views.IndividualRequestView.as_view()),
-    path(f'{authors_app_name}/<uuid:author_id>/followers', views.FollowersView.as_view()),
+    path(f'{app_name}/<int:follow_id>/', views.IndividualRequestView.as_view()),
+    path(f'{authors_app_name}/<uuid:author_id>/followers/', views.FollowersView.as_view()),
+    path(f'{authors_app_name}/<uuid:author_id>/real-friends/', views.RealFriendsView.as_view()),
 ]

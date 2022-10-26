@@ -63,6 +63,21 @@ POST /authors/{AUTHOR_UUID}/posts/{POST_UUID}/comments
 FOLLOWS
 ===========================
 
+### TO GET ALL FOLLOWERS
+GET /authors/{AUTHOR_UUID}/followers
+
+### TO CREATE A FOLLOW REQUEST
+```POST /authors/{AUTHOR_UUID}/followers/```
+
+Note that this request assumes that the data is:
+```
+{
+    "actor": {CURRENT_USER},
+    "object": {AUTHOR_UUID}
+    "has_accepted": false
+}
+```
+
 ### TO GET ALL OUTGOING FOLLOW REQUESTS
 ```GET /follows/outgoing/```
 
@@ -102,21 +117,6 @@ Note that a user can only delete a request if they are either the actor or objec
 
 Note that a user can only delete a request if they are either the actor or object.
 
-### TO GET ALL FOLLOWERS
-GET /authors/{AUTHOR_UUID}/followers
-
-### TO CREATE A FOLLOW REQUEST
-```POST /authors/{AUTHOR_UUID}/followers/```
-
-Note that this request assumes that the data is:
-```
-{
-    "actor": {CURRENT_USER},
-    "object": {AUTHOR_UUID}
-    "has_accepted": false
-}
-```
-
 --------------------------
 AUTHORS
 ==========================
@@ -125,3 +125,92 @@ AUTHORS
 
 ### GET A SPECIFIC AUTHOR
 ```GET /authors/{AUTHOR_UUID}/```
+
+
+--------------------------
+REAL FRIENDS
+==========================
+### GET ALL REAL FRIENDS
+```GET /authors/{AUTHOR_UUID}/real-friends/```
+
+----------------------------------------------------
+FRONTEND GUIDE ON HOW TO ACCEPT FRIEND REQUESTS
+====================================================
+
+User B wants to follow User A.
+
+1. Logged in User B will request to follow User A
+```POST /authors/{USER_A_ID}/followers/```
+
+Note: You don't need a JSON body for this one, but this creates this object in the database:
+```
+{
+    "type", "Follow"
+    "id": {FOLLOW_ID}, # generated
+    "actor": {USER_B}, # assumed User B
+    "object": {USER_A}
+    "has_accepted": false
+}
+```
+
+2. User A logs in and checks the pending follow request they have.
+```GET /follows/incoming/```
+
+The client receives a list of follow requests, and it's the frontend's job to display this list.
+The object it receive looks like this.
+Note 1: This endpoint assumes that these are follow requests only for the logged in user (User A).
+```json
+{
+    "type": "followRequests",
+    [
+        {
+            "type", "Follow",
+            "id": {FOLLOW_ID},
+            "actor": {USER_B},
+            "object": {USER_A}
+            "has_accepted": false
+        },
+        {...},
+        ...
+    ],
+}
+```
+
+
+3. User A can respond to User B's follow request.
+
+3.A. If User A wants to accept the follow request.
+```
+PUT /follows/<FOLLOW_UUID>/
+{
+    "has_accepted": true, # <- User A has to explicitly say, yeah, I accept this request
+}
+```
+
+Note: PUT only works one-way. It cannot make a follower unfollow or decline a request.
+You have to DELETE.
+
+3.B. If User A wants to decline the follow request.
+```DELETE /follows/<FOLLOW_UUID>/```
+
+4. User B now follows User A. To check:
+
+4.A. Everyone, includingUser A and User B, can now see that User B now appears under User A's followers
+```GET /authors/{USER_A_ID}/followers/```
+
+This returns:
+```json
+{
+    "type": "followers",
+    "items": [
+        {USER B}
+    ]
+}
+```
+
+4.B. The follow request is now gone for User A if you look at the follow request endpoint
+```GET /follows/incoming/```
+
+4.B. The follow request is now gone for User B if you look at the follow request endpoint
+```GET /follows/outgoing/```
+Note: not really in the user story
