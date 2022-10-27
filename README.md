@@ -1,23 +1,30 @@
-# CMPUT404F22
+# CMPUT_404_F22
 hgshah
 amanda6
 hsmalhi
 manuba
 junhong1
 
-Before you start:
-Start your virtual env!
+Before you start: Start your virtual env!
+```
+source venv/bin/activate
+
 pip install -r requirements.txt
+```
 
 Switching to PostgresDB (MACOS)
 https://daily-dev-tips.com/posts/installing-postgresql-on-a-mac-with-homebrew/
-Installing postgres
 
+Installing postgres:
+
+```
 1. brew update
 
 2. brew install postgresql
+```
 
 To start the database:
+```
 3. brew services start postgresql
 
 4. psql postgres
@@ -35,16 +42,20 @@ exit out of psql (command + z)
 9. python manage.py migrate
 
 10. python manage.py createsuperuser
+```
 
 To start the database:
-brew services start postgresql
+```brew services start postgresql```
 
 To stop the database:
-brew services stop postgresql
+```brew services stop postgresql```
 
 You must run the postgres database as you're running the server!
 
+<hr>
+
 References:
+
 Amanda
 https://stackoverflow.com/questions/5255913/kwargs-in-django
 https://stackoverflow.com/questions/3805958/how-to-delete-a-record-in-django-models
