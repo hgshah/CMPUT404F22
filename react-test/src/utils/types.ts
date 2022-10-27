@@ -7,3 +7,18 @@ export interface UserResponse {
     updated: Date;
     id: string;
 }
+
+export interface Author {
+    displayName: string;
+    github: string;
+    host: string;
+    id: string;
+    profileImage: string;
+    type: string;
+    url: string;
+}
+
+export interface AuthorList {
+    type: string;
+    items: Author[];
+}
