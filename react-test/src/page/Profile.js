@@ -1,7 +1,11 @@
 import React from 'react'
 import { useNavigate, useParams } from "react-router-dom";
+import {useSelector} from "react-redux";
+
 const Profile = () => {
   const navigate = useNavigate();
+  const account = useSelector((state) => state.auth.account);
+  console.log(account?.id);
 
   return (
     <div>
