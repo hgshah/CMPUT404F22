@@ -8,9 +8,6 @@ from authors.models import Author
 class TestAuthorView(TestCase):
     # todo(turnip): test get_authors, test_get, test_pagination
 
-    def setUp(self) -> None:
-        self.client = Client()
-
     def test_get_author_happy_path(self):
         input_data = {
             "username": "user1",
@@ -25,7 +22,7 @@ class TestAuthorView(TestCase):
             "github": "https://github.com/crouton/"
         }
         author = Author.objects.create_user(**input_data)
-        output_data['id'] = f"www.crouton.net/authors/{author.official_id}"
+        output_data['id'] = f"http://www.crouton.net/authors/{author.official_id}"
         response = self.client.get(
             f'/{Author.URL_PATH}/{author.official_id}/',
             content_type='application/json',
@@ -33,7 +30,7 @@ class TestAuthorView(TestCase):
 
         assert response.status_code == 200, f"Status code: {response.status_code}"
         for key, value in output_data.items():
-            assert value == response.data[key]
+            assert value == response.data[key], f'Failed asserting {value} == {response.data[key]}'
 
     def test_get_author_does_not_exist(self):
         response = self.client.get(
