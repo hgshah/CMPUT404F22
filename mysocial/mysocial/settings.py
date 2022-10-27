@@ -165,8 +165,16 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_HEADERS = default_headers + (
-    "Access-Control-Allow-Headers",
-    "Access-Control-Allow-Origin",
-    "Access-Control-Allow-Methods",
-)
+# later if the above causes issue
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    'http://localhost:*',
+    'http://127.0.0.1:*',
+]
+
+# from https://stackoverflow.com/a/72249293/17836168
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://192.168.0.50:3000',  # for network
+    'http://localhost:8080',  # for localhost (Developlemt)
+    'http://192.168.0.50:8080',  # for network (Development)
+]

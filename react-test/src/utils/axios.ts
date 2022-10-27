@@ -3,9 +3,14 @@ import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import store from '../store';
 import authSlice from '../store/slices/auth';
 
+// from
+const baseURL = process.env.NODE_ENV === "development"
+    ? "http://127.0.0.1:8000/"
+    : "http://example.com" // todo: change with heroku!
+
 const axiosService = axios.create({
     // baseURL: process.env.REACT_APP_API_URL,
-    baseURL: 'http://127.0.0.1:8000/', // todo: make this dynamic!!
+    baseURL: baseURL, // todo: make this dynamic!!
     headers: {
         'Content-Type': 'application/json',
     },
