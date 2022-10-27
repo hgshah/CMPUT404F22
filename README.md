@@ -65,3 +65,4 @@ https://stackoverflow.com/questions/70878647/login-to-django-admin-via-requests
 - https://stackoverflow.com/a/9727050/17836168
 - Tokens: https://simpleisbetterthancomplex.com/tutorial/2018/11/22/how-to-implement-token-authentication-using-django-rest-framework.html
 - Tokens: https://stackoverflow.com/q/66264736/17836168
+- Token: https://dev.to/koladev/django-rest-authentication-cmh

@@ -1,32 +1,25 @@
 // from https://dev.to/koladev/django-rest-authentication-cmh
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AccountResponse } from "../../types";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {TokenResponse} from "../../types";
+import {Author} from "../../utils/types";
 
 type State = {
     token: string | null;
-    refreshToken: string | null;
-    account: AccountResponse | null;
+    author: Author | null;
 };
 
-const initialState: State = { token: null, refreshToken: null, account: null };
+const initialState: State = { token: null, author: null };
 
 const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        setAuthTokens(
-            state: State,
-            action: PayloadAction<{ token: string; refreshToken: string }>
-        ) {
-            state.refreshToken = action.payload.refreshToken;
+        setTokens(state: State, action: PayloadAction<TokenResponse>) {
+            state.author = action.payload.author;
             state.token = action.payload.token;
         },
-        setAccount(state: State, action: PayloadAction<AccountResponse>) {
-            state.account = action.payload;
-        },
         setLogout(state: State) {
-            state.account = null;
-            state.refreshToken = null;
+            state.author = null;
             state.token = null;
         },
     },

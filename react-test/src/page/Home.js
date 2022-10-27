@@ -12,11 +12,14 @@ const Home = () => {
     const blog = { title, body, author };
   }
 
-  TestFetcher();
-
   return (
     <div>
-      
+      {
+        // pretending to be a function body lol
+        // uncomment to test calls to backend
+        // do not remove, this is for debugging
+        // TestFetcher()
+      }
       <h1> Home Page </h1>
       <form onSubmit={handleSubmit}>
         <label>Post Title:</label>
