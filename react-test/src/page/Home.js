@@ -1,6 +1,7 @@
 import React from 'react'
 import { useState } from "react";
 import "./Home.css";
+import {TestFetcher} from "./TestFetcher";
 
 const Home = () => {
   const [title, setTitle] = useState('');
@@ -10,6 +11,9 @@ const Home = () => {
     e.preventDefault();
     const blog = { title, body, author };
   }
+
+  TestFetcher();
+
   return (
     <div>
       

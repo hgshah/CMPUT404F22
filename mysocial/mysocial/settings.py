@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'post.apps.PostConfig',
     'comment.apps.CommentConfig',
     'follow.apps.FollowsConfig',
+    'tokens.apps.TokensConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 ]
 
 LOGGING = {
@@ -162,19 +164,39 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # todo(turnip): would we even try to be secure lol
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 # later if the above causes issue
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    'http://localhost:*',
-    'http://127.0.0.1:*',
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://192.168.0.50:3000',  # for network
+    'http://localhost:8000',  # for localhost (Development)
+    'http://192.168.0.50:8000',  # for network (Development)
 ]
 
 # from https://stackoverflow.com/a/72249293/17836168
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',  # for localhost (REACT Default)
     'http://192.168.0.50:3000',  # for network
-    'http://localhost:8080',  # for localhost (Developlemt)
-    'http://192.168.0.50:8080',  # for network (Development)
+    'http://localhost:8000',  # for localhost (Development)
+    'http://192.168.0.50:8000',  # for network (Development)
+]
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'set-cookie',
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
+
+CORS_EXPOSE_HEADERS = [
+    'set-cookie',
+    'cookie',
 ]
