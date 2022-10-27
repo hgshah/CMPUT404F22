@@ -1,0 +1,99 @@
+.nav {
+  width: 100%;
+  margin: 0 auto;
+  background-color: #03071e;
+}
+.nav__container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  column-gap: 27px;
+  color: white;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav__container li {
+  padding: 27px 0;
+}
+.nav__container a{
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+}
+.nav__container a.active{
+  color: #ffe500;
+}
+.sub__menus {
+  position: absolute;
+  display: none; 
+  background: white;
+  border: 1px solid lavender;
+  width: 227px;
+  left: 0;
+  padding: 17px 17px 17px 17px;
+  z-index: 1000;
+  box-shadow: 0 10px 12px rgb(22 33 39 / 25%);
+  list-style: none;
+  margin-top: 10px;
+}
+.nav__container .sub__menus li a.active {
+	color: #ab9901;
+}
+.sub__menus li {
+	padding: 10px 0;
+	text-align: left;
+}
+.sub__menus li a{
+	color: black;
+}
+.sub__menus__arrows{
+  position: relative;
+}
+.sub__menus__arrows svg{
+  vertical-align: middle;
+}
+@media (min-width:992px) { 
+  .sub__menus__arrows:hover .sub__menus{
+    display: block;
+  }
+}
+@media(max-width:991px){
+	.nav__container {display: none}
+	.menubar__button:hover {background-color: #ffe500;}
+	.menubar__button {
+		display: inline-block!important;
+		background-color: #ffe500;
+		color: #000;
+		padding: 6px 7px;
+		border-radius: 5px;
+    margin: 10px auto;
+		cursor: pointer;
+		position: relative;
+		z-index: 10037;
+	}
+	.nav__container li {padding: 0px 0;}
+	.menubar__button svg{font-size: 27px;}
+	.responsive__nav__show {
+		display: block!important;
+		position: absolute;
+		left: 0;
+		z-index: 10007;
+		background-color: #000000;
+		border-bottom: 3px solid #ffe500;
+		right: 0;
+		padding-bottom: 17px;
+		padding-top: 27px;
+	}
+	.nav__container a {
+		font-size: 22px;
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		justify-content: center;
+		flex-direction: row;
+		margin-bottom: 17px;
+	}
+	.main-nav .sub__menus__arrows:hover .sub__menus {margin: 0 auto;left: 0;right: 0;}
+	.sub__menus__Active{display: block!important;margin: 0 auto;left: 0;right: 0;}
+}
