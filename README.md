@@ -44,8 +44,8 @@ brew services stop postgresql
 
 You must run the postgres database as you're running the server!
 
-References:
-Amanda
+## References:
+### Amanda
 https://stackoverflow.com/questions/5255913/kwargs-in-django
 https://stackoverflow.com/questions/3805958/how-to-delete-a-record-in-django-models
 https://stackoverflow.com/questions/12615154/how-to-get-the-currently-logged-in-users-user-id-in-django --> will probably use to authenticate
@@ -57,3 +57,9 @@ https://stackoverflow.com/questions/62381855/how-to-update-model-objects-only-on
 https://stackoverflow.com/questions/35024781/create-or-update-with-put-in-django-rest-framework
 https://stackoverflow.com/questions/1496346/passing-a-list-of-kwargs
 https://stackoverflow.com/questions/70878647/login-to-django-admin-via-requests
+
+### Allan
+- Django-React auth: https://dev.to/koladev/django-rest-authentication-cmh
+- useEffectOnce: https://usehooks-ts.com/react-hook/use-effect-once
+- https://stackoverflow.com/a/6369558/17836168
+- https://stackoverflow.com/a/9727050/17836168
