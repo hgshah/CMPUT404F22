@@ -30,7 +30,7 @@ function Postbox() {
             
             <div className="postbox_input">
                 <Avatar sr  c = {profilepic} />
-
+                
                 <input onChange={e => setValue(e.target.value)} value={value} placeholder='Enter post title' type = "text"/>
                 <input onChange={e => setPostMessage(e.target.value)} value={postMessage} placeholder='Enter post body' type = "text"/>
                 <label for="set-visibility"></label>
@@ -42,7 +42,7 @@ function Postbox() {
                     <option value="Public">Public</option>
                     <option value="Friends">Friends</option>
                 </select>
-
+                
             </div>
             <input value={postImage} onchange = {e => setPostImage(e.target.value)} className="postbox_inputimage" placeholder='Enter a image url' type = "text" /> <br></br>
             {/* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
