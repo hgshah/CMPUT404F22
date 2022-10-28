@@ -1,3 +1,7 @@
+// link: https://github.com/CleverProgrammers/twitter-clone
+// author: CleverProgrammer: https://www.youtube.com/c/CleverProgrammer/videos
+// license: https://www.apache.org/licenses/LICENSE-2.0
+
 import "./Sidebar.css";
 import { Link } from "react-router-dom";
 import React,{useState} from 'react';

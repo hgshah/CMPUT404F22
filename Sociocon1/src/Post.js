@@ -1,4 +1,6 @@
-
+// link: https://github.com/CleverProgrammers/twitter-clone
+// author: CleverProgrammer: https://www.youtube.com/c/CleverProgrammer/videos
+// license: https://www.apache.org/licenses/LICENSE-2.0
 import React from 'react'
 import {useState} from 'react';
 import "./Post.css";
@@ -39,7 +41,9 @@ function Post({displayName, text, image, avatar, visibility}) {
                 </div>
                  <img className='post_content' src = {image} alt = " "/> 
                 <div className='post_footer'>
-                    
+                {/* /* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
+                // author: https://stackoverflow.com/
+                // license:  https://creativecommons.org/licenses/by-sa/4.0/ */}
                         <input type = "text" value={value} onChange={(e) => {setValue(e.target.value)}} placeholder = "Write a comment" />
                         <LikeIcon fontSize = "small" />
                         <ShareIcon fontSize = "small" />

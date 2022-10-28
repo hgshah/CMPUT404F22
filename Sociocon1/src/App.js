@@ -12,7 +12,9 @@ function App() {
     // bem
     <Router>
         <div className="app">
-          
+        {/* link: https://www.youtube.com/watch?v=Ul3y1LXxzdU
+            author: https://www.youtube.com/c/WebDevSimplified 
+            License: https://creativecommons.org/choose/ */}
             
               <Routes>
                 <Route path = "/" element = {<Home/>} />
