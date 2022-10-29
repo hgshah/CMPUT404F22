@@ -37,13 +37,31 @@ export interface IncomingFollowsResponse {
 
 // todo: follows/id GET
 
-// todo: follows/id PUT #
+// =========================================================
+// Accept a follow request: follows/id POST
+// =========================================================
+export const acceptFollowRequest = (followId: string): Promise<AxiosResponse<Follow>> => {
+    const path = `${FOLLOWS_BASE_PATH}${followId}/`
+    return axiosService.put<Follow>(
+        path,
+        {has_accepted: true}, //  data <- simple here; making posts are more complicated
+        {withCredentials: true} // config for auth endpoints otherwise they return 404
+    );
+}
 
-// todo: follows/id DELETE #
+// =========================================================
+// Decline a follow request: follows/id POST
+// =========================================================
+export const declineFollowRequest = (followId: string): Promise<AxiosResponse<Follow>> => {
+    const path = `${FOLLOWS_BASE_PATH}${followId}/`
+    return axiosService.delete<Follow>(
+        path,
+        {withCredentials: true} // config for auth endpoints otherwise they return 404
+    );
+}
 
 // todo: authors/author_id/followers GET
 
-// todo: authors/author_id/followers POST #
 // =========================================================
 // Create a follow request: authors/author_id/followers POST
 // =========================================================
