@@ -55,9 +55,11 @@ class InboxSerializer(serializers.ModelSerializer):
         model = Inbox
         fields = ['type', 'author', 'content']
 
+
 #                                                                             #
 #----------------------------------- VIEWS -----------------------------------#
 #                                                                             #
+
 # for URL: ://service/authors/{AUTHOR_ID}/inbox/
 def handle_inbox_likes(request, args, kwargs):
     try:
@@ -111,13 +113,14 @@ class InboxView(GenericAPIView):
 
 # for URL: ://service/authors/{AUTHOR_ID}/liked
 class LikedView(GenericAPIView):
-    # def get_queryset(self):
-    #     return Like.objects.all()
+    def get_queryset(self):
+        return Like.objects.all()
+
     def get(self, request: Request, *args, **kwargs):
         try:
             author = Author.objects.get(official_id=kwargs['author_id'])
             liked_posts = Like.objects.filter(author=author)
-            ser = LikesSerializer(liked_posts, True)
+            ser = LikesSerializer(liked_posts, many=True)
             return Response({'type':'liked', 'items':ser.data})
 
         except Exception as e:
@@ -140,12 +143,15 @@ class PostLikesView(GenericAPIView):
             print('Error:\n' + e)
             return HttpResponseNotFound
 
-#
+# source/authors/<uuid:author_id>/posts/<uuid:post_id>/comments/<uuid:comment_id>/likes
 class CommentLikesView(GenericAPIView):
+    def get_queryset(self):
+        return Like.objects.all()
+
     def get(self, request: Request, *args, **kwargs):
         try:
             comment = Comment.objects.get(official_id=kwargs['comment_id'])
-            comment_likes = Like.objects.filter(object=request.get_full_path()[:-5])
+            comment_likes = Like.objects.filter()
             ser = LikesSerializer(comment_likes, True)
             return Response(ser.data)
 
