@@ -1,7 +1,7 @@
 // from https://dev.to/koladev/django-rest-authentication-cmh
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {TokenResponse} from "../../types";
-import {Author} from "../../utils/types";
+import {Author} from "../../api/authors";
+import {TokenResponse} from "../../api/tokens";
 
 type State = {
     token: string | null;
