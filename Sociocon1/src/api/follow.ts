@@ -15,7 +15,7 @@ export interface Follow {
     type: string,
     id: string,
     summary: string,
-    has_accepted: boolean,
+    hasAccepted: boolean,
     object: Author,
     actor: Author,
 }

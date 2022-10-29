@@ -9,6 +9,7 @@ class FollowRequestSerializer(serializers.ModelSerializer):
     summary = serializers.SerializerMethodField('get_summary')
     actor = AuthorSerializer(read_only=True)
     object = AuthorSerializer(source='target', read_only=True)
+    hasAccepted = serializers.BooleanField(source='has_accepted')
 
     def get_type(self, model):
         return "Follow"
@@ -18,4 +19,4 @@ class FollowRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
-        fields = ('type', 'id', 'summary', 'has_accepted', 'object', 'actor')
+        fields = ('type', 'id', 'summary', 'hasAccepted', 'object', 'actor')
