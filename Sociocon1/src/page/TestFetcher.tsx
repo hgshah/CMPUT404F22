@@ -6,6 +6,7 @@ import {AUTHORS_BASE_PATH, Author} from "../api/authors";
 import {createFollowRequest, FOLLOWS_INCOMING_PATH, IncomingFollowsResponse} from "../api/follow";
 import {useEffect} from "react";
 import useEffectOnce from "../utils/usehooks";
+import {login} from "../api/tokens";
 
 // Use as reference how to call the backend!
 export const TestFetcher = () => {
@@ -28,18 +29,18 @@ export const TestFetcher = () => {
     }
 
     // // how to call to backend in non-GET ways
-    // useEffectOnce(() => {
-    //     // how to call it directly
-    //     // axiosService.get<AuthorList>('/authors/').then((response) => {
-    //     //     console.log(response.data?.items);
-    //
-    //     let postSuccessfulLogin = (_: Author) => {
-    //         // don't use axiosService here! this is functional programming!
-    //     }
-    //
-    //     // how to login
-    //     login({username: 'super', password: 'super', dispatch, postSuccessfulLogin});
-    // });
+    useEffectOnce(() => {
+        // how to call it directly
+        // axiosService.get<AuthorList>('/authors/').then((response) => {
+        //     console.log(response.data?.items);
+
+        let postSuccessfulLogin = (_: Author) => {
+            // don't use axiosService here! this is functional programming!
+        }
+
+        // how to login
+        login({username: 'super', password: 'super', dispatch, postSuccessfulLogin});
+    });
 
     // useEffect(() => {
     //     if (token) {
