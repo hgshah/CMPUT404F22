@@ -8,7 +8,7 @@ class Follow(models.Model):
     """
     actor follows target
     """
-    FIELD_NAME_HAS_ACCEPTED = 'has_accepted'
+    FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'
 
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
     target = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
