@@ -68,3 +68,20 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+reference links:
+https://www.geeksforgeeks.org/create-a-responsive-navbar-using-reactjs/
+
+https://github.com/iamshaunjp/Complete-React-Tutorial/blob/lesson-29/dojo-blog/src/index.css
+
+https://devooti.com/create-a-responsive-navbar-using-reactjs/#google_vignette
+https://www.youtube.com/watch?v=rJjaqSTzOxI
+
+https://github.com/CleverProgrammers/twitter-clone
+https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select
+
+https://www.youtube.com/watch?v=30hNmn5TxiY
+
+https://www.youtube.com/watch?v=Ul3y1LXxzdU // router - react
+
+https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
