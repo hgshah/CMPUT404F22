@@ -133,6 +133,27 @@ REAL FRIENDS
 ### GET ALL REAL FRIENDS
 ```GET /authors/{AUTHOR_UUID}/real-friends/```
 
+--------------------------
+LOGIN
+==========================
+### LOGIN
+Request (withCredentials = true):
+```POST /tokens/
+{
+    "username": "username",
+    "password": "password"
+}
+```
+
+Response:
+```
+{
+    "type": "token",
+    "token": "TOKEN",
+    "author": { /*author object*/ }
+}
+```
+
 ----------------------------------------------------
 FRONTEND GUIDE ON HOW TO ACCEPT FRIEND REQUESTS
 ====================================================

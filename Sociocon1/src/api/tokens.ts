@@ -1,21 +1,33 @@
-import axiosService from "./axios";
-import authSlice from "../store/slices/auth";
-import {TokenResponse} from "../types";
-import {Author} from "./types";
+/**
+ * Django equivalent is in mysocial/tokens
+ */
 import {Dispatch} from "redux";
+import axiosService from "../utils/axios";
+import authSlice from "../store/slices/auth";
+import {Author} from "./authors";
+
 
 export type LoginErrorCallback = (error: any) => void;
 export type PostSuccessfulLoginCallback = (author: Author) => void;
 
-export interface LoginArguments {
+export interface TokenRequest {
     username: string,
     password: string,
     dispatch: Dispatch;
-    loginError?: LoginErrorCallback,
-    postSuccessfulLogin?: PostSuccessfulLoginCallback
+    loginError?: LoginErrorCallback, // optional
+    postSuccessfulLogin?: PostSuccessfulLoginCallback // optional
 }
 
-export function login(args: LoginArguments) {
+export interface TokenResponse {
+    token: string;
+    author: Author;
+}
+
+/**
+ * Log the user in by calling the tokens endpoint
+ * @param args TokenRequest
+ */
+export const login = (args: TokenRequest) => {
     const {username, password, postSuccessfulLogin, loginError, dispatch} = args;
     axiosService.post<TokenResponse>('/tokens/',
         {username, password},
