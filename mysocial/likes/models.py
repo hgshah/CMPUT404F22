@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
 import uuid
+from django.utils import timezone
 
 '''
 example like object:
@@ -33,12 +34,11 @@ class Like(models.Model):
     summary = models.CharField(max_length=400)
     type = 'like'
     author = models.ForeignKey('authors.Author', on_delete=models.CASCADE)
-    object = models.CharField(max_length=400)
-    # might need dattime
+    objectURL = models.ForeignKey('post.Post', on_delete=models.CASCADE)
 
 class Inbox(models.Model):
     type = 'inbox'
     author = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     itemType = models.CharField(choices=ItemType.choices, default=ItemType.MISC, max_length=16, blank=False)
-    recieved = models.DateTimeField(default=datetime.now())
-    content = models.CharField(max_length=800)
+    recieved = models.DateTimeField(default=timezone.now())
+    content = models.CharField(max_length=800, null=True)

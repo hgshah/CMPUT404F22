@@ -25,22 +25,27 @@ class LikesSerializer(serializers.ModelSerializer):
     summary = serializers.CharField()
     type = serializers.CharField()
     author = serializers.SerializerMethodField()
-    object = serializers.CharField()
+    objectURL = serializers.SerializerMethodField()
 
     def get_author(self, obj):
         author = AuthorSerializer(obj.author).data
         return author
 
+    def get_objectURL(self, obj):
+        item = PostSerializer(obj.objectURL).data['id']
+        return item
+
     class Meta:
         model = Like
-        #fields = ['context', 'summary', 'type', 'author', 'object']
-        fields = '__all__'
+        fields = ['context', 'summary', 'type', 'author', 'objectURL']
+        #fields = '__all__'
 
 class CreateLikeSerializer(serializers.ModelSerializer):
     def create(self, data):
         like = Like.objects.create(**data)
         return like
 
+#TODO later
 class InboxSerializer(serializers.ModelSerializer):
     type = serializers.CharField()
     author = serializers.CharField()
@@ -119,18 +124,23 @@ class LikedView(GenericAPIView):
             print(e)
             return HttpResponseNotFound
 
+# source/authors/<uuid:author_id>/posts/<uuid:post_id>/likes
 class PostLikesView(GenericAPIView):
-    def get(self, request: Request, *args, **kwargs):
+    def get_queryset(self):
+        return Like.objects.all()
+
+    def get(self, request: Request, *args, **kwargs) -> HttpResponse:
         try:
             post = Post.objects.get(official_id=kwargs['post_id'])
-            post_likes = Like.objects.filter(object=request.get_full_path()[:-5])
-            ser = LikesSerializer(post_likes, True)
+            post_likes = Like.objects.filter()
+            ser = LikesSerializer(post_likes, many=True)
             return Response(ser.data)
 
         except Exception as e:
-            print(e)
+            print('Error:\n' + e)
             return HttpResponseNotFound
 
+#
 class CommentLikesView(GenericAPIView):
     def get(self, request: Request, *args, **kwargs):
         try:
