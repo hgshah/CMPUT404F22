@@ -1,9 +1,6 @@
 from django.test import TestCase
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APIRequestFactory
 
 from authors.models import Author
-from common import ForceLogin
 
 
 class TestFollowersView(TestCase):
@@ -27,11 +24,10 @@ class TestFollowersView(TestCase):
             'github': 'https://github.com/crouton/',
             'host': 'www.crouton.net'
         })
-        token_header = ForceLogin.force_login(actor)
+        self.client.force_login(actor)
         response = self.client.post(
             f'/authors/{target.official_id}/followers/',
             content_type='application/json',
-            **token_header
         )
 
         self.assertEqual(response.status_code, 201)

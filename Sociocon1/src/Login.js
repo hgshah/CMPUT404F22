@@ -1,6 +1,7 @@
 import React from 'react'
 import Sidebar from './Sidebar'
 import {useState} from 'react';
+import {TestFetcher} from "./page/TestFetcher";
 function Login() {
     const[value, setValue] = useState(""); 
     function handle() {
@@ -22,7 +23,7 @@ function Login() {
                 Hello! let me inject my TestFetcher!
                 Do not delete. We'll use this as reference!
                 */
-                // TestFetcher()
+                TestFetcher()
             }
     </div>
   )
