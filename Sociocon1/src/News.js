@@ -12,7 +12,7 @@ function News() {
             Hello! let me inject my TestFetcher!
             Do not delete. We'll use this as reference!
             */
-            TestFetcher()
+            // TestFetcher()
         }
     </div>
   )
