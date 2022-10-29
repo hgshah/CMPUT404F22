@@ -17,6 +17,13 @@ function Login() {
                 <div className="login_button">
                     <button onClick={handle}>Login</button>
             </div>
+            {
+                /*
+                Hello! let me inject my TestFetcher!
+                Do not delete. We'll use this as reference!
+                */
+                // TestFetcher()
+            }
     </div>
   )
 }

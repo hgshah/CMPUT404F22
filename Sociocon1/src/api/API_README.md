@@ -6,7 +6,7 @@
 - to check out how to use the API, look at `src/page/TestFetcher.tsx`
 
 ## Testing
-- You can test by commenting out `TestFetcher()` in `News.js`
+- You can test by commenting out `TestFetcher()` in `Login.js`, then run React, click Login at the sidebar
 - To test out authenticated calls, like making a post, you have to login. uncomment the useEffectOnce
   with the login calls and put your password and username in it (not advisable to commit that when we're now
   using a remote heroku server!)
