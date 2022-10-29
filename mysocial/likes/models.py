@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
+from datetime import datetime
+import uuid
 
 '''
 example like object:
@@ -20,13 +21,24 @@ example like object:
 }
 '''
 # Create your models here.
+class ItemType(models.TextChoices):
+    POST = 'post'
+    COMMENT = 'comment'
+    FOLLOW = 'follow'
+    LIKE = 'like'
+    MISC = 'misc'
+    
 class Like(models.Model):
     context = models.CharField(max_length=400)
     summary = models.CharField(max_length=400)
-    type = 'like'  # requirements spelled with capital l
-    author = models.ForeignKey('authors.Author', on_delete = models.CASCADE)
+    type = 'like'
+    author = models.ForeignKey('authors.Author', on_delete=models.CASCADE)
     object = models.CharField(max_length=400)
+    # might need dattime
 
-# class Liked(models.Model):
-#     type = 'liked'
-#     items = ArrayField(models.ForeignKey('likes.Likes', on_delete = models.CASCADE), null = True, blank = True)
+class Inbox(models.Model):
+    type = 'inbox'
+    author = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    itemType = models.CharField(choices=ItemType.choices, default=ItemType.MISC, max_length=16, blank=False)
+    recieved = models.DateTimeField(default=datetime.now())
+    content = models.CharField(max_length=800)

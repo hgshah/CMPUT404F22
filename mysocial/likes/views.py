@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 
-# models needed
-from .models import Like
+# models
+from .models import Like, Inbox
 from authors.models import Author
 from post.models import Post
 from comment.models import Comment
@@ -15,14 +15,11 @@ from comment.models import Comment
 from rest_framework import serializers
 from post.serializer import PostSerializer 
 from authors.serializers.author_serializer import AuthorSerializer
+from follow.serializers.follow_serializer import FollowRequestSerializer
 
-'''
-    context = models.CharField(max_length=400)
-    summary = models.CharField(max_length=400)
-    type = 'like'  # requirements spelled with capital l
-    author = models.ForeignKey('authors.Author', on_delete = models.CASCADE)
-    object = models.CharField(max_length=400)
-'''
+#                                                                             #
+#-------------------------------- SERIALIZERS --------------------------------#
+#                                                                             #
 class LikesSerializer(serializers.ModelSerializer):
     context = serializers.CharField()
     summary = serializers.CharField()
@@ -44,14 +41,23 @@ class CreateLikeSerializer(serializers.ModelSerializer):
         like = Like.objects.create(**data)
         return like
 
+class InboxSerializer(serializers.ModelSerializer):
+    type = serializers.CharField()
+    author = serializers.CharField()
+    content = serializers.CharField()
+
+    class Meta:
+        model = Inbox
+        fields = ['type', 'author', 'content']
+
 #                                                                             #
 #----------------------------------- VIEWS -----------------------------------#
 #                                                                             #
-
 # for URL: ://service/authors/{AUTHOR_ID}/inbox/
 def handle_inbox_likes(request, args, kwargs):
     try:
         ser = CreateLikeSerializer(data=request.data)
+        ser.save()
 
         if ser.is_valid():
             return Response(ser.validated_data, status=status.HTTP_200_OK)
@@ -61,8 +67,16 @@ def handle_inbox_likes(request, args, kwargs):
         return HttpResponseNotFound
 
 def handle_inbox_follows(request, args, kwargs):
-    #TODO
-    return HttpResponseForbidden
+    try:
+        ser = FollowRequestSerializer(data=request.data)
+        ser.save()
+
+        if ser.is_valid():
+            return Response(ser.validated_data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        print(e)
+        return HttpResponseNotFound
 
 def handle_inbox_posts(request, args, kwargs):
     #TODO
@@ -87,6 +101,7 @@ class InboxView(GenericAPIView):
 
     def get(self, request: Request, *args, **kwargs):
         #TODO
+        #should get by author id, sort by date decending
         return       
 
 # for URL: ://service/authors/{AUTHOR_ID}/liked
