@@ -12,9 +12,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from authors.models import Author
+from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
-from common import PaginationHelper
+from common.pagination_helper import PaginationHelper
 from follow.follow_util import FollowUtil
 from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestSerializer

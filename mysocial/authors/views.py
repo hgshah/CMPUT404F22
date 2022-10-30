@@ -5,9 +5,9 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from authors.models import Author
+from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
-from common import PaginationHelper
+from common.pagination_helper import PaginationHelper
 
 logger = logging.getLogger(__name__)
 

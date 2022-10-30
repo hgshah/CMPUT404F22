@@ -1,8 +1,8 @@
 from unittest import skip
-from django.test import TestCase
-from django.test import Client
 
-from authors.models import Author
+from django.test import TestCase
+
+from authors.models.author import Author
 
 
 class TestAuthorView(TestCase):

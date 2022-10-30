@@ -3,7 +3,7 @@ from django.http.response import HttpResponse, HttpResponseNotFound
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
-from authors.models import Author
+from authors.models.author import Author
 from comment.serializers import CommentSerializer, CreateCommentSerializer
 from .models import Comment
 from post.models import Post
