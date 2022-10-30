@@ -45,11 +45,11 @@ class PaginationHelper:
         try:
             page = int(request.query_params['page'])
             if page < 1:
-                return "page should be greater than or equal to 1"
+                return None, "page should be greater than or equal to 1"
 
             size = int(request.query_params['size'])
             if size < 1:
-                return "size should be greater than or equal to 1"
+                return None, "size should be greater than or equal to 1"
         except Exception as err:
             return None, str(err)
 
