@@ -20,11 +20,13 @@
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
-}
+}   
 .header_text{
     font-size: 15px;
     margin-bottom: 5px;
+    
 }
+
 .post_headerdis{
     margin-bottom: 10px;
     font-size: 15px;

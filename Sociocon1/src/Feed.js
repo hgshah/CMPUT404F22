@@ -26,9 +26,9 @@ function Feed() {
 
       {/* Post*/}
       <Post displayName = "Harsh Shah" text = {postMessage} image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = "public" />
-      <Post displayName = "Harsh Shah" text = {postMessage} image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = "public" />
-      <Post displayName = "Harsh Shah" text = {postMessage} image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = "public" />
-      <Post displayName = "Harsh Shah" text = {postMessage} image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = "public" />
+      <Post displayName = "Elon Musk" text = {postMessage} image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar ="https://nypost.com/wp-content/uploads/sites/2/2022/05/elon-musk-1.jpg?quality=75&strip=all" visibility = "public" />
+      <Post displayName = "Virat_kohli" text = {postMessage} image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = "https://upload.wikimedia.org/wikipedia/commons/7/7e/Virat_Kohli.jpg" visibility = "public" />
+      <Post displayName = "Mr@Bean" text = {postMessage} image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = "https://m.media-amazon.com/images/M/MV5BMTg3NDUzOTc3MV5BMl5BanBnXkFtZTcwNjcxMDkxNw@@._V1_.jpg" visibility = "public" />
 
 
       {/* header*/}

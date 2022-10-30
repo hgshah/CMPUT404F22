@@ -4,13 +4,18 @@
 import React from 'react'
 import {useState} from 'react';
 import "./Post.css";
-import { Avatar} from '@mui/material';
+import Comment from './Comment';
+import { Avatar, Button, TextField} from '@mui/material';
 import profilepic from "./profilepic.jpeg";
 import CommentIcon from '@mui/icons-material/ModeComment';
 import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
+import DeleteIcon from '@mui/icons-material/Delete';
 import LikeIcon from '@mui/icons-material/FavoriteBorder';
+import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
+import { Send } from '@mui/icons-material';
+
 function Post({displayName, text, image, avatar, visibility}) {
     const[value, setValue] = useState(""); 
     function handle() {
@@ -27,6 +32,9 @@ function Post({displayName, text, image, avatar, visibility}) {
                 <div className='header_text'>
                     <h3>
                         {displayName} {" "} <span></span>
+                        
+                        <EditIcon fontSize='small' /> <DeleteIcon fontSize = "small" />
+                        
                     </h3>
                     
                 </div>
@@ -40,19 +48,39 @@ function Post({displayName, text, image, avatar, visibility}) {
     
                 </div>
                  <img className='post_content' src = {image} alt = " "/> 
+                 <form>
+                    <span>
+                        <Button variant='contained' size = "small" endIcon= {<LikeIcon/>} type = "submit" >   </Button>  &nbsp;&nbsp;&nbsp;
+                        <Button variant='contained' size = "small" endIcon= {<ShareIcon/>} type = "submit" >   </Button>
+                    </span>
+
+                    </form>
+
                 <div className='post_footer'>
+
+
                 {/* /* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
                 // license:  https://creativecommons.org/licenses/by-sa/4.0/ */}
-                        <input type = "text" value={value} onChange={(e) => {setValue(e.target.value)}} placeholder = "Write a comment" />
-                        <LikeIcon fontSize = "small" />
-                        <ShareIcon fontSize = "small" />
+                        {/* <input type = "text" value={value} onChange={(e) => {setValue(e.target.value)}} placeholder = "Write a comment" /> */}
+                        {/* <LikeIcon fontSize = "small" />
+                        <ShareIcon fontSize = "small" /> */}
+                     <div className='post_comments'>
+                        <Comment/>
+                        <form>
+
+                            <TextField label = "add comment" size = "small" variant='outlined' className='post_input' placeholder='add comment' />
+                            <Button variant='contained' size = "small" endIcon= {<SendIcon/>} type = "submit" >   </Button> 
+
+                        </form> 
+                    </div> 
+ 
                        
                    
                 </div>
-                <div className='submit'>
+                {/* <div className='submit'>
                     <button onClick={handle} id="post"> Submit</button> 
-                </div>
+                </div> */}
             </div>
         </div>
       
