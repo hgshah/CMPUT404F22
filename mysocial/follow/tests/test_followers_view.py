@@ -118,17 +118,3 @@ class TestFollowersViewGet(TestCase):
             self.assertIn(follower['displayName'], self.follower_names)
             self.assertNotIn(follower['displayName'], self.non_follower_names)
 
-    def test_get_successful(self):
-        for i in range(5):
-            response = self.client.get(
-                f'/authors/{self.target.official_id}/followers?page=2&size=3',
-                content_type='application/json',
-            )
-
-            self.assertEqual(response.status_code, 200)
-            self.assertIsNotNone(response.data)
-            self.assertEqual(len(response.data['items']), 3)
-            for follower in response.data['items']:
-                self.assertIn(follower['displayName'], self.follower_names)
-                self.assertNotIn(follower['displayName'], self.non_follower_names)
-
