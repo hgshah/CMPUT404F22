@@ -1,7 +1,7 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from post.models import Post, Visibility
-from authors.models import Author
+from authors.models.author import Author
 from django.utils import timezone
 import logging, uuid
 import datetime

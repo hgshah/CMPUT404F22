@@ -1,14 +1,20 @@
 import logging
 
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.decorators import permission_classes
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from authors.models import Author
+from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
-from common import PaginationHelper
+from common.pagination_helper import PaginationHelper
 from follow.follow_util import FollowUtil
 from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestSerializer
@@ -19,15 +25,14 @@ logger = logging.getLogger(__name__)
 # todo(turnip): Refactor when tests are available
 
 class OutgoingRequestView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
         return None
 
     @staticmethod
     def get(request: Request) -> HttpResponse:
         """Get all outgoing follow requests that were not accepted yet"""
-        if not request.user.is_authenticated():
-            return HttpResponseNotFound()
-
         relationships = Follow.objects.filter(actor=request.user, has_accepted=False)
         serializers = FollowRequestSerializer(relationships, many=True)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
@@ -39,16 +44,15 @@ class OutgoingRequestView(GenericAPIView):
         })
 
 
-class IncomingRequestView(GenericAPIView):
+class IncomingRequestView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
         return None
 
     @staticmethod
     def get(request: Request) -> HttpResponse:
         """Get all incoming follow requests"""
-        if not request.user.is_authenticated:
-            return HttpResponseNotFound()
-
         relationships = Follow.objects.filter(target=request.user, has_accepted=False)
         serializers = FollowRequestSerializer(relationships, many=True)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
@@ -61,6 +65,8 @@ class IncomingRequestView(GenericAPIView):
 
 
 class IndividualRequestView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
         return None
 
@@ -70,9 +76,6 @@ class IndividualRequestView(GenericAPIView):
     @staticmethod
     def get(request: Request, follow_id: str = None) -> HttpResponse:
         """Get an individual follow request"""
-        if not request.user.is_authenticated:
-            return HttpResponseNotFound()
-
         try:
             follow = Follow.objects.get(id=follow_id)
             if follow.target != request.user and follow.actor != request.user:
@@ -94,9 +97,6 @@ class IndividualRequestView(GenericAPIView):
         Only the target or object can accept the actor's request.
         This is only one way. You cannot make a follow back into has_accepted = False, you have to delete it.
         """
-        if not request.user.is_authenticated:
-            return HttpResponseNotFound()
-
         try:
             follow = Follow.objects.get(id=follow_id)
             if follow.target != request.user:
@@ -104,7 +104,7 @@ class IndividualRequestView(GenericAPIView):
                 # Returning not found due to security concerns
                 return HttpResponseNotFound()
             if Follow.FIELD_NAME_HAS_ACCEPTED not in request.data \
-                    and request.data[Follow.FIELD_NAME_HAS_ACCEPTED]:
+                    or not request.data[Follow.FIELD_NAME_HAS_ACCEPTED]:
                 # You cannot make a follow back into has_accepted = False, you have to delete it.
                 return HttpResponseBadRequest()
 
@@ -200,6 +200,7 @@ class FollowersView(GenericAPIView):
         return Response(data=data, status=201)
 
 
+# todo(turnip): add test
 class RealFriendsView(GenericAPIView):
     def get_queryset(self):
         return None

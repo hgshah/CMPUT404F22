@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework.authtoken.models import Token
 
-from authors.models import Author
+from authors.models.author import Author
 
 
 class TestObtainCookieAuthToken(TestCase):

@@ -16,6 +16,7 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = (('actor', 'target'),)
+        get_latest_by = 'id'
 
     @staticmethod
     def get_serializer_field_name():

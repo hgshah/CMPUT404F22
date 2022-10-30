@@ -1,31 +1,15 @@
 from django.db import transaction
 from django.test import TestCase
 
-from authors.models import Author
-from common import TestHelper
+from common.test_helper import TestHelper
 from follow.models import Follow
+from follow.tests.base_test_follower_view import BaseTestFollowerView
 
 
 class TestFollowersViewPost(TestCase):
     def setUp(self) -> None:
-        self.input_data = {
-            'username': 'user1',
-            'email': 'user1@gmail.com',
-            'password': '1234567',
-            'display_name': 'user1',
-            'github': 'https://github.com/crouton/',
-            'host': 'www.crouton.net'
-        }
-
-        self.actor = Author.objects.create_user(**self.input_data)
-        self.target = Author.objects.create_user(**{
-            'username': 'user2',
-            'email': 'user2@gmail.com',
-            'password': '1234567',
-            'display_name': 'user2',
-            'github': 'https://github.com/crouton/',
-            'host': 'www.crouton.net'
-        })
+        self.actor = TestHelper.create_author('user1')
+        self.target = TestHelper.create_author('user2')
 
     def test_post_successful(self):
         self.client.force_login(self.actor)
@@ -81,29 +65,9 @@ class TestFollowersViewPost(TestCase):
             f.delete()
 
 
-class TestFollowersViewGet(TestCase):
+class TestFollowersViewGet(BaseTestFollowerView):
     def setUp(self) -> None:
-        self.target = TestHelper.create_author('target')
-        self.other = TestHelper.create_author('other')
-        self.followers = []
-        self.non_followers = [self.other]
-
-        for index in range(10):
-            oomfie = TestHelper.create_author(f'user{index}')
-
-            # okay, maybe one of them was not accepted yet
-            if index == 5:
-                self.non_followers.append(oomfie)
-                has_accepted = False
-            else:
-                self.followers.append(oomfie)
-                has_accepted = True
-
-            Follow.objects.create(actor=oomfie, target=self.target, has_accepted=has_accepted)
-
-        self.follower_names = map(lambda f: f.display_name, self.followers)
-        self.non_follower_names = map(lambda f: f.display_name, self.non_followers)
-        self.client.force_login(self.target)
+        super().setUp()
 
     def test_get_successful(self):
         response = self.client.get(
@@ -118,3 +82,16 @@ class TestFollowersViewGet(TestCase):
             self.assertIn(follower['displayName'], self.follower_names)
             self.assertNotIn(follower['displayName'], self.non_follower_names)
 
+    def test_get_author_does_not_exist(self):
+        response = self.client.get(
+            f'/authors/00000000-00000000-00000000-00000000/followers/',
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_pagination_fails(self):
+        response = self.client.get(
+            f'/authors/{self.target.official_id}/followers/?page=-1&size=2',
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 404)
