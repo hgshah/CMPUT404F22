@@ -1,4 +1,3 @@
-from fcntl import F_FULLFSYNC
 from rest_framework.test import APITestCase
 from rest_framework import status
 from post.models import Post
