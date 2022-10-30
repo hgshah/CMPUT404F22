@@ -118,3 +118,16 @@ class TestFollowersViewGet(TestCase):
             self.assertIn(follower['displayName'], self.follower_names)
             self.assertNotIn(follower['displayName'], self.non_follower_names)
 
+    def test_get_author_does_not_exist(self):
+        response = self.client.get(
+            f'/authors/00000000-00000000-00000000-00000000/followers/',
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_pagination_fails(self):
+        response = self.client.get(
+            f'/authors/{self.target.official_id}/followers/?page=-1&size=2',
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 404)
