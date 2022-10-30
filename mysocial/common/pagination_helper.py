@@ -1,7 +1,7 @@
 from typing import Any
 from rest_framework.request import Request
 from rest_framework.utils.serializer_helpers import ReturnDict
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, InvalidPage, PageNotAnInteger, EmptyPage
 
 
 class PaginationHelper:
@@ -54,4 +54,13 @@ class PaginationHelper:
             return None, str(err)
 
         paginator = Paginator(data, size)
-        return paginator.get_page(page).object_list, None
+        try:
+            return paginator.page(page).object_list, None
+        except EmptyPage:
+            return (), 'Page is empty'
+        except PageNotAnInteger:
+            return (), 'Page is not an integer'
+        except InvalidPage:
+            return (), 'Invalid page'
+        except Exception as err:
+            return (), str(err)

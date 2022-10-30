@@ -13,14 +13,17 @@ class AuthorSerializer(serializers.ModelSerializer):
     profileImage = serializers.CharField(source='profile_image')
     url = serializers.SerializerMethodField('get_url')
 
-    def get_type(self, model: Author):
+    @staticmethod
+    def get_type(model: Author):
         return model.get_serializer_field_name()
 
-    def get_url(self, model: Author):
+    @staticmethod
+    def get_url(model: Author):
         # they're the same as id, for now
-        return self.get_id(model)
+        return AuthorSerializer.get_id(model)
 
-    def get_id(self, model: Author):
+    @staticmethod
+    def get_id(model: Author):
         # the path after host may vary, e.g. authors/ vs authors/id
         return f"http://{model.host}/{Author.URL_PATH}/{model.official_id}"
 
