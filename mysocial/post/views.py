@@ -28,6 +28,8 @@ class PostView(GenericAPIView):
         obj = queryset.get(pk = self.kwargs['post_id'])
         return obj
 
+    # Get specific post by post id
+    # GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
         try:
             post = Post.objects.get(official_id=kwargs['post_id'])
@@ -37,6 +39,7 @@ class PostView(GenericAPIView):
             logger.info(e)
             return HttpResponseNotFound()
     
+    # DELETE /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     def delete(self, request: Request, *args, **kwargs) -> HttpResponse:
         try:
             if self.authorize_user(kwargs['author_id']) == False:
@@ -100,6 +103,7 @@ class PublicPostView(GenericAPIView):
     def get_queryset(self):
         return Post.objects.all()
 
+    # get all public posts
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
         try:
             public_posts = Post.objects.filter(
@@ -123,8 +127,10 @@ class CreationPostView(GenericAPIView):
     def get_queryset(self):
         return Post.objects.all()
     
+    # get posts by the author
     def get(self, request, *args, **kwargs):
-        posts = Post.objects.all().order_by('-published')
+        author = Author.objects.get(official_id = kwargs['author_id'])
+        posts = Post.objects.filter(author = author).order_by('-published')
         serializer = PostSerializer(posts, many = True)
         data = serializer.data
         data, err = PaginationHelper.paginate_serialized_data(request, data)
@@ -134,6 +140,7 @@ class CreationPostView(GenericAPIView):
         else:
             return Response({'type': 'posts', 'items': data})
 
+    # create brand new post, no id
     def post(self, request, *args, **kwargs):
         try:
             serializer = CreatePostSerializer(data=request.data)
