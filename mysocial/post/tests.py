@@ -7,7 +7,10 @@ import logging, uuid
 import datetime
 
 logger = logging.getLogger("mylogger")
+#pymike00, October 29, https://www.youtube.com/watch?v=1FqxfnlQPi8&ab_channel=pymike00
 
+#mg22, October 29, https://stackoverflow.com/questions/44604686/how-to-test-a-model-that-has-a-foreign-key-in-django
+#kravietz, October 29, https://stackoverflow.com/questions/18622007/runtimewarning-datetimefield-received-a-naive-datetime
 class PostTestCase(APITestCase):
     CREATE_POST_PAYLOAD = {
     "title": "test",
