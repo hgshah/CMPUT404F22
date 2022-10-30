@@ -46,14 +46,14 @@ class CreateLikeSerializer(serializers.ModelSerializer):
         return like
 
 #TODO later
-class InboxSerializer(serializers.ModelSerializer):
-    type = serializers.CharField()
-    author = serializers.CharField()
-    content = serializers.CharField()
+# class InboxSerializer(serializers.ModelSerializer):
+#     type = serializers.CharField()
+#     author = serializers.CharField()
+#     content = serializers.CharField()
 
-    class Meta:
-        model = Inbox
-        fields = ['type', 'author', 'content']
+#     class Meta:
+#         model = Inbox
+#         fields = ['type', 'author', 'content']
 
 
 #                                                                             #
@@ -61,51 +61,40 @@ class InboxSerializer(serializers.ModelSerializer):
 #                                                                             #
 
 # for URL: ://service/authors/{AUTHOR_ID}/inbox/
-def handle_inbox_likes(request, args, kwargs):
+def handle_inbox_likes(request, args, kwargs) -> HttpResponse:
     try:
-        ser = CreateLikeSerializer(data=request.data)
-        ser.save()
+        serializer = CreateLikeSerializer(data=request.data)
 
-        if ser.is_valid():
-            return Response(ser.validated_data, status=status.HTTP_200_OK)
+        if serializer.is_valid():
+            data = serializer.data
+            like = serializer.create(validated_data=data)
+
+            return Response(LikesSerializer(like).data)
+        else:
+            return("error")
 
     except Exception as e:
         print(e)
         return HttpResponseNotFound
 
-def handle_inbox_follows(request, args, kwargs):
-    try:
-        ser = FollowRequestSerializer(data=request.data)
-        ser.save()
+# def handle_inbox_follows(request, args, kwargs):
 
-        if ser.is_valid():
-            return Response(ser.validated_data, status=status.HTTP_200_OK)
+# def handle_inbox_posts(request, args, kwargs):
+#     #TODO
+#     return HttpResponseForbidden
 
-    except Exception as e:
-        print(e)
-        return HttpResponseNotFound
+# def handle_inbox_comments(request, args, kwargs):
+#     #TODO
+#     return HttpResponseForbidden
 
-def handle_inbox_posts(request, args, kwargs):
-    #TODO
-    return HttpResponseForbidden
-
-def handle_inbox_comments(request, args, kwargs):
-    #TODO
-    return HttpResponseForbidden
-
+# service/authors/<uuid:author_id>/inbox
 class InboxView(GenericAPIView):
     def post(self, request: Request, *args, **kwargs):
-        if kwargs['type'] == 'like':
-            handle_inbox_likes(request, args, kwargs)        
-        elif kwargs['type'] == 'follow':
-            handle_inbox_follows(request, args, kwargs)            
-        elif kwargs['type'] == 'post':
-            handle_inbox_posts(request, args, kwargs)
-        elif kwargs['type'] == 'comment':
-            handle_inbox_comments(request, args, kwargs)
-        else:
-            return HttpResponseBadRequest
+        print(f'INFO\n {request} \nARGS\n {args} \nKWARGS\n {kwargs}')
+        authorUUID = kwargs['author_id']
+        return handle_inbox_likes(request, args, kwargs)
 
+    # everything in inbox (likes, follows, posts, comments)
     def get(self, request: Request, *args, **kwargs):
         #TODO
         #should get by author id, sort by date decending
@@ -152,9 +141,9 @@ class CommentLikesView(GenericAPIView):
         try:
             comment = Comment.objects.get(official_id=kwargs['comment_id'])
             comment_likes = Like.objects.filter()
-            ser = LikesSerializer(comment_likes, True)
+            ser = LikesSerializer(comment_likes, many=True)
             return Response(ser.data)
 
         except Exception as e:
-            print(e)
+            print('Error:\n' + e)
             return HttpResponseNotFound
