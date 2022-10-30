@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from common import TestHelper
+from common.test_helper import TestHelper
 from follow.models import Follow
 
 
@@ -26,6 +26,6 @@ class BaseTestFollowerView(TestCase):
 
             Follow.objects.create(actor=oomfie, target=self.target, has_accepted=has_accepted)
 
-        self.follower_names = map(lambda f: f.display_name, self.followers)
-        self.non_follower_names = map(lambda f: f.display_name, self.non_followers)
+        self.follower_names = list(map(lambda f: f.display_name, self.followers))
+        self.non_follower_names = list(map(lambda f: f.display_name, self.non_followers))
         self.client.force_login(self.target)

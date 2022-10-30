@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.test import TestCase
 
-from common import TestHelper
+from common.test_helper import TestHelper
 from follow.models import Follow
 from follow.tests.base_test_follower_view import BaseTestFollowerView
 
