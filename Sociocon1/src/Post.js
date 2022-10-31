@@ -5,6 +5,7 @@ import React from 'react'
 import {useState, useEffect} from 'react';
 import "./Post.css";
 import Comment from './Comment';
+import {useNavigate, useParams} from 'react-router-dom'
 import { Avatar, Button, TextField} from '@mui/material';
 import profilepic from "./profilepic.jpeg";
 import CommentIcon from '@mui/icons-material/ModeComment';
@@ -36,7 +37,20 @@ function Post({displayName, title, description, text, image, avatar, visibility}
         }
         getAllPosts()
     }, [])
-
+    const navigate = useNavigate()
+    
+    const DeletePostInfo = async (id) => {
+        String(id)
+        const nid = String(id).slice(-36)
+        await axios({
+                method:'DELETE',
+                url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/' + nid + '/',
+            
+        }).then((response) =>{
+            console.log(response.data)
+            navigate.push('/')
+        })
+    }
   return (
     <div className='post'>
         <div className = "post_avatar">
@@ -48,7 +62,8 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                     <h3>
                         {displayName} {" "} <span></span>
                         
-                        <EditIcon fontSize='small' /> <DeleteIcon fontSize = "small" />
+                        <EditIcon fontSize='small' /> 
+                        
                         
                     </h3>
                     
@@ -64,9 +79,10 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                     {
                         p_post.map((posts) => {
                             return (
-                                <h2 key={posts.id}>
+                                <h2 >
                                     {posts.title} <br></br>
                                     {posts.description}
+                                    <Button onClick = {() =>DeletePostInfo(posts.id)}  className = "postdel_button">Delete</Button>
                                 </h2>
                             )
                         })
