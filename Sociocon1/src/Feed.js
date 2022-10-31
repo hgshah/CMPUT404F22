@@ -33,7 +33,9 @@ function Feed() {
       getAllPosts()
   }, [])
   const navigate = useNavigate()
-    
+    // link: https://www.youtube.com/watch?v=aRYkCe6JcGM
+    // author: https://www.youtube.com/c/GreatAdib
+    // license: https://creativecommons.org/
     const DeletePostInfo = async (id) => {
         String(id)
         const nid = String(id).slice(-36)
