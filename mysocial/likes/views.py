@@ -166,7 +166,7 @@ class PostLikesView(GenericAPIView):
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
         try:
             post = Post.objects.get(official_id=kwargs['post_id'])
-            post_likes = Like.objects.filter()
+            post_likes = Like.objects.filter(objectURL=post.official_id)
             ser = LikesSerializer(post_likes, many=True)
             return Response(ser.data)
 
@@ -182,7 +182,7 @@ class CommentLikesView(GenericAPIView):
     def get(self, request: Request, *args, **kwargs):
         try:
             comment = Comment.objects.get(official_id=kwargs['comment_id'])
-            comment_likes = Like.objects.filter()
+            comment_likes = Like.objects.filter(objectURL=comment.official_id)
             ser = LikesSerializer(comment_likes, many=True)
             return Response(ser.data)
 
