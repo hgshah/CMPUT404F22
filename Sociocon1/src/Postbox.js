@@ -27,7 +27,9 @@ const Postbox = () => {
     function handle() {
         alert("post has been created")
     }
-    
+    // link: https://www.youtube.com/watch?v=xtQ74HKTOwY
+    // author: https://www.youtube.com/c/GreatAdib
+    //license: https://creativecommons.org/
     const AddPostInfo = async () => {
         let formField = new FormData()
         formField.append("title", title)
