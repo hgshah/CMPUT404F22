@@ -17,9 +17,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
 import axios from 'axios'
+import ActivityTab from './ActivityTab';
+import Tabs from './Tabs';
 
 function Post({displayName, title, description, text, image, avatar, visibility}) {
     const[value, setValue] = useState(""); 
+    const[likeActive, setLikeActive] = useState(false);
     //const[p_post, setPost] = useState([]); 
     function handle() {
         alert(value)
@@ -51,6 +54,11 @@ function Post({displayName, title, description, text, image, avatar, visibility}
             navigate.push('/')
         })
     }
+
+    function handleLikeClick() {
+        setLikeActive(!likeActive);
+    }
+
   return (
     <div className='post'>
         <div className = "post_avatar">
@@ -84,7 +92,7 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                  <img className='post_content' src = {image} alt = " "/> 
                  <form>
                     <span>
-                        <Button variant='contained' size = "small" endIcon= {<LikeIcon/>} type = "submit" >   </Button>  &nbsp;&nbsp;&nbsp;
+                        <Button onClick={handleLikeClick} style={{backgroundColor: likeActive ? "red" : "blue"}} variant='contained' size = "small" endIcon= {<LikeIcon/>} type = "submit" >   </Button>  &nbsp;&nbsp;&nbsp;
                         <Button variant='contained' size = "small" endIcon= {<ShareIcon/>} type = "submit" >   </Button>
                     </span>
 

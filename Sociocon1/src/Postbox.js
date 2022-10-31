@@ -36,7 +36,7 @@ const Postbox = () => {
         formField.append("description", description)
         await axios({
             method: 'post',
-            url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
+            url: 'http://localhost:8000/authors/d79952c6-634c-440b-9b4f-8bd16239892d/posts/',
             data: formField
         }).then((response) =>{
             console.log(response.data)
@@ -76,7 +76,8 @@ const Postbox = () => {
                 </select>
                 
             </div>
-            <input value={postImage} onchange = {e => setPostImage(e.target.value)} className="postbox_inputimage" placeholder='Enter a image url' type = "text" /> <br></br>
+            <input
+             value={postImage} onchange = {e => setPostImage(e.target.value)} className="postbox_inputimage" placeholder='Enter an image url' type = "text" /> <br></br>
             {/* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
                 // license:  https://creativecommons.org/licenses/by-sa/4.0/ */}
