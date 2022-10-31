@@ -22,7 +22,7 @@ function Post({displayName, title, description, text, image, avatar, visibility}
     const[value, setValue] = useState(""); 
     //const[p_post, setPost] = useState([]); 
     function handle() {
-        alert(value)
+        alert(value) 
     }
     // useEffect(() => {
     //     async function getAllPosts(){
@@ -39,18 +39,18 @@ function Post({displayName, title, description, text, image, avatar, visibility}
     // }, [])
     const navigate = useNavigate()
     
-    const DeletePostInfo = async (id) => {
-        String(id)
-        const nid = String(id).slice(-36)
-        await axios({
-                method:'DELETE',
-                url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/' + nid + '/',
+    // const DeletePostInfo = async (id) => {
+    //     String(id)
+    //     const nid = String(id).slice(-36)
+    //     await axios({
+    //             method:'DELETE',
+    //             url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/' + nid + '/',
             
-        }).then((response) =>{
-            console.log(response.data)
-            navigate.push('/')
-        })
-    }
+    //     }).then((response) =>{
+    //         console.log(response.data)
+    //         navigate.push('/')
+    //     })
+    // }
   return (
     <div className='post'>
         <div className = "post_avatar">
@@ -104,7 +104,8 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                         <form>
 
                             <TextField label = "add comment" size = "small" variant='outlined' className='post_input' placeholder='add comment' />
-                            <Button variant='contained' size = "small" endIcon= {<SendIcon/>} type = "submit" >   </Button> 
+                            <Button  variant='contained' size = "small" endIcon= {<SendIcon/>} type = "submit" >   </Button> 
+                            
 
                         </form> 
                     </div> 

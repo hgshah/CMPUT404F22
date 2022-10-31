@@ -12,14 +12,17 @@ import Inbox from "./Inbox";
 import axios from 'axios'
 import Test from './Test';
 import Profile from "./Profile";
-import {useNavigate, useParams} from 'react-router-dom'
+import {useFetcher, useNavigate, useParams} from 'react-router-dom'
 function Feed() {
     //const [posts, setPosts] = useState([]);
     const[p_post, setPost] = useState([]); 
+    const[p_delete, setDelete] = useState([]); 
     // useEffect(() =>{
     //         setPosts()
     // }, [])
     useEffect(() => {
+        
+        
       async function getAllPosts(){
           try {
                   const p_post = await axios.get("http://localhost:8000/posts/public/")
@@ -31,7 +34,9 @@ function Feed() {
           }
       }
       getAllPosts()
+      
   }, [])
+
   const navigate = useNavigate()
     // link: https://www.youtube.com/watch?v=aRYkCe6JcGM
     // author: https://www.youtube.com/c/GreatAdib
@@ -42,6 +47,7 @@ function Feed() {
         await axios({
                 method:'DELETE',
                 url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/' + nid + '/',
+                
             
         }).then((response) =>{
             console.log(response.data)
@@ -57,6 +63,7 @@ function Feed() {
         
       {/* header*/}
       <Postbox />
+    
       {
                         p_post.map((posts) => {
                             return (
