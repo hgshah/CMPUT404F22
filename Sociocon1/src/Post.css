@@ -1,0 +1,38 @@
+
+.post{
+    display: flex;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--home-background) ;
+    padding-bottom: 10px;
+}
+.post_body{
+    flex: 1;
+    padding: 10px;
+}
+.post_body > img {
+    border-radius: 25px; 
+}
+
+.post_content{
+    border-radius: 20px;
+}
+.post_footer{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+.header_text{
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+.post_headerdis{
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+.post_avatar{
+    padding: 20px;
+}
+.visibility{
+    color:grey;
+    font-size: small;
+}
