@@ -30,7 +30,10 @@ class OutgoingRequestView(GenericAPIView):
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
         if err is not None:
             return HttpResponseNotFound()
-        return Response(data=data)
+        return Response(data={
+            'type': 'followRequests',
+            'items': data,
+        })
 
 
 class IncomingRequestView(GenericAPIView):
@@ -45,7 +48,10 @@ class IncomingRequestView(GenericAPIView):
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
         if err is not None:
             return HttpResponseNotFound()
-        return Response(data=data)
+        return Response(data={
+            'type': 'followRequests',
+            'items': data,
+        })
 
 
 class IndividualRequestView(GenericAPIView):
@@ -81,7 +87,7 @@ class IndividualRequestView(GenericAPIView):
         """
         try:
             follow = Follow.objects.get(id=follow_id)
-            if follow.target != request.user and follow.actor != request.user:
+            if follow.target != request.user:
                 # Only the two accounts should be able to delete an account
                 # Returning not found due to security concerns
                 return HttpResponseNotFound()

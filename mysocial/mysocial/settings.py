@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'authors.apps.AuthorsConfig',
+    'likes.apps.LikesConfig',
     'post.apps.PostConfig',
     'comment.apps.CommentConfig',
     'follow.apps.FollowsConfig',
