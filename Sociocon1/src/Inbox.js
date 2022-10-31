@@ -39,7 +39,9 @@ export default function Inbox() {
 
     return (
     <div
+        
         className="Inbox">
+            
             <div className="InboxHeader">
                 <h1>Inbox</h1>
             </div>

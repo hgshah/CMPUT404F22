@@ -2,7 +2,7 @@
 // author: CleverProgrammer: https://www.youtube.com/c/CleverProgrammer/videos
 // license: https://www.apache.org/licenses/LICENSE-2.0
 import React from 'react'
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import "./Post.css";
 import Comment from './Comment';
 import { Avatar, Button, TextField} from '@mui/material';
@@ -15,12 +15,27 @@ import LikeIcon from '@mui/icons-material/FavoriteBorder';
 import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
+import axios from 'axios'
 
-function Post({displayName, text, image, avatar, visibility}) {
+function Post({displayName, title, description, text, image, avatar, visibility}) {
     const[value, setValue] = useState(""); 
+    const[p_post, setPost] = useState([]); 
     function handle() {
         alert(value)
     }
+    useEffect(() => {
+        async function getAllPosts(){
+            try {
+                    const p_post = await axios.get("http://localhost:8000/posts/public/")
+                    console.log(p_post.data)
+                    setPost(p_post.data)
+            }
+            catch(error){
+                console.log(error)
+            }
+        }
+        getAllPosts()
+    }, [])
 
   return (
     <div className='post'>
@@ -44,9 +59,20 @@ function Post({displayName, text, image, avatar, visibility}) {
                     </h4>
                 </div>
                 <div className = "post_headerdis">
-                    <p>{text}</p>
-    
+                    
+                    {/* <p>{text}</p> */}
+                    {
+                        p_post.map((posts) => {
+                            return (
+                                <h2 key={posts.id}>
+                                    {posts.title} <br></br>
+                                    {posts.description}
+                                </h2>
+                            )
+                        })
+                    }
                 </div>
+                
                  <img className='post_content' src = {image} alt = " "/> 
                  <form>
                     <span>
