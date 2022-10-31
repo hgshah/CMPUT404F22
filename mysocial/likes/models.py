@@ -21,7 +21,6 @@ example like object:
 }
 '''
 # Create your models here.
-# for inbox
 class ItemType(models.TextChoices):
     POST = 'post'
     COMMENT = 'comment'
@@ -33,18 +32,20 @@ class LikedItem(models.TextChoices):
     POST = 'post'
     COMMENT = 'comment'
 
+# models
 class Like(models.Model):
     context = models.CharField(max_length=400)
     summary = models.CharField(max_length=400)
     type = 'like'
     author = models.ForeignKey('authors.Author', on_delete=models.CASCADE)
     objectURL = models.ForeignKey('post.Post', on_delete=models.CASCADE)
+    objectType = models.CharField(choices=LikedItem.choices, default=LikedItem.POST, max_length=16, blank=False)
     refComment = models.ForeignKey('comment.Comment', on_delete=models.CASCADE, blank=True, null=True)
     #likedObject = models.CharField(choices=LikedItem.choices, default=LikedItem.POST, max_length=16, blank=False)
 
 class Inbox(models.Model):
     type = 'inbox'
     author = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item = models.CharField(max_length=800, null=True)
     itemType = models.CharField(choices=ItemType.choices, default=ItemType.MISC, max_length=16, blank=False)
-    recieved = models.DateTimeField(default=timezone.now())
-    content = models.CharField(max_length=800, null=True)
+    recieved = models.DateTimeField(default=timezone.now())    
