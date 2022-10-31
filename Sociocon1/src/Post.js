@@ -20,23 +20,23 @@ import axios from 'axios'
 
 function Post({displayName, title, description, text, image, avatar, visibility}) {
     const[value, setValue] = useState(""); 
-    const[p_post, setPost] = useState([]); 
+    //const[p_post, setPost] = useState([]); 
     function handle() {
         alert(value)
     }
-    useEffect(() => {
-        async function getAllPosts(){
-            try {
-                    const p_post = await axios.get("http://localhost:8000/posts/public/")
-                    console.log(p_post.data)
-                    setPost(p_post.data)
-            }
-            catch(error){
-                console.log(error)
-            }
-        }
-        getAllPosts()
-    }, [])
+    // useEffect(() => {
+    //     async function getAllPosts(){
+    //         try {
+    //                 const p_post = await axios.get("http://localhost:8000/posts/public/")
+    //                 console.log(p_post.data)
+    //                 setPost(p_post.data)
+    //         }
+    //         catch(error){
+    //             console.log(error)
+    //         }
+    //     }
+    //     getAllPosts()
+    // }, [])
     const navigate = useNavigate()
     
     const DeletePostInfo = async (id) => {
@@ -76,17 +76,9 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                 <div className = "post_headerdis">
                     
                     {/* <p>{text}</p> */}
-                    {
-                        p_post.map((posts) => {
-                            return (
-                                <h2 >
-                                    {posts.title} <br></br>
-                                    {posts.description}
-                                    <Button onClick = {() =>DeletePostInfo(posts.id)}  className = "postdel_button">Delete</Button>
-                                </h2>
-                            )
-                        })
-                    }
+                    {title} <br></br>
+                    {description}
+
                 </div>
                 
                  <img className='post_content' src = {image} alt = " "/> 
