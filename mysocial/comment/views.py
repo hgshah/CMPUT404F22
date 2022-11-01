@@ -36,7 +36,7 @@ class CommentView(GenericAPIView):
             serializer = CreateCommentSerializer(data=request.data)
             if serializer.is_valid():
                 data = serializer.data
-                data['author'] = Author.objects.get(official_id = kwargs['author_id'])
+                data['author'] = Author.objects.get(official_id = self.request.user.official_id)
                 data['post'] = Post.objects.get(official_id = kwargs['post_id'])
                 comment = serializer.create(validated_data=data)
                 return Response(CommentSerializer(comment).data, status = status.HTTP_200_OK)

@@ -73,3 +73,13 @@ probably use to authenticate
   https://stackoverflow.com/questions/35024781/create-or-update-with-put-in-django-rest-framework
   https://stackoverflow.com/questions/1496346/passing-a-list-of-kwargs
   https://stackoverflow.com/questions/70878647/login-to-django-admin-via-requests
+
+https://stackoverflow.com/questions/31173324/django-rest-framework-update-field
+https://stackoverflow.com/questions/43859053/django-rest-framework-assertionerror-fix-your-url-conf-or-set-the-lookup-fi
+https://stackoverflow.com/questions/62381855/how-to-update-model-objects-only-one-field-data-when-doing-serializer-save
+https://stackoverflow.com/questions/35024781/create-or-update-with-put-in-django-rest-framework
+https://stackoverflow.com/questions/1496346/passing-a-list-of-kwargs
+https://stackoverflow.com/questions/70878647/login-to-django-admin-via-requests
+https://www.youtube.com/watch?v=1FqxfnlQPi8&ab_channel=pymike00
+https://stackoverflow.com/questions/44604686/how-to-test-a-model-that-has-a-foreign-key-in-django
+https://stackoverflow.com/questions/18622007/runtimewarning-datetimefield-received-a-naive-datetime
