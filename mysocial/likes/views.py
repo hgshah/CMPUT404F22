@@ -25,20 +25,34 @@ logger = logging.getLogger("mylogger")
 #                                                                             #
 #-------------------------------- SERIALIZERS --------------------------------#
 #                                                                             #
+'''
+class Like(models.Model):
+    context = models.CharField(max_length=400)
+    summary = models.CharField(max_length=400)
+    type = 'like'
+    author = models.ForeignKey('authors.Author', on_delete=models.CASCADE)
+    objectURL = models.UUIDField(primary_key=False, default=0, editable=True)
+
+    official_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    date_received = models.DateTimeField(default=timezone.now)
+    object_type = models.CharField(choices=LikedItem.choices, default=LikedItem.POST, max_length=16, blank=False)
+    ref_post = models.ForeignKey('post.Post', on_delete=models.CASCADE, blank=True, null=True)
+    ref_comment = models.ForeignKey('comment.Comment', on_delete=models.CASCADE, blank=True, null=True)
+'''
 class LikesSerializer(serializers.ModelSerializer):
     context = serializers.CharField()
     summary = serializers.CharField()
     type = serializers.CharField()
     author = serializers.SerializerMethodField()
-    objectURL = serializers.SerializerMethodField()
+    objectURL = serializers.CharField()
 
     def get_author(self, obj):
         author = AuthorSerializer(obj.author).data
         return author
 
-    def get_objectURL(self, obj):
-        item = PostSerializer(obj.objectURL).data['id']
-        return item
+    # def get_objectURL(self, obj):
+    #     item = PostSerializer(obj.objectURL).data['id']
+    #     return item
 
     class Meta:
         model = Like
@@ -52,7 +66,7 @@ class CreateLikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Like
-        fields = ['context', 'summary', 'type', 'author', 'objectURL', 'objectType']
+        fields = ['context', 'summary', 'type', 'author', 'objectURL', 'object_type']
 
 #TODO later
 # class InboxSerializer(serializers.ModelSerializer):
@@ -68,33 +82,17 @@ class CreateLikeSerializer(serializers.ModelSerializer):
 #                                                                             #
 #----------------------------------- VIEWS -----------------------------------#
 #                                                                             #
+
+#TODO MOVE
 # for URL: ://service/authors/{AUTHOR_ID}/inbox/
-def handle_inbox_likes(request, args, kwargs) -> HttpResponse:
-    try:
-        serializer = CreateLikeSerializer(data=request.data)
-
-        if serializer.is_valid():
-            data = serializer.data
-            like = serializer.create(validated_data=data)
-
-            return Response(LikesSerializer(like).data)
-        else:
-            return("error")
-
-    except Exception as e:
-        print(e)
-        return HttpResponseNotFound
-
+#def handle_inbox_likes(request, args, kwargs) -> HttpResponse:
 # def handle_inbox_follows(request, args, kwargs):
-
 # def handle_inbox_posts(request, args, kwargs):
 #     #TODO
 #     return HttpResponseForbidden
-
 # def handle_inbox_comments(request, args, kwargs):
 #     #TODO
 #     return HttpResponseForbidden
-
 # source/authors/<uuid:author_id>/inbox
 class InboxView(GenericAPIView):
     def get_serializer_class(self):
@@ -124,21 +122,25 @@ class InboxView(GenericAPIView):
             return HttpResponseNotFound
 
     def post(self, request: Request, *args, **kwargs) -> HttpResponse:
-        print(f'REQ\n {request} \nARGS\n {args} \nKWARGS\n {kwargs}')
+        print(f'REQ:\n{request}\nARGS:\n{args}\nKWARGS:\n{kwargs}')
 
         try:
             serializer = CreateLikeSerializer(data=request.data)
+            print('Creating Like Object')
 
             if serializer.is_valid():
                 like_data = serializer.data
-                like_data['author'] = Author.objects.get(official_id=kwargs['author_id'])
-                like_data['objectURL'] = Post.objects.get(official_id=like_data['objectURL'])
+                # like_object_url = like_data[objectURL]
+                # author_uuid = like_object_url.split('authors/')[1].split('/posts')[0]
+                like_data['author'] = Author.objects.get(official_id=like_data['author'])
                 like_obj = serializer.create(data=like_data)
                 ser = LikesSerializer(like_obj)
                 return Response(ser.data)
+            else:
+                return HttpResponseBadRequest
 
         except Exception as e:
-            print('error:\n' + str(e))
+            print('\nerror:\n' + str(e))
             logger.info(e)
             return HttpResponseNotFound
 
@@ -150,6 +152,8 @@ class LikedView(GenericAPIView):
     def get(self, request: Request, *args, **kwargs):
         try:
             author = Author.objects.get(official_id=kwargs['author_id'])
+            # TODO once inbox is implemented, change this to filter inbox with
+            # author's id and fiter by likes
             liked_posts = Like.objects.filter(author=author)
             ser = LikesSerializer(liked_posts, many=True)
             return Response({'type':'liked', 'items':ser.data})

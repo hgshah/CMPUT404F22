@@ -20,7 +20,10 @@ example like object:
      "object":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/764efa883dda1e11db47671c4a3bbd9e"
 }
 '''
+
 # Create your models here.
+
+# TODO MOVE TO INBOX LATER
 class ItemType(models.TextChoices):
     POST = 'post'
     COMMENT = 'comment'
@@ -33,19 +36,26 @@ class LikedItem(models.TextChoices):
     COMMENT = 'comment'
 
 # models
+# https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#likes
 class Like(models.Model):
-    context = models.CharField(max_length=400)
-    summary = models.CharField(max_length=400)
+    # API fields
+    context = models.CharField(max_length=400, default='no context')
+    summary = models.CharField(max_length=400, default='no summary')
     type = 'like'
     author = models.ForeignKey('authors.Author', on_delete=models.CASCADE)
-    objectURL = models.ForeignKey('post.Post', on_delete=models.CASCADE)
-    objectType = models.CharField(choices=LikedItem.choices, default=LikedItem.POST, max_length=16, blank=False)
-    refComment = models.ForeignKey('comment.Comment', on_delete=models.CASCADE, blank=True, null=True)
-    #likedObject = models.CharField(choices=LikedItem.choices, default=LikedItem.POST, max_length=16, blank=False)
+    objectURL = models.CharField(primary_key=False, default=0, editable=True, max_length=400)
 
+    # other fields
+    official_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    date_received = models.DateTimeField(default=timezone.now)
+    object_type = models.CharField(choices=LikedItem.choices, default=LikedItem.POST, max_length=16, blank=False)
+    ref_post = models.ForeignKey('post.Post', on_delete=models.CASCADE, blank=True, null=True)
+    ref_comment = models.ForeignKey('comment.Comment', on_delete=models.CASCADE, blank=True, null=True)
+    
+#TODO MOVE LATER
 class Inbox(models.Model):
     type = 'inbox'
     author = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     item = models.CharField(max_length=800, null=True)
     itemType = models.CharField(choices=ItemType.choices, default=ItemType.MISC, max_length=16, blank=False)
-    recieved = models.DateTimeField(default=timezone.now())    
+    recieved = models.DateTimeField(default=timezone.now)    
