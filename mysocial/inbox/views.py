@@ -17,7 +17,7 @@ from follow.models import Follow
 
 # serializing
 from rest_framework import serializers
-from . import inbox_serializers
+from .inbox_serializers import InboxSerializer
 from authors.serializers.author_serializer import AuthorSerializer
 from post.serializer import PostSerializer
 from likes.views import LikesSerializer, CreateLikeSerializer
@@ -25,7 +25,6 @@ from follow.serializers.follow_serializer import FollowRequestSerializer
 from comment.serializers import CommentSerializer, CreateCommentSerializer
 
 logger = logging.getLogger("mylogger")
-
 
 # def handle_inbox_likes(request, args, kwargs) -> HttpResponse:
 # def handle_inbox_follows(request, args, kwargs):
@@ -36,25 +35,32 @@ logger = logging.getLogger("mylogger")
 #     #TODO
 #     return HttpResponseForbidden
 
-# service/authors/<uuid:author_id>/inbox
-# handles POST, GET
+# like_object_url = like_data[objectURL]
+# author_uuid = like_object_url.split('authors/')[1].split('/posts')[0]
+
+# URI: service/authors/<uuid:author_id>/inbox
+# handles POST, GET, DELETE
 # objects: likes, follows, posts, comments
 class InboxView(GenericAPIView):
     def get_serializer_class(self):
         # POST can be like, follow, comment, or post object
         if self.request.method == 'POST':
             return CreateLikeSerializer
+
         # GET returns inbox objects only
         elif self.request.method == 'GET':
-            return CommentSerializer
+            return InboxSerializer
+
         else:
-            print('serializer error' + __str__)
+            print('serializer error: ' + __str__)
+            # maybe log it
             return
 
     def get_queryset(self):
         # may be diff for POST and GET later on
         return Inbox.objects.all()
 
+    # GET: list of items sent to author_id
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
         print('HTTP REQUEST: \n' + str(HttpRequest) + 'REQUEST DATA:\n' + str(request.data))
         try:
@@ -66,6 +72,7 @@ class InboxView(GenericAPIView):
             logger.info(e)
             return HttpResponseNotFound
 
+    # POST: either a like, follow, post, or comment; follows need approval
     def post(self, request: Request, *args, **kwargs) -> HttpResponse:
         print(f'REQ:\n{request}\nARGS:\n{args}\nKWARGS:\n{kwargs}')
 
@@ -75,11 +82,25 @@ class InboxView(GenericAPIView):
 
             if serializer.is_valid():
                 like_data = serializer.data
-                # like_object_url = like_data[objectURL]
-                # author_uuid = like_object_url.split('authors/')[1].split('/posts')[0]
                 like_data['author'] = Author.objects.get(official_id=like_data['author'])
                 like_obj = serializer.create(data=like_data)
                 ser = LikesSerializer(like_obj)
+                return Response(ser.data)
+            else:
+                return HttpResponseBadRequest
+
+        except Exception as e:
+            print('\nerror:\n' + str(e))
+            logger.info(e)
+            return HttpResponseNotFound
+
+    #TODO
+    # DELETE: clears inbox
+    def delete(self, request: Request, *args, **kwargs) -> HttpResponse:
+        try:
+
+            if serializer.is_valid():
+
                 return Response(ser.data)
             else:
                 return HttpResponseBadRequest

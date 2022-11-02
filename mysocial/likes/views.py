@@ -80,8 +80,6 @@ class LikedView(GenericAPIView):
     def get(self, request: Request, *args, **kwargs):
         try:
             author = Author.objects.get(official_id=kwargs['author_id'])
-            # TODO once inbox is implemented, change this to filter inbox with
-            # author's id and fiter by likes
             liked_posts = Like.objects.filter(author=author)
             ser = LikesSerializer(liked_posts, many=True)
             return Response({'type':'liked', 'items':ser.data})
