@@ -57,6 +57,9 @@ https://stackoverflow.com/questions/62381855/how-to-update-model-objects-only-on
 https://stackoverflow.com/questions/35024781/create-or-update-with-put-in-django-rest-framework
 https://stackoverflow.com/questions/1496346/passing-a-list-of-kwargs
 https://stackoverflow.com/questions/70878647/login-to-django-admin-via-requests
+https://www.youtube.com/watch?v=1FqxfnlQPi8&ab_channel=pymike00
+https://stackoverflow.com/questions/44604686/how-to-test-a-model-that-has-a-foreign-key-in-django
+https://stackoverflow.com/questions/18622007/runtimewarning-datetimefield-received-a-naive-datetime
 
 ### Allan
 - Django-React auth: https://dev.to/koladev/django-rest-authentication-cmh

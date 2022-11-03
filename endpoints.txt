@@ -19,13 +19,13 @@ GET /posts/public
 
 TO DELETE A POST:
 You must be logged in as the correct author to delete!
-DELETE /authors/{AUTHOR_UUID}/posts/{POST_UUID}
+DELETE /authors/{AUTHOR_UUID}/posts/{POST_UUID}/
 
 TO GET A SPECIFIC POST BY SPECIFIC AUTHOR:
-GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
+GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}/
 
 TO UPDATE A POST:
-POST /authors/{AUTHOR_UUID}/posts/{POST_UUID}
+POST /authors/{AUTHOR_UUID}/posts/{POST_UUID}/
 {
     "title": "test",
     "description": "test",
@@ -37,7 +37,7 @@ POST /authors/{AUTHOR_UUID}/posts/{POST_UUID}
 }
 
 TO UPDATE OR CREATE A POST:
-PUT /authors/{AUTHOR_UUID}/posts/{POST_UUID}
+PUT /authors/{AUTHOR_UUID}/posts/{POST_UUID}/
 {
     "title": "test",
     "description": "test",
