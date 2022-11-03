@@ -13,13 +13,13 @@ import InboxIcon from "@mui/icons-material/Mail";
 
 import { Button } from '@mui/material';
 function Sidebar(){
-
+   
     return (
  <div className = "sidebar">
     {/* Sidebar option*/}
-
-
-      <LogoIcon className="sidebar_logoicon"  />
+      
+      
+      <LogoIcon className="sidebar_logoicon"  /> 
       <div className="list">
          <ul>
             <li> <a href="/login">  Login </a> </li>
@@ -29,9 +29,9 @@ function Sidebar(){
          </ul>
 
       </div>
-
-
-
+      
+    
+    
     {/* <Button variant="outlined" className = "sidebar_post" fullWidth> Post </Button> */}
  </div>
     );
