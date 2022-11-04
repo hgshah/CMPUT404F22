@@ -1,5 +1,5 @@
 # models
-from .models import Inbox
+from .models import Inbox, InboxPOSTObject
 from likes.models import Like
 from authors.models import Author
 from post.models import Post
@@ -41,6 +41,21 @@ from comment.serializers import CommentSerializer, CreateCommentSerializer
             "visibility":"FRIENDS",
             "unlisted":false
         }, ... { }
+
+class Inbox(models.Model):
+    # API fields
+    type = 'inbox'
+    author = models.UUIDField(primary_key=False, default=0, editable=True)
+    item = models.UUIDField(primary_key=False, default=0, editable=True)
+    # for backend
+    official_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    date_received = models.DateTimeField(default=timezone.now)  # use this to sort list on frontend
+    item_type = models.CharField(choices=ItemType.choices, default=ItemType.UNDEF, max_length=16, blank=False)
+    ref_like = models.ForeignKey('likes.Like', on_delete=models.CASCADE, blank=True, null=True)
+    ref_follow = models.ForeignKey('follow.Follow', on_delete=models.CASCADE, blank=True, null=True)
+    ref_post = models.ForeignKey('post.Post', on_delete=models.CASCADE, blank=True, null=True)
+    ref_comment = models.ForeignKey('comment.Comment', on_delete=models.CASCADE, blank=True, null=True)
+
 '''
 
 class InboxSerializer(serializers.ModelSerializer):
@@ -51,3 +66,21 @@ class InboxSerializer(serializers.ModelSerializer):
     class Meta:
         model = Inbox
         fields = ['type', 'author', 'content']
+
+class CreateInboxSerializer(serializers.ModelSerializer):
+    def create(self, data):
+        inbox_item = Inbox.objects.create(**data)
+        return inbox_item
+
+    class Meta:
+        model = Inbox
+        fields = ['type', 'author', 'item', 'item_type', 'ref_like', 'ref_follow', 'ref_post', 'ref_comment']
+
+class CreatePOSTObjectSerializer(serializers.ModelSerializer):
+    def create(self, data):
+        item = InboxPOSTObject.objects.create(**data)
+        return item
+    
+    class Meta:
+        model = InboxPOSTObject
+        fields = ['type']

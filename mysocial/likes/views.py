@@ -66,7 +66,7 @@ class CreateLikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Like
-        fields = ['context', 'summary', 'type', 'author', 'objectURL', 'object_type']
+        fields = ['context', 'summary', 'type', 'author', 'objectURL']
 
 #                                                                             #
 #----------------------------------- VIEWS -----------------------------------#

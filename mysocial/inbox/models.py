@@ -23,3 +23,6 @@ class Inbox(models.Model):
     ref_follow = models.ForeignKey('follow.Follow', on_delete=models.CASCADE, blank=True, null=True)
     ref_post = models.ForeignKey('post.Post', on_delete=models.CASCADE, blank=True, null=True)
     ref_comment = models.ForeignKey('comment.Comment', on_delete=models.CASCADE, blank=True, null=True)
+
+class InboxPOSTObject(models.Model):
+    type = models.CharField(max_length=400, default='undef', blank=False, editable=True)

@@ -32,7 +32,7 @@ class Like(models.Model):
     # API fields
     context = models.CharField(max_length=400, default='no context')
     summary = models.CharField(max_length=400, default='no summary')
-    type = 'like'
+    type = models.CharField(max_length=40, default='like', editable=False)
     author = models.ForeignKey('authors.Author', on_delete=models.CASCADE)
     objectURL = models.CharField(primary_key=False, default=0, editable=True, max_length=400)
 
