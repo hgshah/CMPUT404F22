@@ -56,15 +56,11 @@ class InboxView(GenericAPIView):
         try:
             print('Creating Like Object...')
             #request = json.dumps(request)
-            print(type(request))
-            print(request)
             serializer = CreateLikeSerializer(data=request)
-            print(serializer)
-            
+
             if serializer.is_valid():
                 print('valid data...')
                 like_data = serializer.data
-                print(like_data)
                 like_data['author'] = Author.objects.get(official_id=like_data['author'])
                 like_obj = serializer.create(data=like_data)
 
@@ -86,14 +82,10 @@ class InboxView(GenericAPIView):
         return
 
     def __handle_comments(self, request):
-        print('IN COMMENTS')
         serializer = CreateCommentSerializer(data=request.body.decode('utf-8'))
-        print('serializer:')
-        print(serializer)
 
         if serializer.is_valid():
             data = serializer.data
-            print (data)
             return Response(CommentSerializer(comment).data)
 
         else:
@@ -104,21 +96,10 @@ class InboxView(GenericAPIView):
         print(f'REQ:\n{request}\nARGS:\n{args}\nKWARGS:\n{kwargs}')
         mail_type = request.data['type']
 
-        # print('')
-        # decoded_data = request.body.decode('utf-8')
-        # decoded_data = 'r"""' + decoded_data + '"""'
-        # print('Req data:\n' + decoded_data)
-        # print(type(decoded_data))
-
-        # new1 = json.loads(decoded_data)
-        # print(new1)
         # data_dict = ast.literal_eval(decoded_data)
-        # print(type(data_dict))
-        # print(data_dict)
         # data = request.data
         # dict_str = dict_str.replace(" ", "")
         # item_dict = json.loads(dict_str)
-        # print('new dict_str\n' + str(item_dict))
 
         if mail_type.upper() == 'LIKE':
             return self.__handle_likes(request=request)
@@ -148,9 +129,8 @@ class InboxView(GenericAPIView):
     # DELETE: clears inbox
     def delete(self, request: Request, *args, **kwargs) -> HttpResponse:
         try:
-
             if serializer.is_valid():
-
+                
                 return Response(ser.data)
             else:
                 return HttpResponseBadRequest
