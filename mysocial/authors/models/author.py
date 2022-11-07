@@ -70,3 +70,26 @@ class Author(AbstractUser):
         :return: True if the current user is an authenticated active_remote_node.
         """
         return self.author_type == AuthorType.ACTIVE_REMOTE_NODE and super(Author, self).is_authenticated
+
+    @staticmethod
+    def get_author(official_id: str):
+        """
+        Gets a local author ONLY. Nodes are ignored.
+        :param official_id:
+        :return: A local_author
+        """
+        try:
+            return Author.objects.get(
+                official_id=official_id,
+                author_type=AuthorType.LOCAL_AUTHOR
+            )
+        except Author.DoesNotExist:
+            return None
+
+    @staticmethod
+    def get_all_authors():
+        """
+        Gets all local_author. Nodes are ignored.
+        :return: All local_authors.
+        """
+        return Author.objects.filter(author_type=AuthorType.LOCAL_AUTHOR)
