@@ -10,8 +10,8 @@ class Follow(models.Model):
     """
     FIELD_NAME_HAS_ACCEPTED = 'has_accepted'
 
-    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
-    target = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
+    actor = models.ForeignKey(settings.base.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
+    target = models.ForeignKey(settings.base.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
     has_accepted = models.BooleanField(default=False)
 
     class Meta:
