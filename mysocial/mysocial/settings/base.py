@@ -152,3 +152,42 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# todo(turnip): would we even try to be secure lol
+# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+# later if the above causes issue
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://192.168.0.50:3000',  # for network
+    'http://localhost:8000',  # for localhost (Development)
+    'http://192.168.0.50:8000',  # for network (Development)
+]
+
+# from https://stackoverflow.com/a/72249293/17836168
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://192.168.0.50:3000',  # for network
+    'http://localhost:8000',  # for localhost (Development)
+    'http://192.168.0.50:8000',  # for network (Development)
+]
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'set-cookie',
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
+
+CORS_EXPOSE_HEADERS = [
+    'set-cookie',
+    'cookie',
+]
