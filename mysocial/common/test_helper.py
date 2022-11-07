@@ -1,7 +1,24 @@
-from authors.models.author import Author
+from authors.models.author import Author, AuthorType
 
 
 class TestHelper:
+    @staticmethod
+    def create_user(username: str, password: str, host: str):
+        return TestHelper.create_author(
+            username=username,
+            other_args={'password': password, 'host': host}
+        )
+
+    @staticmethod
+    def create_node(username: str, password: str, host: str):
+        return TestHelper.create_author(
+            username=username,
+            other_args={'password': password,
+                        'host': host,
+                        'author_type': AuthorType.ACTIVE_REMOTE_NODE
+                        }
+        )
+
     @staticmethod
     def create_author(username: str, other_args: dict = None) -> Author:
         """
