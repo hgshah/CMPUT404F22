@@ -49,6 +49,19 @@ The result should look like:
 }
 ```
 
+4. Call in your backend like this:
+```python
+# Python
+import requests
+
+username = 'team-oomf'
+password = 'hunter2'
+token = base64.b64encode(f'{username}:{password}'.encode('ascii')).decode('utf-8')
+header = {'HTTP_AUTHORIZATION': f'Basic {token}'}
+# todo(turnip): change when we have actual domain
+response = requests.get('http://sociocon.herokuapp.com/remote-node/', **headers)
+```
+
 ### How to add a remote node in the server: Troubleshooting
 
 - **401**: You're not logged in.
