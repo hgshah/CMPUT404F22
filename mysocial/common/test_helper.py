@@ -2,6 +2,8 @@ from authors.models.author import Author, AuthorType
 
 
 class TestHelper:
+    DEFAULT_PASSWORD = '1234567'
+
     @staticmethod
     def create_user(username: str, password: str, host: str):
         return TestHelper.create_author(
@@ -31,7 +33,7 @@ class TestHelper:
         default_args = {
             'username': username,
             'email': '{placeholder}@gmail.com',
-            'password': '1234567',
+            'password': TestHelper.DEFAULT_PASSWORD,
             'display_name': '{placeholder}',
             'github': 'https://github.com/{placeholder}/',
             'host': 'www.crouton.net'

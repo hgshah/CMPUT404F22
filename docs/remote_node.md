@@ -2,7 +2,7 @@
 
 Remote nodes are just normal users with a special hidden type. It can be activated and reactivated by the server admin.
 
-## Setup: How to add a remote node in the server
+## How to add a remote node in the server
 
 1. Create a user in your commandline via `shell`
 
@@ -47,3 +47,9 @@ The result should look like:
   "type": "remoteNode"
 }
 ```
+
+### How to add a remote node in the server: Troubleshooting
+
+- **401**: You're not logged in.
+- **403**: You're either logging in as a user or your node has been deactivated.
+- **404**: Wrong url. Try adding a slash at the end? Double-check your format.
