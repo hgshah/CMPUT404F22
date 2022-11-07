@@ -18,10 +18,11 @@ node.save()
 exit()
 ```
 
+- Note: For host in this step: use the remote host! (OR your host if you want to connect with us)
 - Note: you cannot make this in `admin/`, because the password is encrypted!
 
 2. In `admin/`, make sure that the **Author type**: is **Active Remote Node**
-3. Test out Basic Auth by calling this endpoint:
+3. Test out Basic Auth by calling our endpoint (user OUR host not yours aka not the remote):
 
 ```shell
 # curl local
