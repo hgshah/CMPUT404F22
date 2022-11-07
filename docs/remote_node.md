@@ -35,9 +35,9 @@ curl http://team-oomf:hunter2@www.sociocon.herokuapp.com/remote-node/
 http -a team-oomf:hunter2 http://www.sociocon.herokuapp.com/remote-node/
 ````
 
-If you want to try it in your browser: [http://team-oomf:hunter2@127.0.0.1:8000/remote-node/](http://team-oomf:hunter2@127.0.0.1:8000/remote-node/)
-
-**Warning: remember to logout from your admin or clear current cookies or local storage!**
+If you want to try it in your browser, **logout from your admin or clear current cookies or local storage,**
+and then click this link:
+[http://team-oomf:hunter2@127.0.0.1:8000/remote-node/](http://team-oomf:hunter2@127.0.0.1:8000/remote-node/)
 
 The result should look like:
 
