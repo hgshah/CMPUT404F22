@@ -50,19 +50,23 @@ class Author(AbstractUser):
     def __str__(self):
         return self.display_name if self.display_name else self.username
 
-    def is_server_authenticated(self):
-        """
-        :return: True if the current user is an authenticated or logged in active_remote_node
-        """
-        return self.author_type == AuthorType.ACTIVE_REMOTE_NODE and super(Author, self).is_authenticated
-
     @property
     def is_authenticated(self):
         """
-        Only use is_authenticated for users. If a node or server tries to imitate a local user, we return it as False
-        :return: True if the current user is an authenticated or logged in local_author
+        :return: True if the current user is an authenticated local_author or active_remote_node.
         """
-        if self.author_type != AuthorType.LOCAL_AUTHOR:
-            return False
+        return self.author_type != AuthorType.INACTIVE_REMOTE_NODE and super().is_authenticated
 
-        return super().is_authenticated
+    @property
+    def is_authenticated_user(self):
+        """
+        :return: True if the current user is an authenticated or logged in local_author.
+        """
+        return self.author_type == AuthorType.LOCAL_AUTHOR and super().is_authenticated
+
+    @property
+    def is_authenticated_node(self):
+        """
+        :return: True if the current user is an authenticated active_remote_node.
+        """
+        return self.author_type == AuthorType.ACTIVE_REMOTE_NODE and super(Author, self).is_authenticated

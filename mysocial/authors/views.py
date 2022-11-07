@@ -6,6 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from authors.models.author import Author
+from authors.permissions import NodeIsAuthenticated
 from authors.serializers.author_serializer import AuthorSerializer
 from common.pagination_helper import PaginationHelper
 
@@ -58,3 +59,23 @@ class AuthorView(GenericAPIView):
             return self._get_all_authors(request)
         else:
             return self._get_author(request, author_id)
+
+
+class RemoteNodeView(GenericAPIView):
+    """
+    View for other groups to test if they have a registered, active node.
+
+    Useful for debugging and "sanity-checking" with other groups.
+    """
+
+    permission_classes = [NodeIsAuthenticated]
+
+    def get_queryset(self):
+        return None
+
+    @staticmethod
+    def get(request) -> HttpResponse:
+        return Response({
+            'type': 'remoteNode',
+            'message': 'Authentication passed!'
+        })

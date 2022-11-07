@@ -7,8 +7,6 @@ from common.test_helper import TestHelper
 
 
 class TestAuthorView(TestCase):
-    # todo(turnip): test get_authors, test_get, test_pagination
-
     def setUp(self) -> None:
         self.users = []
         for index in range(10):
