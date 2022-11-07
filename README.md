@@ -59,3 +59,4 @@ https://stackoverflow.com/questions/70878647/login-to-django-admin-via-requests
 https://www.youtube.com/watch?v=1FqxfnlQPi8&ab_channel=pymike00
 https://stackoverflow.com/questions/44604686/how-to-test-a-model-that-has-a-foreign-key-in-django
 https://stackoverflow.com/questions/18622007/runtimewarning-datetimefield-received-a-naive-datetime
+https://stackoverflow.com/questions/16416172/how-can-i-modify-procfile-to-run-gunicorn-process-in-a-non-standard-folder-on-he
