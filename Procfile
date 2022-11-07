@@ -1,2 +1,2 @@
-web: gunicorn mysocial.wsgi
+web: gunicorn mysocial.wsgi:mysocial
 
