@@ -4,6 +4,12 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 class UserIsAuthenticated(BasePermission):
     """
     Allows access to authenticated users exclusively.
+
+    Example::
+
+        class MyView(GenericAPIView):
+            permission_classes = [UserIsAuthenticated]
+
     """
 
     def has_permission(self, request, view):
@@ -13,6 +19,12 @@ class UserIsAuthenticated(BasePermission):
 class NodeIsAuthenticated(BasePermission):
     """
     Allows access to authenticated nodes exclusively.
+
+    Example::
+
+        class MyView(GenericAPIView):
+            permission_classes = [NodeIsAuthenticated]
+
     """
 
     def has_permission(self, request, view):
@@ -22,6 +34,12 @@ class NodeIsAuthenticated(BasePermission):
 class UserIsAuthenticatedOrReadOnly(BasePermission):
     """
     Allows access to authenticated users exclusively, or is a read-only request.
+
+    Example::
+
+        class MyView(GenericAPIView):
+            permission_classes = [UserIsAuthenticatedOrReadOnly]
+
     """
 
     def has_permission(self, request, view):
@@ -36,6 +54,12 @@ class UserIsAuthenticatedOrReadOnly(BasePermission):
 class IsNodeAuthenticatedOrReadOnly(BasePermission):
     """
     Allows access to authenticated nodes exclusively, or is a read-only request.
+
+    Example::
+
+        class MyView(GenericAPIView):
+            permission_classes = [IsNodeAuthenticatedOrReadOnly]
+
     """
 
     def has_permission(self, request, view):
