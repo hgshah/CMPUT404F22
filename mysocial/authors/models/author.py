@@ -1,6 +1,12 @@
+import pathlib
 import uuid
-from django.db import models
+from urllib.parse import urlparse
+
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.db import models
+
+from mysocial.settings import REMOTE_NODE_CONFIG, SITE_URL
 from .author_manager import AuthorManager
 
 
@@ -70,3 +76,50 @@ class Author(AbstractUser):
         :return: True if the current user is an authenticated active_remote_node.
         """
         return self.author_type == AuthorType.ACTIVE_REMOTE_NODE and super(Author, self).is_authenticated
+
+    @staticmethod
+    def get_author(official_id: str):
+        """
+        Gets a local author ONLY. Nodes are ignored.
+        :param official_id:
+        :return: A local_author
+        """
+        try:
+            return Author.objects.get(
+                official_id=official_id,
+                author_type=AuthorType.LOCAL_AUTHOR
+            )
+        except Author.DoesNotExist:
+            return None
+
+    @staticmethod
+    def get_all_authors():
+        """
+        Gets all local_author. Nodes are ignored.
+        :return: All local_authors.
+        """
+        return Author.objects.filter(author_type=AuthorType.LOCAL_AUTHOR)
+
+
+def validate_author_url(author_url: str):
+    # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
+    _, domain, path, _, _, _ = urlparse(author_url)
+
+    if domain == SITE_URL:
+        # todo: check if it exists on our end
+        # from:
+        path = pathlib.PurePath(path)
+        author = Author.get_author(official_id=path.name)
+        if author is None:
+            raise ValidationError(f'There is no local_author with id {path.name}')
+        return
+
+    # check if we have this server
+    if domain not in REMOTE_NODE_CONFIG:
+        raise ValidationError(f'{author_url} does not have any corresponding domain')
+
+    # todo: otherwise, check it at the other server
+    node_config = REMOTE_NODE_CONFIG[domain]
+    author = node_config.get_author(author_url)
+    if author is None:
+        raise ValidationError(f'{author_url} does not exist in the domain {domain}')

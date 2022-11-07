@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-import django_on_heroku
-from pathlib import Path
+import json
 import os
-from pathlib import Path
+from pathlib import Path, Path
 
+import django_on_heroku
 from corsheaders.defaults import default_headers
+
+from remote_nodes.test_config import NodeConfigBase
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -205,3 +207,30 @@ CORS_EXPOSE_HEADERS = [
     'set-cookie',
     'cookie',
 ]
+
+"""
+Heroku Config under!
+
+Check out the settings page of Heroku, and look at the Config Vars section.
+That's where we store the os.environ stuff!
+"""
+SITE_URL: str = 'socioecon.herokuapp.com'
+SITE_URL_KEY = 'SITE_URL'
+if SITE_URL_KEY in os.environ:
+    SITE_URL = os.environ[SITE_URL_KEY]
+
+REMOTE_NODE_CREDENTIALS: dict = {}
+REMOTE_NODE_CREDENTIALS_KEY = 'REMOTE_NODE_CREDENTIALS'
+if REMOTE_NODE_CREDENTIALS_KEY in os.environ:
+    REMOTE_NODE_CREDENTIALS = json.loads(os.environ[REMOTE_NODE_CREDENTIALS_KEY])
+
+"""
+Remote node configs
+
+This is where both test and production configurations of each configs are accessible. It's
+a key-value pair of the domain and the corresponding logic of how to call the server and map
+the values into something our internal code can understand.
+"""
+REMOTE_NODE_CONFIG: dict = {}
+for config in (NodeConfigBase,):
+    REMOTE_NODE_CONFIG.update(config.create_dictionary_entry())

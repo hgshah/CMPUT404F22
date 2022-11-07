@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 
+from authors.models.author import validate_author_url
 from mysocial import settings
 
 
@@ -10,8 +10,9 @@ class Follow(models.Model):
     """
     FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'
 
-    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
-    target = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
+    # todo(turnip): change to url
+    actor = models.URLField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, validators=[validate_author_url])
+    target = models.URLField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, validators=[validate_author_url])
     has_accepted = models.BooleanField(default=False)
 
     class Meta:

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 
+from authors.models.author import Author
 from common.test_helper import TestHelper
 
 
@@ -11,7 +12,7 @@ class TestAuthor(TestCase):
         self.inactive_node = TestHelper.create_author('inactive_node', {'author_type': 'inactive_remote_node'})
 
     class Case:
-        def __init__(self, user, result: bool, is_anon=False):
+        def __init__(self, user, result, is_anon=False):
             self.user = user
             self.result = result
             self.is_anon = is_anon
@@ -59,3 +60,27 @@ class TestAuthor(TestCase):
                     continue
 
                 self.assertEqual(case.user.is_authenticated_node, case.result)
+
+    def test_get_author(self):
+        test_cases = (
+            TestAuthor.Case(self.local_author, self.local_author),
+            TestAuthor.Case(self.active_node, None),
+            TestAuthor.Case(self.inactive_node, None),
+        )
+
+        for case in test_cases:
+            with self.subTest(case=case.user):
+                self.assertEqual(Author.get_author(case.user.official_id), case.result)
+
+    def test_get_all_authors(self):
+        test_cases = (
+            TestAuthor.Case(self.local_author, True),
+            TestAuthor.Case(self.active_node, False),
+            TestAuthor.Case(self.inactive_node, False),
+        )
+
+        authors = Author.get_all_authors()
+        self.assertEqual(len(authors), 1)
+
+        for case in test_cases:
+            self.assertEqual(case.user in authors, case.result)

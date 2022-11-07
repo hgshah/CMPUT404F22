@@ -21,7 +21,7 @@ class AuthorView(GenericAPIView):
     def _get_all_authors(request: Request) -> HttpResponse:
         # lazy query set serialization so it's fine if this goes first
         # todo(turnip): only allow superusers because this kinda seems bad access?
-        authors = Author.objects.all()
+        authors = Author.get_all_authors()
         serializer = AuthorSerializer(
             authors,
             many=True,
@@ -44,7 +44,7 @@ class AuthorView(GenericAPIView):
     @staticmethod
     def _get_author(request: Request, author_id: str) -> HttpResponse:
         try:
-            author = Author.objects.get(official_id=author_id)
+            author = Author.get_author(official_id=author_id)
         except Author.DoesNotExist:
             return HttpResponseNotFound()
         serializer = AuthorSerializer(
