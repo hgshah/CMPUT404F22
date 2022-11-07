@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'drf_yasg',
+    'drf_spectacular',
 ]
 
 LOGGING = {
@@ -107,6 +107,7 @@ WSGI_APPLICATION = 'mysocial.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'PAGE_SIZE': 100,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -203,3 +204,12 @@ CORS_EXPOSE_HEADERS = [
     'set-cookie',
     'cookie',
 ]
+
+# docs
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Sociocon API',
+    'DESCRIPTION': 'Social media app...',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}

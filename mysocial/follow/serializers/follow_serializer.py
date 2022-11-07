@@ -20,3 +20,16 @@ class FollowRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ('type', 'id', 'summary', 'hasAccepted', 'object', 'actor')
+
+
+class FollowRequestListSerializer(serializers.ModelSerializer):
+    """Only for documentation"""
+    type = serializers.SerializerMethodField('get_type')
+    items = FollowRequestSerializer(many=True)
+
+    def get_type(self):
+        return "Follow"
+
+    class Meta:
+        model = Follow
+        fields = ('type', 'items')

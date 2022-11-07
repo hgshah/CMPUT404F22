@@ -1,10 +1,12 @@
 from typing import Any
+
+from rest_framework.pagination import BasePagination
 from rest_framework.request import Request
 from rest_framework.utils.serializer_helpers import ReturnDict
 from django.core.paginator import Paginator, InvalidPage, PageNotAnInteger, EmptyPage
 
 
-class PaginationHelper:
+class PaginationHelper(BasePagination):
     NO_PAGINATION_REQUEST = "NO_PAGINATION_REQUEST"
 
     @staticmethod
