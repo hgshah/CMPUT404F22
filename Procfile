@@ -1,2 +1,1 @@
-web: gunicorn mysocial.wsgi:mysocial
-
+web: gunicorn --pythonpath mysocial mysocial.wsgi
