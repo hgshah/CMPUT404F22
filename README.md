@@ -97,3 +97,6 @@ https://stackoverflow.com/questions/18622007/runtimewarning-datetimefield-receiv
 https://stackoverflow.com/questions/16416172/how-can-i-modify-procfile-to-run-gunicorn-process-in-a-non-standard-folder-on-he
 https://stackoverflow.com/questions/12615154/how-to-get-the-currently-logged-in-users-user-id-in-django
 https://www.youtube.com/watch?v=5d8AQFF0Ot0&t=689s&ab_channel=CodeAura
+https://www.linkedin.com/pulse/migrating-my-django-app-database-postgresql-onheroku-jovanta-pelawi/
+https://stackoverflow.com/questions/68265591/why-it-shows-unknown-command-collectstatic-when-i-try-to-collect-static
+https://stackoverflow.com/questions/15128135/setting-debug-false-causes-500-error#:~:text=If%20you%20are%20having%20a,in%20any%20web%20error%20logs.
