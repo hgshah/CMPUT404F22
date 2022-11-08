@@ -43,12 +43,12 @@ DJANGO_SETTINGS_MODULE: mysocial.settings.production
 8. Either push to your main or manually deploy your branch under the Deploy tab in your app.
 9. Remember to create a superuser!
     - In the heroku CLI, you can
-      do `heroku run python manage.py createsuperuser --settings mysocial.settings.production --app app-name`
+      do `heroku run python mysocial/manage.py createsuperuser --settings mysocial.settings.production --app app-name`
     - In the heroku web GUI
         1. At the top-right **More**, click it.
         2. It will show a drop-down menu. Choose `Run console`.
         3. In the dialog box that showed up,
-           enter: `python manage.py createsuperuser --settings mysocial.settings.production`
+           enter: `python mysocial/manage.py createsuperuser --settings mysocial.settings.production`
 10. For my workflow, I've added my remote fork repository
     with `git add remote new-remote-origin-nickname git@github.com/user/fork-repo.git`
 11. Since we have similar named mains for different remote origins, you have to checkout to your remote fork origin's
