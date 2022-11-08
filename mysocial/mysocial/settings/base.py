@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '8zox7ox(g#^5%*))!ywyjs1c9k3zwzpkefc1t$3r3ej19(20b*'
 
-ALLOWED_HOSTS = ['http://127.0.0.1', 'https://socioecon.herokuapp.com']
+ALLOWED_HOSTS = ['http://127.0.0.1', 'socioecon.herokuapp.com']
 
 
 # Application definition
@@ -72,6 +72,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -148,4 +149,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, '/staticfiles/')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 django_on_heroku.settings(locals())
