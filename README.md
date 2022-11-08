@@ -9,6 +9,11 @@ Before you start:
 Start your virtual env!
 pip install -r requirements.txt
 
+To run locally:
+```bash
+python manage.py runserver --settings mysocial.settings.local
+```
+
 Switching to PostgresDB (MACOS)
 https://daily-dev-tips.com/posts/installing-postgresql-on-a-mac-with-homebrew/
 Installing postgres

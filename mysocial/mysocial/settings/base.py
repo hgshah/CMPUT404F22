@@ -154,8 +154,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, '/staticfiles/')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 django_on_heroku.settings(locals())
-
 
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
@@ -193,3 +194,13 @@ CORS_EXPOSE_HEADERS = [
     'set-cookie',
     'cookie',
 ]
+
+
+# overriding configurations using environment variables
+
+# keys
+CURRENT_DOMAIN_KEY = "CURRENT_DOMAIN"
+CURRENT_DOMAIN = None
+
+if CURRENT_DOMAIN_KEY in os.environ:
+    CURRENT_DOMAIN = os.environ[CURRENT_DOMAIN_KEY]
