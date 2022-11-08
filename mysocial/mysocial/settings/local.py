@@ -1,5 +1,6 @@
 from mysocial.settings.base import *
 from mysocial.settings import base
+from remote_nodes.remote_configs import RemoteConfigs
 
 DEBUG = True
 
@@ -16,3 +17,5 @@ DATABASES = {
 
 if base.CURRENT_DOMAIN is None:
     base.CURRENT_DOMAIN = '127.0.0.1:8000'
+
+RemoteConfigs.setup()

@@ -6,7 +6,8 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from mysocial.settings import REMOTE_NODE_CONFIG, SITE_URL
+from mysocial.settings import base
+from remote_nodes.remote_configs import RemoteConfigs
 from .author_manager import AuthorManager
 
 
@@ -105,7 +106,7 @@ def validate_author_url(author_url: str):
     # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
     _, domain, path, _, _, _ = urlparse(author_url)
 
-    if domain == SITE_URL:
+    if domain == base.CURRENT_DOMAIN:
         # todo: check if it exists on our end
         # from:
         path = pathlib.PurePath(path)
@@ -115,11 +116,11 @@ def validate_author_url(author_url: str):
         return
 
     # check if we have this server
-    if domain not in REMOTE_NODE_CONFIG:
+    if domain not in RemoteConfigs.CONFIG:
         raise ValidationError(f'{author_url} does not have any corresponding domain')
 
     # todo: otherwise, check it at the other server
-    node_config = REMOTE_NODE_CONFIG[domain]
+    node_config = RemoteConfigs.CONFIG[domain]
     author = node_config.get_author(author_url)
     if author is None:
         raise ValidationError(f'{author_url} does not exist in the domain {domain}')

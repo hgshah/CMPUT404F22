@@ -1,7 +1,7 @@
 import requests
 from django.utils.baseconv import base64
 
-from mysocial.settings import REMOTE_NODE_CREDENTIALS
+from mysocial.settings import base
 
 
 class NodeConfigBase:
@@ -20,14 +20,19 @@ class NodeConfigBase:
     domain = 'domain.herokuapp.com'
 
     def __init__(self):
-        credentials = REMOTE_NODE_CREDENTIALS[self.__class__.domain]
+        if base.CURRENT_DOMAIN == '127.0.0.1:8000':
+            self.username = 'username'
+            self.password = 'password'
+            return
+
+        credentials = base.REMOTE_CONFIG_CREDENTIALS[self.__class__.domain]
         self.username = credentials['username']
         self.password = credentials['password']
         # todo(turnip): check entry in Author, check if inactive?
 
     @classmethod
     def create_dictionary_entry(cls):
-        return NodeConfigBase.domain, NodeConfigBase()
+        return {cls.domain: NodeConfigBase()}
 
     def get_author(self, author_url: str):
         token = base64.b64encode(f'{self.username}:{self.password}'.encode('ascii')).decode('utf-8')

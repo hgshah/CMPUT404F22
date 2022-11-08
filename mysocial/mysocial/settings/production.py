@@ -2,6 +2,7 @@ import json
 
 from mysocial.settings.base import *
 from mysocial.settings import base
+from remote_nodes.remote_configs import RemoteConfigs
 
 DEBUG = False
 
@@ -26,3 +27,5 @@ if DATABASE_CONFIG_KEY in os.environ:
 
 if base.CURRENT_DOMAIN is None:
     base.CURRENT_DOMAIN = 'socioecon.herokuapp.com'
+
+RemoteConfigs.setup()
