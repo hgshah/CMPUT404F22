@@ -10,7 +10,7 @@ from authors.serializers.author_serializer import AuthorSerializer
 # from https://stackoverflow.com/q/66264736/17836168
 class ObtainCookieAuthToken(ObtainAuthToken):
     """
-    Override default ObtainAuthToken view from rest_framework.
+    Override default ObtainAuthToken view from rest_framework. This is how frontend should log in.
     """
 
     @extend_schema(
