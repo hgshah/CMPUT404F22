@@ -11,10 +11,10 @@ class FollowRequestSerializer(serializers.ModelSerializer):
     object = AuthorSerializer(source='target', read_only=True)
     hasAccepted = serializers.BooleanField(source='has_accepted')
 
-    def get_type(self, model):
+    def get_type(self, model) -> str:
         return "Follow"
 
-    def get_summary(self, model):
+    def get_summary(self, model) -> str:
         return str(model)
 
     class Meta:
@@ -27,7 +27,7 @@ class FollowRequestListSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField('get_type')
     items = FollowRequestSerializer(many=True)
 
-    def get_type(self):
+    def get_type(self) -> str:
         return "Follow"
 
     class Meta:
