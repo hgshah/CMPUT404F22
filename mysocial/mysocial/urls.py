@@ -18,7 +18,7 @@ from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
-    path('authors/', include('authors.urls')),
+    path('', include('authors.urls')),
     path('admin/', admin.site.urls),
     path('', include('post.urls')),
     path('', include('comment.urls')),
