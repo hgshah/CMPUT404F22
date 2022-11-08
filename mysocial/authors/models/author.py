@@ -47,7 +47,7 @@ class Author(AbstractUser):
 
     objects = AuthorManager()
 
-    REQUIRED_FIELDS = ['email', 'host', 'password']
+    REQUIRED_FIELDS = ['email', 'password']
 
     @staticmethod
     def get_serializer_field_name():

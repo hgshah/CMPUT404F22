@@ -9,18 +9,13 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-import json
 import os
-from pathlib import Path, Path
+from pathlib import Path
 
-import django_on_heroku
 from corsheaders.defaults import default_headers
-
-from remote_nodes.test_config import NodeConfigBase
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -28,11 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '8zox7ox(g#^5%*))!ywyjs1c9k3zwzpkefc1t$3r3ej19(20b*'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['127.0.0.1', 'socioecon.herokuapp.com']
 
 # Application definition
 
@@ -82,6 +73,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -117,19 +109,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # Our custom user
 AUTH_USER_MODEL = "authors.Author"
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -149,7 +130,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -163,11 +143,12 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, '/staticfiles/')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 django_on_heroku.settings(locals())
 
 # todo(turnip): would we even try to be secure lol
@@ -214,10 +195,13 @@ Heroku Config under!
 Check out the settings page of Heroku, and look at the Config Vars section.
 That's where we store the os.environ stuff!
 """
-SITE_URL: str = 'socioecon.herokuapp.com'
-SITE_URL_KEY = 'SITE_URL'
-if SITE_URL_KEY in os.environ:
-    SITE_URL = os.environ[SITE_URL_KEY]
+
+# keys
+CURRENT_DOMAIN_KEY = "CURRENT_DOMAIN"
+CURRENT_DOMAIN = None
+
+if CURRENT_DOMAIN_KEY in os.environ:
+    CURRENT_DOMAIN = os.environ[CURRENT_DOMAIN_KEY]
 
 REMOTE_NODE_CREDENTIALS: dict = {}
 REMOTE_NODE_CREDENTIALS_KEY = 'REMOTE_NODE_CREDENTIALS'
