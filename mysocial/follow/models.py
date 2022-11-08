@@ -8,7 +8,7 @@ class Follow(models.Model):
     """
     actor follows target
     """
-    FIELD_NAME_HAS_ACCEPTED = 'has_accepted'
+    FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'
 
     actor = models.ForeignKey(settings.base.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
     target = models.ForeignKey(settings.base.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
@@ -16,6 +16,7 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = (('actor', 'target'),)
+        get_latest_by = 'id'
 
     @staticmethod
     def get_serializer_field_name():

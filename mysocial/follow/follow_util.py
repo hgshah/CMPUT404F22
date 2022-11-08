@@ -1,6 +1,6 @@
 import logging
 
-from authors.models import Author
+from authors.models.author import Author
 from follow.models import Follow
 
 logger = logging.getLogger(__name__)
