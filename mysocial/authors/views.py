@@ -89,6 +89,9 @@ class RemoteNodeView(GenericAPIView):
     View for other groups to test if they have a registered, active node.
 
     Useful for debugging and "sanity-checking" with other groups.
+
+    To use basic auth, do the following:
+    GET http://username:password@www.socioecon.herokuapp.com/remote-node/
     """
 
     permission_classes = [NodeIsAuthenticated]
