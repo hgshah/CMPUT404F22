@@ -199,7 +199,9 @@ CORS_EXPOSE_HEADERS = [
 # docs
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Sociocon API',
-    'DESCRIPTION': 'Social media app...',
+    'DESCRIPTION': 'Note: application/json is best supported by our servers so remember to toggle the Payload Content '
+                   'type drop-down choice to application/json. Check out our [Github repository]('
+                   'https://github.com/hgshah/cmput404-project) to file an Issue.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
