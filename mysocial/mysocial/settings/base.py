@@ -151,3 +151,12 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, '/staticfiles/')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 django_on_heroku.settings(locals())
+
+
+# overriding configurations using environment variables
+
+# keys
+CURRENT_DOMAIN_KEY = "CURRENT_DOMAIN"
+
+if CURRENT_DOMAIN_KEY in os.environ:
+    CURRENT_DOMAIN = os.environ[CURRENT_DOMAIN_KEY]
