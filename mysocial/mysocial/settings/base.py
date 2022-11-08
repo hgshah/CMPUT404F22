@@ -162,8 +162,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, '/staticfiles/')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 django_on_heroku.settings(locals())
 
-# todo(turnip): would we even try to be secure lol
-# CORS_ORIGIN_ALLOW_ALL = True
+
 CORS_ALLOW_CREDENTIALS = True
 
 # later if the above causes issue
