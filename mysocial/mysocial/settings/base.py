@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '8zox7ox(g#^5%*))!ywyjs1c9k3zwzpkefc1t$3r3ej19(20b*'
 
-ALLOWED_HOSTS = ['http://127.0.0.1', 'socioecon.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'socioecon.herokuapp.com']
 
 
 # Application definition
@@ -197,6 +197,7 @@ CORS_EXPOSE_HEADERS = [
 
 # keys
 CURRENT_DOMAIN_KEY = "CURRENT_DOMAIN"
+CURRENT_DOMAIN = None
 
 if CURRENT_DOMAIN_KEY in os.environ:
     CURRENT_DOMAIN = os.environ[CURRENT_DOMAIN_KEY]
