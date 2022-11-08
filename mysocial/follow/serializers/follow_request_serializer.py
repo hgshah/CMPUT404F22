@@ -1,5 +1,7 @@
 class FollowRequestSerializer:
     """
+    todo(turnip): WIP
+
     For local authors, we ignore
 
     There are two ways to make a Follow request

@@ -6,6 +6,7 @@ from mysocial import settings
 
 class Follow(models.Model):
     """
+    todo(turnip): WIP
     actor follows target
     """
     FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'

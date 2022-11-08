@@ -15,8 +15,6 @@ class NodeConfigBase:
     Remember to call super whenever possible; use good judgment to determine when to call super in the method body.
     """
 
-    # todo(turnip): check entry in Author, if does not exist, make one
-
     """
     Call domain with self.__class__.domain so you can override it in classes that inherit this.
     Inheriting classes may not need it unless when needed
