@@ -60,7 +60,24 @@ class IncomingRequestView(APIView):
         summary="incoming_follow_requests_all"
     )
     def get(request: Request) -> HttpResponse:
-        """Get all incoming follow requests"""
+        """
+        Get all incoming follow requests
+
+        User story: as an author: I want to un-befriend local and remote authors.
+        todo(turnip): remote authors not yet implemented
+
+        User story: as an author: I want to know if I have friend requests.
+        todo(turnip): remote authors not yet implemented
+
+        User story: as an author, When I befriend someone (they accept my friend request) I follow them, only when the
+        other author befriends me do I count as a real friend – a bi-directional follow is a true friend.
+        todo(turnip): remote authors not yet implemented
+
+        User story: As an author, I want to befriend local authors
+
+        See the step-by-step calls to follow or befriend someone at:
+        https://github.com/hgshah/cmput404-project/blob/main/endpoints.txt#L137
+        """
         relationships = Follow.objects.filter(target=request.user, has_accepted=False)
         serializers = FollowRequestSerializer(relationships, many=True)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
@@ -81,7 +98,21 @@ class IndividualRequestView(GenericAPIView):
 
     @staticmethod
     def get(request: Request, follow_id: str = None) -> HttpResponse:
-        """Get an individual follow request"""
+        """
+        Get an individual follow request
+
+        User story: as an author: I want to un-befriend local and remote authors.
+        todo(turnip): remote authors not yet implemented
+
+        User story: as an author, When I befriend someone (they accept my friend request) I follow them, only when the
+        other author befriends me do I count as a real friend – a bi-directional follow is a true friend.
+        todo(turnip): remote authors not yet implemented
+
+        User story: As an author, I want to befriend local authors
+
+        See the step-by-step calls to follow or befriend someone at:
+        https://github.com/hgshah/cmput404-project/blob/main/endpoints.txt#L137
+        """
         try:
             follow = Follow.objects.get(id=follow_id)
             if follow.target != request.user and follow.actor != request.user:
@@ -102,6 +133,16 @@ class IndividualRequestView(GenericAPIView):
         Accept a follow request
         Only the target or object can accept the actor's request.
         This is only one way. You cannot make a follow back into has_accepted = False, you have to delete it.
+
+        User story: as an author: I want to un-befriend local and remote authors.
+        todo(turnip): remote authors not yet implemented
+
+        User story: as an author, When I befriend someone (they accept my friend request) I follow them, only when the
+        other author befriends me do I count as a real friend – a bi-directional follow is a true friend.
+        todo(turnip): remote authors not yet implemented
+
+        See the step-by-step calls to follow or befriend someone at:
+        https://github.com/hgshah/cmput404-project/blob/main/endpoints.txt#L137
         """
         try:
             follow = Follow.objects.get(id=follow_id)
@@ -128,6 +169,9 @@ class IndividualRequestView(GenericAPIView):
     def delete(request: Request, follow_id: str = None) -> HttpResponse:
         """
         Delete, decline, or cancel a follow request
+
+        User story: as an author: I want to un-befriend local and remote authors.
+        todo(turnip): remote authors not yet implemented
         """
         if not request.user.is_authenticated:
             return HttpResponseNotFound()
@@ -158,7 +202,14 @@ class FollowersView(GenericAPIView):
     @staticmethod
     @extend_schema(parameters=PaginationHelper.OPEN_API_PARAMETERS)
     def get(request: Request, author_id: str = None) -> HttpResponse:
-        """Get followers for an Author"""
+        """
+        Get followers for an Author
+
+        See the step-by-step calls to follow or befriend someone at:
+        https://github.com/hgshah/cmput404-project/blob/main/endpoints.txt#L137
+
+        User story: As an author, my server will know about my friends
+        """
         user = None
         try:
             user = Author.objects.get(official_id=author_id)
@@ -210,7 +261,17 @@ class FollowersView(GenericAPIView):
 
         Two cases:
         (1) A local author makes a follow request to a local author
-        (2) A remote node tells us that one of its users wants to follow us
+        (2) A remote node tells us that one of its users wants to follow us todo(turnip)
+
+        User story: as an author: I want to un-befriend local and remote authors.
+        todo(turnip): remote authors not yet implemented
+
+        User story: as an author, When I befriend someone (they accept my friend request) I follow them, only when the
+        other author befriends me do I count as a real friend – a bi-directional follow is a true friend.
+        todo(turnip): remote authors not yet implemented
+
+        See the step-by-step calls to follow or befriend someone at:
+        https://github.com/hgshah/cmput404-project/blob/main/endpoints.txt#L137
         """
         if not request.user.is_authenticated:
             return HttpResponseNotFound()
@@ -244,7 +305,17 @@ class RealFriendsView(GenericAPIView):
         )
     )
     def get(request: Request, author_id: str = None) -> HttpResponse:
-        """Get friends, real friends, true friends, or mutual followers for an Author"""
+        """
+        Get friends, real friends, true friends, or mutual followers for an Author
+
+        User story: as an author, When I befriend someone (they accept my friend request) I follow them, only when the
+        other author befriends me do I count as a real friend – a bi-directional follow is a true friend.
+        todo(turnip): remote authors not yet implemented
+
+        User story: As an author, posts I create can be a private to my friends.
+
+        User story: As an author, my server will know about my friends
+        """
         user = None
         try:
             user = Author.objects.get(official_id=author_id)

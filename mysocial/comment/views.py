@@ -32,6 +32,9 @@ class CommentView(GenericAPIView):
             return HttpResponseNotFound
 
     def post(self, request: Request, *args, **kwargs) -> HttpResponse:
+        """
+        User story: As an author, I want to comment on posts that I can access
+        """
         try:
             serializer = CreateCommentSerializer(data=request.data)
             if serializer.is_valid():
