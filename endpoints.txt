@@ -133,6 +133,13 @@ REAL FRIENDS
 ### GET ALL REAL FRIENDS
 ```GET /authors/{AUTHOR_UUID}/real-friends/```
 
+----------------------------------------
+REMOTE-NODE (testing for external users)
+=========================================
+### TEST BASIC AUTH
+<!-- todo(turnip): change domain when we have actual domain! -->
+GET http://username:password@www.sociocon.herokuapp.com/remote-node/
+
 --------------------------
 LOGIN
 ==========================
