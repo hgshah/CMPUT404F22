@@ -1,11 +1,8 @@
 import logging
 
-from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.decorators import permission_classes
+from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -17,7 +14,8 @@ from authors.serializers.author_serializer import AuthorSerializer
 from common.pagination_helper import PaginationHelper
 from follow.follow_util import FollowUtil
 from follow.models import Follow
-from follow.serializers.follow_serializer import FollowRequestSerializer
+from follow.serializers.follow_serializer import FollowRequestListSerializer, FollowRequestSerializer
+from rest_framework import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +24,16 @@ logger = logging.getLogger(__name__)
 
 class OutgoingRequestView(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = FollowRequestListSerializer
 
     def get_queryset(self):
         return None
 
     @staticmethod
+    @extend_schema(
+        parameters=PaginationHelper.OPEN_API_PARAMETERS,
+        summary="outgoing_follow_requests_all"
+    )
     def get(request: Request) -> HttpResponse:
         """Get all outgoing follow requests that were not accepted yet"""
         relationships = Follow.objects.filter(actor=request.user, has_accepted=False)
@@ -46,11 +49,16 @@ class OutgoingRequestView(GenericAPIView):
 
 class IncomingRequestView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = FollowRequestListSerializer
 
     def get_queryset(self):
         return None
 
     @staticmethod
+    @extend_schema(
+        parameters=PaginationHelper.OPEN_API_PARAMETERS,
+        summary="incoming_follow_requests_all"
+    )
     def get(request: Request) -> HttpResponse:
         """Get all incoming follow requests"""
         relationships = Follow.objects.filter(target=request.user, has_accepted=False)
@@ -66,12 +74,10 @@ class IncomingRequestView(APIView):
 
 class IndividualRequestView(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = FollowRequestSerializer
 
     def get_queryset(self):
         return None
-
-    def get_serializer_class(self):
-        return FollowRequestSerializer
 
     @staticmethod
     def get(request: Request, follow_id: str = None) -> HttpResponse:
@@ -150,6 +156,7 @@ class FollowersView(GenericAPIView):
         return FollowRequestSerializer
 
     @staticmethod
+    @extend_schema(parameters=PaginationHelper.OPEN_API_PARAMETERS)
     def get(request: Request, author_id: str = None) -> HttpResponse:
         """Get followers for an Author"""
         user = None
@@ -209,8 +216,18 @@ class RealFriendsView(GenericAPIView):
         return FollowRequestSerializer
 
     @staticmethod
+    @extend_schema(
+        parameters=PaginationHelper.OPEN_API_PARAMETERS,
+        responses=inline_serializer(
+            name='RealFriends',
+            fields={
+                'type': serializers.CharField(),
+                'items': AuthorSerializer(many=True)
+            }
+        )
+    )
     def get(request: Request, author_id: str = None) -> HttpResponse:
-        """Get friends for an Author"""
+        """Get friends, real friends, true friends, or mutual followers for an Author"""
         user = None
         try:
             user = Author.objects.get(official_id=author_id)

@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+app_name = 'post'
 urlpatterns = [
     path('posts/public/', views.PublicPostView.as_view()),
     path('authors/<uuid:author_id>/posts/<uuid:post_id>/', views.PostView.as_view()),
