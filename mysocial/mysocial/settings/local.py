@@ -18,4 +18,5 @@ DATABASES = {
 if base.CURRENT_DOMAIN is None:
     base.CURRENT_DOMAIN = '127.0.0.1:8000'
 
+# has to be called last to prevent circular dependency error
 RemoteUtil.setup()

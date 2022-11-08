@@ -27,6 +27,9 @@ class RemoteUtil:
 
     @staticmethod
     def setup():
+        """
+        Setup all remote node configs and logic
+        """
         for config in (TurnipOomfie, PotatoOomfie):
             RemoteUtil.CONFIG.update(config.create_dictionary_entry())
 
