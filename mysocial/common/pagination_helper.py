@@ -1,13 +1,23 @@
 from typing import Any
 
-from rest_framework.pagination import BasePagination
+from django.core.paginator import EmptyPage, InvalidPage, PageNotAnInteger, Paginator
+from drf_spectacular.utils import OpenApiParameter
 from rest_framework.request import Request
 from rest_framework.utils.serializer_helpers import ReturnDict
-from django.core.paginator import Paginator, InvalidPage, PageNotAnInteger, EmptyPage
 
 
-class PaginationHelper(BasePagination):
+class PaginationHelper:
     NO_PAGINATION_REQUEST = "NO_PAGINATION_REQUEST"
+
+    # use this for documenting endpoints that can be paginated
+    OPEN_API_PARAMETERS = [
+        OpenApiParameter(name='page', location=OpenApiParameter.QUERY,
+                         description='A page number greater than zero',
+                         required=False, type=int),
+        OpenApiParameter(name='size', location=OpenApiParameter.QUERY,
+                         description='The size of a page greater than zero',
+                         required=False, type=int),
+    ]
 
     @staticmethod
     def paginate_serialized_data(request: Request, data: ReturnDict) -> (Any, str):

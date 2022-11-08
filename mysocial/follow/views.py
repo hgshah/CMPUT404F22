@@ -30,6 +30,10 @@ class OutgoingRequestView(GenericAPIView):
         return None
 
     @staticmethod
+    @extend_schema(
+        parameters=PaginationHelper.OPEN_API_PARAMETERS,
+        summary="outgoing_follow_requests_all"
+    )
     def get(request: Request) -> HttpResponse:
         """Get all outgoing follow requests that were not accepted yet"""
         relationships = Follow.objects.filter(actor=request.user, has_accepted=False)
@@ -51,6 +55,10 @@ class IncomingRequestView(APIView):
         return None
 
     @staticmethod
+    @extend_schema(
+        parameters=PaginationHelper.OPEN_API_PARAMETERS,
+        summary="incoming_follow_requests_all"
+    )
     def get(request: Request) -> HttpResponse:
         """Get all incoming follow requests"""
         relationships = Follow.objects.filter(target=request.user, has_accepted=False)
@@ -148,6 +156,7 @@ class FollowersView(GenericAPIView):
         return FollowRequestSerializer
 
     @staticmethod
+    @extend_schema(parameters=PaginationHelper.OPEN_API_PARAMETERS)
     def get(request: Request, author_id: str = None) -> HttpResponse:
         """Get followers for an Author"""
         user = None
@@ -208,6 +217,7 @@ class RealFriendsView(GenericAPIView):
 
     @staticmethod
     @extend_schema(
+        parameters=PaginationHelper.OPEN_API_PARAMETERS,
         responses=inline_serializer(
             name='RealFriends',
             fields={
@@ -217,7 +227,7 @@ class RealFriendsView(GenericAPIView):
         )
     )
     def get(request: Request, author_id: str = None) -> HttpResponse:
-        """Get friends for an Author"""
+        """Get friends, real friends, true friends, or mutual followers for an Author"""
         user = None
         try:
             user = Author.objects.get(official_id=author_id)
