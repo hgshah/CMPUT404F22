@@ -22,7 +22,8 @@ class NodeConfigBase:
     domain = 'domain.herokuapp.com'
 
     def __init__(self):
-        if base.CURRENT_DOMAIN == '127.0.0.1:8000':
+        if self.__class__.domain not in base.REMOTE_CONFIG_CREDENTIALS:
+            print(f'{self.__class__.domain} is not in ConfigVars REMOTE_CONFIG_CREDENTIALS')
             self.username = 'username'
             self.password = 'password'
             return
