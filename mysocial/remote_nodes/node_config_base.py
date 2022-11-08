@@ -1,4 +1,5 @@
 import json
+import urllib.parse
 
 import requests
 from django.http import HttpResponseNotFound
@@ -38,8 +39,12 @@ class NodeConfigBase:
         return {cls.domain: cls()}
 
     # endpoints
-    def get_all_authors_request(self):
-        response = requests.get(f'http://{self.__class__.domain}/authors/')
+    def get_all_authors_request(self, params: dict):
+        url = f'http://{self.__class__.domain}/authors/'
+        if len(params) > 0:
+            query_param = urllib.parse.urlencode(params)
+            url += '?' + query_param
+        response = requests.get(url)
         if response.status_code == 200:
             # todo(turnip): map to our author?
             return Response(json.loads(response.content))

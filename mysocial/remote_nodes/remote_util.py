@@ -37,11 +37,15 @@ class RemoteUtil:
     def extract_node_param(request: Request):
         """
         :param request:
-        :return: Either None if the param does not exist or a string if it does
+        :return: Either (None, None) if the param does not exist
+        or a (string, dict) if it does. Dict here is the request query parameters without the added node
         """
         if 'node' not in request.query_params:
-            return None
-        return request.query_params['node']
+            return None, None
+        node_param = request.query_params['node']
+        new_dict = request.query_params.copy()
+        new_dict.pop('node')
+        return node_param, new_dict
 
     @staticmethod
     def get_node_config(node_param: str):
