@@ -13,6 +13,7 @@ from authors.models.author import Author
 from authors.permissions import NodeIsAuthenticated
 from authors.serializers.author_serializer import AuthorSerializer
 from common.pagination_helper import PaginationHelper
+from remote_nodes.remote_util import RemoteUtil
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ class AuthorView(GenericViewSet):
 
     @staticmethod
     @extend_schema(
-        parameters=PaginationHelper.OPEN_API_PARAMETERS,
+        parameters=PaginationHelper.OPEN_API_PARAMETERS + RemoteUtil.REMOTE_NODE_PARAMETERS,
         responses=inline_serializer(
             name='AuthorList',
             fields={
@@ -42,6 +43,9 @@ class AuthorView(GenericViewSet):
     @action(detail=True, methods=['get'], url_name='retrieve_all')
     def retrieve_all(request: Request):
         """Gets all authors"""
+        node_param = RemoteUtil.extract_node_param(request)
+        if node_param is not None:
+            return AuthorView.retrieve_all_remote(request, node_param)
 
         # lazy query set serialization so it's fine if this goes first
         # todo(turnip): only allow superusers because this kinda seems bad access?
@@ -66,12 +70,26 @@ class AuthorView(GenericViewSet):
         })
 
     @staticmethod
+    def retrieve_all_remote(request: Request, node_param: str):
+        """Gets all authors in another node"""
+        node_config = RemoteUtil.get_node_config(node_param)
+        if node_config is None:
+            return HttpResponseNotFound()
+        return node_config.get_all_authors_request()
+
+    @staticmethod
     @extend_schema(
+        parameters=RemoteUtil.REMOTE_NODE_PARAMETERS,
         responses=AuthorSerializer,
         summary="authors_retrieve"
     )
     def retrieve(request: Request, author_id: str) -> HttpResponse:
         """Get an individual author"""
+
+        node_param = RemoteUtil.extract_node_param(request)
+        if node_param is not None:
+            return AuthorView.retrieve_author(request, node_param, author_id)
+
         try:
             author = Author.get_author(official_id=author_id)
         except Author.DoesNotExist:
@@ -82,6 +100,14 @@ class AuthorView(GenericViewSet):
                 "host": request.get_host()
             })
         return Response(serializer.data)
+
+    @staticmethod
+    def retrieve_author(request: Request, node_param: str, author_id: str):
+        """Get an author in another node"""
+        node_config = RemoteUtil.get_node_config(node_param)
+        if node_config is None:
+            return HttpResponseNotFound()
+        return node_config.get_author_request(author_id)
 
 
 class RemoteNodeView(GenericAPIView):

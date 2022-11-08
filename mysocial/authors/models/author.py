@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from mysocial.settings import base
-from remote_nodes.remote_configs import RemoteConfigs
+from remote_nodes.remote_util import RemoteUtil
 from .author_manager import AuthorManager
 
 
@@ -116,11 +116,11 @@ def validate_author_url(author_url: str):
         return
 
     # check if we have this server
-    if domain not in RemoteConfigs.CONFIG:
+    if domain not in RemoteUtil.CONFIG:
         raise ValidationError(f'{author_url} does not have any corresponding domain')
 
     # todo: otherwise, check it at the other server
-    node_config = RemoteConfigs.CONFIG[domain]
+    node_config = RemoteUtil.CONFIG[domain]
     author = node_config.get_author(author_url)
     if author is None:
         raise ValidationError(f'{author_url} does not exist in the domain {domain}')

@@ -1,7 +1,7 @@
 import logging
 
 from django.db import IntegrityError
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseForbidden
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -176,15 +176,7 @@ class FollowersView(GenericAPIView):
         })
 
     @staticmethod
-    def post(request: Request, author_id: str = None) -> HttpResponse:
-        """
-        Create a follow request for the author
-        Only the current authenticated user can send request for itself
-        - In other words, you can't follow request on behalf of another user
-        """
-        if not request.user.is_authenticated:
-            return HttpResponseNotFound()
-
+    def post_local_author(request: Request, author_id: str = None) -> HttpResponse:
         actor = request.user
         target = None
         data = None
@@ -205,6 +197,31 @@ class FollowersView(GenericAPIView):
             logger.error(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
         return Response(data=data, status=201)
+
+    @staticmethod
+    def post_remote_node(request: Request, author_id: str = None) -> HttpResponse:
+        # we want to get the author representation of the
+        return Response(status=201)
+
+    @staticmethod
+    def post(request: Request, author_id: str = None) -> HttpResponse:
+        """
+        Create a follow request for the local author
+
+        Two cases:
+        (1) A local author makes a follow request to a local author
+        (2) A remote node tells us that one of its users wants to follow us
+        """
+        if not request.user.is_authenticated:
+            return HttpResponseNotFound()
+
+        if request.user.is_authenticated_user:
+            return FollowersView.post_local_author(request, author_id=author_id)
+
+        if request.user.is_authenticated_node:
+            return FollowersView.post_local_author(request, author_id=author_id)
+
+        return HttpResponseForbidden()
 
 
 # todo(turnip): add test
