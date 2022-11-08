@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import django_on_heroku
 from pathlib import Path
 import os
+from pathlib import Path
+
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '8zox7ox(g#^5%*))!ywyjs1c9k3zwzpkefc1t$3r3ej19(20b*'
 
-ALLOWED_HOSTS = ['http://127.0.0.1', 'socioecon.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'socioecon.herokuapp.com']
 
 
 # Application definition
@@ -33,6 +36,7 @@ INSTALLED_APPS = [
     'post.apps.PostConfig',
     'comment.apps.CommentConfig',
     'follow.apps.FollowsConfig',
+    'tokens.apps.TokensConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 ]
 
@@ -69,14 +74,12 @@ LOGGING = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
 ]
 
 ROOT_URLCONF = 'mysocial.urls'
@@ -101,15 +104,16 @@ WSGI_APPLICATION = 'mysocial.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
+    'PAGE_SIZE': 100,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
 }
 
 # Our custom user
 AUTH_USER_MODEL = "authors.Author"
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-]
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -148,15 +152,52 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, '/staticfiles/')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-django_on_heroku.settings(locals())
+
+
+# todo(turnip): would we even try to be secure lol
+# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+# later if the above causes issue
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://192.168.0.50:3000',  # for network
+    'http://localhost:8000',  # for localhost (Development)
+    'http://192.168.0.50:8000',  # for network (Development)
+]
+
+# from https://stackoverflow.com/a/72249293/17836168
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://192.168.0.50:3000',  # for network
+    'http://localhost:8000',  # for localhost (Development)
+    'http://192.168.0.50:8000',  # for network (Development)
+]
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'set-cookie',
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
+
+CORS_EXPOSE_HEADERS = [
+    'set-cookie',
+    'cookie',
+]
 
 
 # overriding configurations using environment variables
 
 # keys
 CURRENT_DOMAIN_KEY = "CURRENT_DOMAIN"
+CURRENT_DOMAIN = None
 
 if CURRENT_DOMAIN_KEY in os.environ:
     CURRENT_DOMAIN = os.environ[CURRENT_DOMAIN_KEY]

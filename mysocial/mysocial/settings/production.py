@@ -1,6 +1,7 @@
 import json
 
 from mysocial.settings.base import *
+from mysocial.settings import base
 
 DEBUG = False
 
@@ -19,7 +20,9 @@ DATABASES = {
 
 # keys
 DATABASE_CONFIG_KEY = "DATABASE_CONFIG"
-CURRENT_DOMAIN_KEY = "CURRENT_DOMAIN"
 
 if DATABASE_CONFIG_KEY in os.environ:
     DATABASES.update(json.loads(os.environ[DATABASE_CONFIG_KEY]))
+
+if base.CURRENT_DOMAIN is None:
+    base.CURRENT_DOMAIN = 'socioecon.herokuapp.com'

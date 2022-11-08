@@ -1,7 +1,7 @@
 from typing import Any
 from rest_framework.request import Request
 from rest_framework.utils.serializer_helpers import ReturnDict
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, InvalidPage, PageNotAnInteger, EmptyPage
 
 
 class PaginationHelper:
@@ -45,13 +45,22 @@ class PaginationHelper:
         try:
             page = int(request.query_params['page'])
             if page < 1:
-                return "page should be greater than or equal to 1"
+                return None, "page should be greater than or equal to 1"
 
             size = int(request.query_params['size'])
             if size < 1:
-                return "size should be greater than or equal to 1"
+                return None, "size should be greater than or equal to 1"
         except Exception as err:
             return None, str(err)
 
         paginator = Paginator(data, size)
-        return paginator.get_page(page).object_list, None
+        try:
+            return paginator.page(page).object_list, None
+        except EmptyPage:
+            return (), 'Page is empty'
+        except PageNotAnInteger:
+            return (), 'Page is not an integer'
+        except InvalidPage:
+            return (), 'Invalid page'
+        except Exception as err:
+            return (), str(err)
