@@ -2,7 +2,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from post.models import Post
 from comment.models import Comment, ContentType
-from authors.models import Author
+from authors.models.author import Author
 from django.utils import timezone
 import logging
 import datetime

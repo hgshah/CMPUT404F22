@@ -4,12 +4,12 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from .serializer import PostSerializer, CreatePostSerializer
 from django.core.paginator import Paginator
-from authors.models import Author
+from authors.models.author import Author
 from .models import Post, Visibility
 from rest_framework import status
 import logging, json
 from urllib.request import urlopen
-from common import PaginationHelper
+from common.pagination_helper import PaginationHelper
 
 logger = logging.getLogger("mylogger")
 
