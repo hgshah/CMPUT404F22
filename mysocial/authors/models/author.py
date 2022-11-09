@@ -33,7 +33,7 @@ class Author(AbstractUser):
     last_name = None
 
     official_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    host = models.TextField()
+    host = models.TextField(blank=True)
     display_name = models.TextField(blank=True)
     github = models.TextField(blank=True)
     profile_image = models.ImageField(blank=True)
