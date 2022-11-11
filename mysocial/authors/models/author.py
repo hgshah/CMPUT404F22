@@ -40,7 +40,7 @@ class Author(AbstractUser):
     last_name = None
 
     official_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    host = models.TextField()
+    host = models.TextField(blank=True)
     display_name = models.TextField(blank=True)
     github = models.TextField(blank=True)
     profile_image = models.ImageField(blank=True)
@@ -49,6 +49,24 @@ class Author(AbstractUser):
     objects = AuthorManager()
 
     REQUIRED_FIELDS = ['email', 'password']
+
+    def get_url(self):
+        """
+        Returns author_url following the local_author's format
+        Example:
+            - http://socioecon/authors/{self.official_id}
+            - http://{local_host}/authors/{self.official_id}
+        """
+        return self.get_id()
+
+    def get_id(self):
+        """
+        Returns author_url following the local_author's format
+        Example:
+            - http://socioecon/authors/{self.official_id}
+            - http://{local_host}/authors/{self.official_id}
+        """
+        return f"http://{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
 
     @staticmethod
     def get_serializer_field_name():
@@ -102,25 +120,60 @@ class Author(AbstractUser):
         return Author.objects.filter(author_type=AuthorType.LOCAL_AUTHOR)
 
 
-def validate_author_url(author_url: str):
+# These functions are outside Author to prevent circular dependency and IDEs struggling figuring out type hinting
+def from_author_url_to_author(author_url: str) -> (Author, ValidationError):
+    """
+    Convert url to Author
+
+    :param author_url:
+    :return: Returns a pair of Author and ValidationError
+
+    Example:
+        author, err = from_url_to_author(url)
+
+        if err is not None:
+            # handle error
+            return
+
+        # do logic with author
+    """
     # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
     _, domain, path, _, _, _ = urlparse(author_url)
 
     if domain == base.CURRENT_DOMAIN:
-        # todo: check if it exists on our end
-        # from:
-        path = pathlib.PurePath(path)
-        author = Author.get_author(official_id=path.name)
+        local_id = from_author_url_to_local_id(path)
+        author = Author.get_author(official_id=local_id)
+        err = None
         if author is None:
-            raise ValidationError(f'There is no local_author with id {path.name}')
-        return
+            err = ValidationError(f'There is no local_author with id {path.name}')
+        return author, err
 
     # check if we have this server
     if domain not in RemoteUtil.CONFIG:
-        raise ValidationError(f'{author_url} does not have any corresponding domain')
+        return None, ValidationError(f'{author_url} does not have any corresponding domain')
 
-    # todo: otherwise, check it at the other server
+    # todo: otherwise, check it at the other server; implement
     node_config = RemoteUtil.CONFIG[domain]
     author = node_config.get_author(author_url)
     if author is None:
-        raise ValidationError(f'{author_url} does not exist in the domain {domain}')
+        return None, ValidationError(f'{author_url} does not exist in the domain {domain}')
+    return author, None
+
+
+def validate_author_url(author_url: str):
+    """
+    Do validations only; for Model fields
+    :param author_url:
+    :return:
+    """
+    _, err = from_author_url_to_author(author_url)
+    if err:
+        raise err
+
+
+def from_author_url_to_local_id(local_author_url: str):
+    """
+    Note: this does NOT validate if the url is not from a local author
+    :return:
+    """
+    return pathlib.PurePath(local_author_url).name

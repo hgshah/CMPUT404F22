@@ -228,7 +228,7 @@ class FollowersView(GenericAPIView):
 
     @staticmethod
     def post_local_author(request: Request, author_id: str = None) -> HttpResponse:
-        actor = request.user
+        actor: Author = request.user
         target = None
         data = None
         try:
@@ -237,7 +237,7 @@ class FollowersView(GenericAPIView):
                 # validation: do not follow self!
                 return HttpResponseBadRequest('You can not follow self')
 
-            follow = Follow.objects.create(actor=actor, target=target, has_accepted=False)
+            follow = Follow.objects.create(actor=actor.get_id(), target=target.get_id(), has_accepted=False)
             serializers = FollowRequestSerializer(follow)
             data = serializers.data
         except Author.DoesNotExist:

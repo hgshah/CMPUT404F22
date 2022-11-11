@@ -1,6 +1,6 @@
 import logging
 
-from authors.models.author import Author
+from authors.models.author import Author, from_author_url_to_local_id
 from follow.models import Follow
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,9 @@ class FollowUtil:
 
         Remember to catch errors!
         """
-        follow_ids = Follow.objects.values_list('actor', flat=True).filter(target=target, has_accepted=True)
+        follower_paths = Follow.objects.values_list('actor', flat=True).filter(target=target.get_url(), has_accepted=True)
+        follow_ids = list(map(lambda f: from_author_url_to_local_id(f), follower_paths))
+        # todo(turnip): support remote author
         return Author.objects.filter(official_id__in=follow_ids)
 
     @staticmethod
