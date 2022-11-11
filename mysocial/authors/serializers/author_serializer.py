@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from authors.models.author import Author
+from authors.models.author import Author, from_author_url_to_author
 from mysocial.settings import base
 
 
@@ -34,6 +34,16 @@ class AuthorSerializer(serializers.ModelSerializer):
     def get_host(model: Author) -> str:
         # todo(turnip): if remote node: use host
         return base.CURRENT_DOMAIN
+
+    def to_internal_value(self, data):
+        if 'url' not in data:
+            raise serializers.ValidationError('Missing url')
+
+        url = data['url']
+        author, err = from_author_url_to_author(url)
+        if author is None:
+            raise err
+        return author
 
     class Meta:
         model = Author

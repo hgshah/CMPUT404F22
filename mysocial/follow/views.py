@@ -280,7 +280,8 @@ class FollowersView(GenericAPIView):
             return FollowersView.post_local_author(request, author_id=author_id)
 
         if request.user.is_authenticated_node:
-            return FollowersView.post_local_author(request, author_id=author_id)
+            return FollowersView.post_remote_node(request, author_id=author_id)
+            # return FollowersView.post_local_author(request, author_id=author_id)
 
         return HttpResponseForbidden()
 
