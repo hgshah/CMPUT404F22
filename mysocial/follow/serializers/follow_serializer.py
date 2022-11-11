@@ -2,8 +2,8 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.utils.serializer_helpers import ReturnDict
 
-from authors.models.author import from_author_url_to_author
 from authors.serializers.author_serializer import AuthorSerializer
+from authors.util import AuthorUtil
 from follow.models import Follow
 
 
@@ -23,7 +23,7 @@ class FollowRequestSerializer(serializers.ModelSerializer):
     @extend_schema_field(AuthorSerializer)
     def get_actor(self, model: Follow) -> ReturnDict:
         author_url = model.actor
-        author, err = from_author_url_to_author(author_url)
+        author, err = AuthorUtil.from_author_url_to_author(author_url)
         if err is not None:
             raise err
         return AuthorSerializer(author).data
@@ -31,7 +31,7 @@ class FollowRequestSerializer(serializers.ModelSerializer):
     @extend_schema_field(AuthorSerializer)
     def get_object(self, model: Follow) -> ReturnDict:
         author_url = model.target
-        author, err = from_author_url_to_author(author_url)
+        author, err = AuthorUtil.from_author_url_to_author(author_url)
         if err is not None:
             raise err
         return AuthorSerializer(author).data

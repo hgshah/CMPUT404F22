@@ -1,6 +1,6 @@
 from django.db import models
 
-from authors.models.author import from_author_url_to_author, validate_author_url
+from authors.util import AuthorUtil
 
 
 class Follow(models.Model):
@@ -10,8 +10,8 @@ class Follow(models.Model):
     """
     FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'
 
-    actor = models.URLField(validators=[validate_author_url])
-    target = models.URLField(validators=[validate_author_url])
+    actor = models.URLField(validators=[AuthorUtil.validate_author_url])
+    target = models.URLField(validators=[AuthorUtil.validate_author_url])
     has_accepted = models.BooleanField(default=False)
 
     class Meta:
@@ -24,11 +24,11 @@ class Follow(models.Model):
 
     def __str__(self):
         # todo(turnip): make calls to server
-        actor, _ = from_author_url_to_author(self.actor)
+        actor, _ = AuthorUtil.from_author_url_to_author(self.actor)
         actor_name = ""
         if actor is not None:
             actor_name = str(actor)
-        target, _ = from_author_url_to_author(self.target)
+        target, _ = AuthorUtil.from_author_url_to_author(self.target)
         target_name = ""
         if target is not None:
             target_name = str(target)

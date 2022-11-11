@@ -16,8 +16,6 @@ from pathlib import Path
 import django_on_heroku
 from corsheaders.defaults import default_headers
 
-from remote_nodes.node_config_base import NodeConfigBase
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -225,6 +223,11 @@ if CURRENT_DOMAIN_KEY in os.environ:
 
 # remote config credentials
 
+"""
+Dictionary of domain/host and domain config (class NodeConfigBase) pair
+
+Placed here to prevent circular dependencies
+"""
 REMOTE_CONFIG_CREDENTIALS: dict = {}
 REMOTE_NODE_CREDENTIALS_KEY = 'REMOTE_NODE_CREDENTIALS'
 if REMOTE_NODE_CREDENTIALS_KEY in os.environ:

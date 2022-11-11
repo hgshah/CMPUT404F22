@@ -1,6 +1,7 @@
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework.request import Request
 
+from mysocial.settings import base
 from remote_nodes.potato_oomfie import PotatoOomfie
 from remote_nodes.turnip_oomfie import TurnipOomfie
 
@@ -23,15 +24,13 @@ class RemoteUtil:
                          required=False, type=str),
     ]
 
-    CONFIG: dict = {}
-
     @staticmethod
     def setup():
         """
         Setup all remote node configs and logic
         """
         for config in (TurnipOomfie, PotatoOomfie):
-            RemoteUtil.CONFIG.update(config.create_dictionary_entry())
+            base.REMOTE_CONFIG_CREDENTIALS.update(config.create_dictionary_entry())
 
     @staticmethod
     def extract_node_param(request: Request):
@@ -49,6 +48,6 @@ class RemoteUtil:
 
     @staticmethod
     def get_node_config(node_param: str):
-        if node_param not in RemoteUtil.CONFIG:
+        if node_param not in base.REMOTE_CONFIG_CREDENTIALS:
             return None
-        return RemoteUtil.CONFIG[node_param]
+        return base.REMOTE_CONFIG_CREDENTIALS[node_param]

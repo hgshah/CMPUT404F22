@@ -73,3 +73,6 @@ class NodeConfigBase:
             return serializer.validated_data
         else:
             return None
+
+    def post_author(self):
+        pass

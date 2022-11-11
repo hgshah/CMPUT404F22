@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from authors.models.author import Author, from_author_url_to_author
+from authors.models.author import Author
+from authors.util import AuthorUtil
 from mysocial.settings import base
 
 
@@ -40,7 +41,7 @@ class AuthorSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Missing url')
 
         url = data['url']
-        author, err = from_author_url_to_author(url)
+        author, err = AuthorUtil.from_author_url_to_author(url)
         if author is None:
             raise err
         return author
