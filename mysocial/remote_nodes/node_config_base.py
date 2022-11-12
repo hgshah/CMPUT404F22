@@ -53,6 +53,14 @@ class NodeConfigBase:
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
+    def from_author_id_to_url(self, author_id: str):
+        response = requests.get(f'http://{self.__class__.domain}/authors/{author_id}/')
+        if response.status_code == 200:
+            # todo(turnip): map to our author?
+            json_dict = json.loads(response.content)
+            return json_dict['url']
+        return None
+
     def get_author_request(self, author_id: str):
         response = requests.get(f'http://{self.__class__.domain}/authors/{author_id}/')
         if response.status_code == 200:
@@ -60,7 +68,7 @@ class NodeConfigBase:
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
-    def get_author(self, author_url: str) -> Author:
+    def get_author_via_url(self, author_url: str) -> Author:
         token = base64.b64encode(f'{self.username}:{self.password}'.encode('ascii')).decode('utf-8')
         headers = {'HTTP_AUTHORIZATION': f'Basic {token}'}
         response = requests.get(author_url, **headers)
@@ -74,5 +82,25 @@ class NodeConfigBase:
         else:
             return None
 
-    def post_author(self):
-        pass
+    def get_all_followers_request(self, params: dict, author_id: str):
+        url = f'http://{self.__class__.domain}/authors/{author_id}/followers/'
+        if len(params) > 0:
+            query_param = urllib.parse.urlencode(params)
+            url += '?' + query_param
+        response = requests.get(url)
+        if response.status_code == 200:
+            # todo(turnip): map to our author?
+            return Response(json.loads(response.content))
+        return HttpResponseNotFound()
+
+    def post_local_follow_remote(self, actor_url: str, target_id: str):
+        """Make call to remote node to follow"""
+        target_author_url = self.from_author_id_to_url(target_id)
+        url = f'{target_author_url}/followers/'
+        response = requests.post(url,
+                                 auth=(self.username, self.password),
+                                 data={'actor': actor_url})
+        if response.status_code >= 200 or response.status_code < 300:
+            return Response(json.loads(response.content))
+        # todo: fix non-RESTful response; some cases need to return 500
+        return Response(status=response.status_code)

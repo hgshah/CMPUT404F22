@@ -15,8 +15,10 @@ class RemoteUtil:
     the values into something our internal code can understand.
     """
 
+    NODE_TARGET_QUERY_PARAM = 'node-target'
+
     REMOTE_NODE_PARAMETERS = [
-        OpenApiParameter(name='node', location=OpenApiParameter.QUERY,
+        OpenApiParameter(name=NODE_TARGET_QUERY_PARAM, location=OpenApiParameter.QUERY,
                          description='The domain name for the remote node we want to target. For example: '
                                      'node=app.herokuapp.com. We currently support the following nodes:\n'
                                      '- potato-oomfie.herokuapp.com\n '
@@ -33,17 +35,17 @@ class RemoteUtil:
             base.REMOTE_CONFIG_CREDENTIALS.update(config.create_dictionary_entry())
 
     @staticmethod
-    def extract_node_param(request: Request):
+    def extract_node_target(request: Request):
         """
         :param request:
         :return: Either (None, None) if the param does not exist
         or a (string, dict) if it does. Dict here is the request query parameters without the added node
         """
-        if 'node' not in request.query_params:
+        if RemoteUtil.NODE_TARGET_QUERY_PARAM not in request.query_params:
             return None, None
-        node_param = request.query_params['node']
+        node_param = request.query_params[RemoteUtil.NODE_TARGET_QUERY_PARAM]
         new_dict = request.query_params.copy()
-        new_dict.pop('node')
+        new_dict.pop(RemoteUtil.NODE_TARGET_QUERY_PARAM)
         return node_param, new_dict
 
     @staticmethod

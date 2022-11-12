@@ -43,9 +43,9 @@ class AuthorView(GenericViewSet):
     @action(detail=True, methods=['get'], url_name='retrieve_all')
     def retrieve_all(request: Request):
         """Gets all authors"""
-        node_param, other_params = RemoteUtil.extract_node_param(request)
-        if node_param is not None:
-            return AuthorView.retrieve_all_remote(request, node_param, other_params)
+        node_target, other_params = RemoteUtil.extract_node_target(request)
+        if node_target is not None:
+            return AuthorView.retrieve_all_remote(request, node_target, other_params)
 
         # lazy query set serialization so it's fine if this goes first
         # todo(turnip): only allow superusers because this kinda seems bad access?
@@ -90,9 +90,9 @@ class AuthorView(GenericViewSet):
     def retrieve(request: Request, author_id: str) -> HttpResponse:
         """Get an individual author"""
 
-        node_param, _ = RemoteUtil.extract_node_param(request)
-        if node_param is not None:
-            return AuthorView.retrieve_author(request, node_param, author_id)
+        node_target, _ = RemoteUtil.extract_node_target(request)
+        if node_target is not None:
+            return AuthorView.retrieve_author(request, node_target, author_id)
 
         try:
             author = Author.get_author(official_id=author_id)

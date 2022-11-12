@@ -44,7 +44,7 @@ class AuthorUtil:
 
         # todo: otherwise, check it at the other server; implement
         node_config = base.REMOTE_CONFIG_CREDENTIALS[domain]
-        author = node_config.get_author(author_url)
+        author = node_config.get_author_via_url(author_url)
         if author is None:
             return None, ValidationError(f'{author_url} does not exist in the domain {domain}')
         return author, None
