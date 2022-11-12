@@ -17,6 +17,7 @@ from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestListSerializer, FollowRequestSerializer
 from rest_framework import serializers
 
+from mysocial.settings import base
 from remote_nodes.remote_util import RemoteUtil
 
 logger = logging.getLogger(__name__)
@@ -234,7 +235,7 @@ class FollowersView(GenericAPIView):
 
     @staticmethod
     def get_remote(request: Request, node_param: str, params: dict, author_id: str):
-        node_config = RemoteUtil.get_node_config(node_param)
+        node_config = base.REMOTE_CONFIG.get(node_param)
         if node_config is None:
             return HttpResponseNotFound()
         return node_config.get_all_followers_request(params, author_id)
@@ -273,7 +274,7 @@ class FollowersView(GenericAPIView):
 
         if request.user.is_authenticated_node:
             # a remote node tells us that one of its users wants to follow someone in our server
-            return FollowersView.post_remote_local(request, author_id=author_id)
+            return FollowersView.post_remote_follow_local(request, author_id=author_id)
 
         return HttpResponseForbidden()
 
@@ -302,8 +303,9 @@ class FollowersView(GenericAPIView):
 
     @staticmethod
     def post_local_follow_remote(request: Request, author_target_id: str, node_target: str) -> HttpResponse:
-        node_config = RemoteUtil.get_node_config(node_target)
+        node_config = base.REMOTE_CONFIG.get(node_target)
         if node_config is None:
+            print(f"post_local_follow_remote: missing config: {node_target}")
             return HttpResponseNotFound()
         return node_config.post_local_follow_remote(request.user.get_url(), author_target_id)
 
@@ -319,20 +321,21 @@ class FollowersView(GenericAPIView):
         :return:
         """
         # todo: clean up code?
-        author_actor_url = request.data['actor']
         target = None
         data = None
         try:
+            author_actor_url = request.data['actor']
             target = Author.objects.get(official_id=author_id)
             follow = Follow.objects.create(actor=author_actor_url, target=target.get_id(), has_accepted=False)
             serializers = FollowRequestSerializer(follow)
             data = serializers.data
         except Author.DoesNotExist:
+            print(f"Local author does not exist: {author_id}")
             return HttpResponseNotFound()
         except IntegrityError:
             return HttpResponseBadRequest('You\'re either following this account or have already made a follow request')
         except Exception as e:
-            logger.error(f'FollowersView: post: unknown error: {e}')
+            print(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
         return Response(data=data, status=201)
 

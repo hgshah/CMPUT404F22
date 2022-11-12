@@ -39,11 +39,10 @@ class AuthorUtil:
             return author, err
 
         # check if we have this server
-        if domain not in base.REMOTE_CONFIG_CREDENTIALS:
+        node_config = base.REMOTE_CONFIG.get(domain)
+        if node_config is None:
             return None, ValidationError(f'{author_url} does not have any corresponding domain')
 
-        # todo: otherwise, check it at the other server; implement
-        node_config = base.REMOTE_CONFIG_CREDENTIALS[domain]
         author = node_config.get_author_via_url(author_url)
         if author is None:
             return None, ValidationError(f'{author_url} does not exist in the domain {domain}')

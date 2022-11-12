@@ -222,13 +222,15 @@ if CURRENT_DOMAIN_KEY in os.environ:
     CURRENT_DOMAIN = os.environ[CURRENT_DOMAIN_KEY]
 
 # remote config credentials
+REMOTE_NODE_CREDENTIALS: dict = {}
+REMOTE_NODE_CREDENTIALS_KEY = 'REMOTE_NODE_CREDENTIALS'
+if REMOTE_NODE_CREDENTIALS_KEY in os.environ:
+    REMOTE_NODE_CREDENTIALS = json.loads(os.environ[REMOTE_NODE_CREDENTIALS_KEY])
+
 
 """
 Dictionary of domain/host and domain config (class NodeConfigBase) pair
 
 Placed here to prevent circular dependencies
 """
-REMOTE_CONFIG_CREDENTIALS: dict = {}
-REMOTE_NODE_CREDENTIALS_KEY = 'REMOTE_NODE_CREDENTIALS'
-if REMOTE_NODE_CREDENTIALS_KEY in os.environ:
-    REMOTE_CONFIG_CREDENTIALS = json.loads(os.environ[REMOTE_NODE_CREDENTIALS_KEY])
+REMOTE_CONFIG: dict = {}

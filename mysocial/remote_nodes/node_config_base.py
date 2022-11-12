@@ -26,13 +26,14 @@ class NodeConfigBase:
     author_serializer = AuthorSerializer
 
     def __init__(self):
-        if self.__class__.domain not in base.REMOTE_CONFIG_CREDENTIALS:
+        if base.CURRENT_DOMAIN not in base.REMOTE_NODE_CREDENTIALS:
             print(f'{self.__class__.domain} is not in ConfigVars REMOTE_CONFIG_CREDENTIALS')
             self.username = 'username'
             self.password = 'password'
             return
 
-        credentials = base.REMOTE_CONFIG_CREDENTIALS[self.__class__.domain]
+        credentials = base.REMOTE_NODE_CREDENTIALS[base.CURRENT_DOMAIN]
+        print(credentials)
         self.username = credentials['username']
         self.password = credentials['password']
         # todo(turnip): check entry in Author, check if inactive?
@@ -53,8 +54,9 @@ class NodeConfigBase:
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
-    def from_author_id_to_url(self, author_id: str):
-        response = requests.get(f'http://{self.__class__.domain}/authors/{author_id}/')
+    def from_author_id_to_url(self, author_id: str) -> dict:
+        url = f'http://{self.__class__.domain}/authors/{author_id}/'
+        response = requests.get(url)
         if response.status_code == 200:
             # todo(turnip): map to our author?
             json_dict = json.loads(response.content)
@@ -68,17 +70,12 @@ class NodeConfigBase:
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
-    def get_author_via_url(self, author_url: str) -> Author:
-        token = base64.b64encode(f'{self.username}:{self.password}'.encode('ascii')).decode('utf-8')
-        headers = {'HTTP_AUTHORIZATION': f'Basic {token}'}
-        response = requests.get(author_url, **headers)
+    def get_author_via_url(self, author_url: str) -> dict:
+        response = requests.get(author_url, auth=(self.username, self.password))
 
         if response.status_code == 200:
             # todo(turnip): map to our author?
-            serializer = self.__class__.author_serializer(data=response.data)
-            if not serializer.is_valid():
-                return None
-            return serializer.validated_data
+            return json.loads(response.content.decode('utf-8'))
         else:
             return None
 
@@ -96,11 +93,13 @@ class NodeConfigBase:
     def post_local_follow_remote(self, actor_url: str, target_id: str):
         """Make call to remote node to follow"""
         target_author_url = self.from_author_id_to_url(target_id)
+        if target_author_url is None:
+            return HttpResponseNotFound()
         url = f'{target_author_url}/followers/'
         response = requests.post(url,
                                  auth=(self.username, self.password),
                                  data={'actor': actor_url})
-        if response.status_code >= 200 or response.status_code < 300:
-            return Response(json.loads(response.content))
+        if 200 <= response.status_code < 300:
+            return Response(json.loads(response.content.decode('utf-8')))
         # todo: fix non-RESTful response; some cases need to return 500
         return Response(status=response.status_code)

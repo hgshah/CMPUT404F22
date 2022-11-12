@@ -13,6 +13,7 @@ from authors.models.author import Author
 from authors.permissions import NodeIsAuthenticated
 from authors.serializers.author_serializer import AuthorSerializer
 from common.pagination_helper import PaginationHelper
+from mysocial.settings import base
 from remote_nodes.remote_util import RemoteUtil
 
 logger = logging.getLogger(__name__)
@@ -76,7 +77,7 @@ class AuthorView(GenericViewSet):
         :param request: http request
         :param params: other query params; useful for pagination
         """
-        node_config = RemoteUtil.get_node_config(node_param)
+        node_config = base.REMOTE_CONFIG.get(node_param)
         if node_config is None:
             return HttpResponseNotFound()
         return node_config.get_all_authors_request(params)
@@ -108,7 +109,7 @@ class AuthorView(GenericViewSet):
     @staticmethod
     def retrieve_author(request: Request, node_param: str, author_id: str):
         """Get an author in another node"""
-        node_config = RemoteUtil.get_node_config(node_param)
+        node_config = base.REMOTE_CONFIG.get(node_param)
         if node_config is None:
             return HttpResponseNotFound()
         return node_config.get_author_request(author_id)

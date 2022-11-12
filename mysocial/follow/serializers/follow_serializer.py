@@ -1,9 +1,11 @@
+import json
+
+import requests
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
-from rest_framework.utils.serializer_helpers import ReturnDict
+from rest_framework.exceptions import ValidationError
 
 from authors.serializers.author_serializer import AuthorSerializer
-from authors.util import AuthorUtil
 from follow.models import Follow
 
 
@@ -21,20 +23,24 @@ class FollowRequestSerializer(serializers.ModelSerializer):
         return str(model)
 
     @extend_schema_field(AuthorSerializer)
-    def get_actor(self, model: Follow) -> ReturnDict:
-        author_url = model.actor
-        author, err = AuthorUtil.from_author_url_to_author(author_url)
-        if err is not None:
-            raise err
-        return AuthorSerializer(author).data
+    def get_actor(self, model: Follow) -> dict:
+        response = requests.get(model.actor)
+        if response.status_code != 200:
+            raise ValidationError(f"Cannot find author: {model.actor} with code {response.status_code}")
+        return json.loads(response.content.decode('utf-8'))
+        # future code: I want local Author and author to have the same properties
+        # author_url = model.actor
+        # author, err = AuthorUtil.from_author_url_to_author(author_url)
+        # if err is not None:
+        #     raise err
+        # return AuthorSerializer(author).data
 
     @extend_schema_field(AuthorSerializer)
-    def get_object(self, model: Follow) -> ReturnDict:
-        author_url = model.target
-        author, err = AuthorUtil.from_author_url_to_author(author_url)
-        if err is not None:
-            raise err
-        return AuthorSerializer(author).data
+    def get_object(self, model: Follow) -> dict:
+        response = requests.get(model.target)
+        if response.status_code != 200:
+            raise ValidationError(f"Cannot find author: {model.target} with code {response.status_code}")
+        return json.loads(response.content.decode('utf-8'))
 
     def to_internal_value(self, data):
         if 'id' not in data:

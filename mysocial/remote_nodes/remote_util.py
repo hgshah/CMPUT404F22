@@ -36,7 +36,7 @@ class RemoteUtil:
         Setup all remote node configs and logic
         """
         # setup remote config node type authors
-        for host, credentials in base.REMOTE_CONFIG_CREDENTIALS.items():
+        for host, credentials in base.REMOTE_NODE_CREDENTIALS.items():
             TestHelper.overwrite_node(credentials['username'], credentials['password'], host)
 
         # todo: setup superuser???
@@ -52,7 +52,7 @@ class RemoteUtil:
                 TestHelper.overwrite_author(username, other_args)
 
         for config in (TurnipOomfie, PotatoOomfie):
-            base.REMOTE_CONFIG_CREDENTIALS.update(config.create_dictionary_entry())
+            base.REMOTE_CONFIG.update(config.create_dictionary_entry())
 
     @staticmethod
     def extract_node_target(request: Request):
@@ -70,6 +70,6 @@ class RemoteUtil:
 
     @staticmethod
     def get_node_config(node_param: str):
-        if node_param not in base.REMOTE_CONFIG_CREDENTIALS:
+        if node_param not in base.REMOTE_CONFIG:
             return None
-        return base.REMOTE_CONFIG_CREDENTIALS[node_param]
+        return base.REMOTE_CONFIG[node_param]
