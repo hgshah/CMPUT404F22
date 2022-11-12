@@ -56,17 +56,18 @@ class AuthorSerializer(serializers.ModelSerializer):
 
         try:
             if host == base.CURRENT_DOMAIN:
-                # deserialize a local author
                 local_id = pathlib.PurePath(path).name
+                # deserialize a local author
                 author = Author.objects.get(official_id=local_id)
             else:
                 # deserialize a remote author; take not it's missing some stuff so check with is_local()
                 author = AuthorMixin()
                 for index, key in enumerate(AuthorSerializer.Meta.fields):
-                    if key not in data:
+                    internal_field = AuthorSerializer.Meta.internal_field_equivalents[index]
+                    if key not in data or internal_field == '_':
                         continue
-                    setattr(author, AuthorSerializer.Meta.internal_field_equivalents[index], data[key])
-                setattr(author, 'host', host)  # force a set even if field does not exist
+                    setattr(author, internal_field, data[key])
+                author.host = host  # force a set even if field was not given
         except Exception as e:
             print(f"AuthorSerializer: failed serializing {e}")
             raise serializers.ValidationError(f"AuthorSerializer: failed serializing {e}")
@@ -79,4 +80,4 @@ class AuthorSerializer(serializers.ModelSerializer):
 
         # custom fields
         required_fields = ('url',)
-        internal_field_equivalents = ('type', 'id', 'url', 'host', 'display_name', 'github', 'profile_image')
+        internal_field_equivalents = ('_', '_', 'url', 'host', 'display_name', 'github', 'profile_image')

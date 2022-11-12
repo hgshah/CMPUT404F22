@@ -3,10 +3,32 @@ from django.db import models
 from mysocial.settings import base
 
 
-class AuthorMixin:
+class AuthorMixin(object):
+    """
+    A shared representation and logic between local and remote authors
+
+    Helps IDEs auto-complete. It also makes some logic straightforward, instead
+    of doing split logics between an Author object and a json object that represents a remote author.
+    """
+
     URL_PATH = "authors"
 
     objects = None
+
+    def __init__(self, *args, **kwargs):
+        # Shared
+        self.host = ''
+        self.display_name = ''
+        self.github = ''
+        self.profile_image = ''
+
+        # Author exclusive
+        self.username = ''
+        self.official_id = None
+        self.author_type = AuthorType.LOCAL_AUTHOR  # least worst case typing
+
+        # let the AbstractUser class to take over these fields
+        super().__init__(*args, **kwargs)
 
     def get_url(self):
         """
@@ -24,6 +46,12 @@ class AuthorMixin:
             - http://socioecon/authors/{self.official_id}
             - http://{local_host}/authors/{self.official_id}
         """
+
+        # for remote authors have a special field self.url obtained from deserialization in AuthorSerializer
+        if hasattr(self, 'url'):
+            return self.url
+
+        # local authors
         return f"http://{base.CURRENT_DOMAIN}/{AuthorMixin.URL_PATH}/{self.official_id}"
 
     def is_local(self) -> bool:
@@ -31,7 +59,7 @@ class AuthorMixin:
         Returns true if the Author object belongs to the local server or current server
         """
 
-        return hasattr(self, 'official_id')
+        return self.host is None or self.host == '' or self.host == base.CURRENT_DOMAIN
 
     def __str__(self):
         return self.display_name if hasattr(self, 'display_name') and self.display_name else self.username

@@ -7,7 +7,7 @@ from .author_manager import AuthorManager
 from .author_mixin import AuthorMixin, AuthorType
 
 
-class Author(AbstractUser, AuthorMixin):
+class Author(AuthorMixin, AbstractUser):
     """
     Fields:
     - Inherited fields not shown below:
