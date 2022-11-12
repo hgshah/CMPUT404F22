@@ -1,7 +1,10 @@
+import pathlib
+from urllib.parse import urlparse
+
 from rest_framework import serializers
 
 from authors.models.author import Author
-from authors.util import AuthorUtil
+from authors.models.author_mixin import AuthorMixin
 from mysocial.settings import base
 
 
@@ -36,21 +39,44 @@ class AuthorSerializer(serializers.ModelSerializer):
         # todo(turnip): if remote node: use host
         return base.CURRENT_DOMAIN
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data: dict) -> Author:
         """
         Does not work with remote Author
         :param data:
         :return: Access serializers.validated_data for deserialized version of the json converted to Author
         """
-        if 'url' not in data:
-            raise serializers.ValidationError('Missing url')
+
+        for required_field in AuthorSerializer.Meta.required_fields:
+            if required_field not in data:
+                raise serializers.ValidationError(f'AuthorSerializer: missing field: {required_field}')
 
         url = data['url']
-        author, err = AuthorUtil.from_author_url_to_author(url)
-        if author is None:
-            raise err
+        # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
+        _, host, path, _, _, _ = urlparse(url)
+
+        try:
+            if host == base.CURRENT_DOMAIN:
+                # deserialize a local author
+                local_id = pathlib.PurePath(path).name
+                author = Author.objects.get(official_id=local_id)
+            else:
+                # deserialize a remote author; take not it's missing some stuff so check with is_local()
+                author = AuthorMixin()
+                for index, key in enumerate(AuthorSerializer.Meta.fields):
+                    if key not in data:
+                        continue
+                    setattr(author, AuthorSerializer.Meta.internal_field_equivalents[index], data[key])
+                setattr(author, 'host', host)  # force a set even if field does not exist
+        except Exception as e:
+            print(f"AuthorSerializer: failed serializing {e}")
+            raise serializers.ValidationError(f"AuthorSerializer: failed serializing {e}")
+
         return author
 
     class Meta:
         model = Author
         fields = ('type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage')
+
+        # custom fields
+        required_fields = ('url',)
+        internal_field_equivalents = ('type', 'id', 'url', 'host', 'display_name', 'github', 'profile_image')

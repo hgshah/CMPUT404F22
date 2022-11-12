@@ -1,0 +1,91 @@
+from django.db import models
+
+from mysocial.settings import base
+
+
+class AuthorMixin:
+    URL_PATH = "authors"
+
+    objects = None
+
+    def get_url(self):
+        """
+        Returns author_url following the local_author's format
+        Example:
+            - http://socioecon/authors/{self.official_id}
+            - http://{local_host}/authors/{self.official_id}
+        """
+        return self.get_id()
+
+    def get_id(self):
+        """
+        Returns author_url following the local_author's format
+        Example:
+            - http://socioecon/authors/{self.official_id}
+            - http://{local_host}/authors/{self.official_id}
+        """
+        return f"http://{base.CURRENT_DOMAIN}/{AuthorMixin.URL_PATH}/{self.official_id}"
+
+    def is_local(self) -> bool:
+        """
+        Returns true if the Author object belongs to the local server or current server
+        """
+
+        return hasattr(self, 'official_id')
+
+    def __str__(self):
+        return self.display_name if hasattr(self, 'display_name') and self.display_name else self.username
+
+    @property
+    def is_authenticated(self):
+        """
+        :return: True if the current user is an authenticated local_author or active_remote_node.
+        """
+        return self.author_type != AuthorType.INACTIVE_REMOTE_NODE and super().is_authenticated
+
+    @property
+    def is_authenticated_user(self):
+        """
+        :return: True if the current user is an authenticated or logged in local_author.
+        """
+        return self.author_type == AuthorType.LOCAL_AUTHOR and super().is_authenticated
+
+    @property
+    def is_authenticated_node(self):
+        """
+        :return: True if the current user is an authenticated active_remote_node.
+        """
+        return self.author_type == AuthorType.ACTIVE_REMOTE_NODE and super().is_authenticated
+
+    @staticmethod
+    def get_serializer_field_name():
+        return "author"
+
+    @classmethod
+    def get_author(cls, official_id: str):
+        """
+        Gets a local author ONLY. Nodes are ignored.
+        :param official_id:
+        :return: A local_author
+        """
+        try:
+            return cls.objects.get(
+                official_id=official_id,
+                author_type=AuthorType.LOCAL_AUTHOR
+            )
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def get_all_authors(cls):
+        """
+        Gets all local_author. Nodes are ignored.
+        :return: All local_authors.
+        """
+        return cls.objects.filter(author_type=AuthorType.LOCAL_AUTHOR)
+
+
+class AuthorType(models.TextChoices):
+    LOCAL_AUTHOR = "local_author"
+    ACTIVE_REMOTE_NODE = "active_remote_node"
+    INACTIVE_REMOTE_NODE = "inactive_remote_node"  # we can deactivate nodes by just changing their type

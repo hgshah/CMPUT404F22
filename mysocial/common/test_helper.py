@@ -1,4 +1,5 @@
-from authors.models.author import Author, AuthorType
+from authors.models.author import Author
+from authors.models.author_mixin import AuthorType
 
 
 class TestHelper:

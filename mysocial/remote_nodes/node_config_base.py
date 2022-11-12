@@ -69,14 +69,19 @@ class NodeConfigBase:
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
-    def get_author_via_url(self, author_url: str) -> dict:
+    def get_author_via_url(self, author_url: str) -> Author:
         response = requests.get(author_url, auth=(self.username, self.password))
 
         if response.status_code == 200:
-            # todo(turnip): map to our author?
-            return json.loads(response.content.decode('utf-8'))
-        else:
-            return None
+            author_json = json.loads(response.content.decode('utf-8'))
+            serializer = AuthorSerializer(data=author_json)
+
+            if serializer.is_valid():
+                return serializer.validated_data # <- GOOD RESULT HERE!!!
+
+            print('GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
+
+        return None
 
     def get_all_followers_request(self, params: dict, author_id: str):
         url = f'http://{self.__class__.domain}/authors/{author_id}/followers/'

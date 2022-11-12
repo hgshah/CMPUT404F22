@@ -21,8 +21,10 @@ class FollowUtil:
         todo(turnip): support remote authors
         """
         follower_paths = Follow.objects.values_list('actor', flat=True).filter(target=target.get_url(), has_accepted=True)
+
+        # todo: obtain all local paths then do the logic below
         follow_ids = list(map(lambda f: AuthorUtil.from_author_url_to_local_id(f), follower_paths))
-        # todo(turnip): support remote author
+        # todo(turnip): support remote author; call the paths and deserialize with AuthorSerializer
         return Author.objects.filter(official_id__in=follow_ids)
 
     @staticmethod

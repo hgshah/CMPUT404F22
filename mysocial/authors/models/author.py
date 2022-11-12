@@ -3,17 +3,11 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from mysocial.settings import base
 from .author_manager import AuthorManager
+from .author_mixin import AuthorMixin, AuthorType
 
 
-class AuthorType(models.TextChoices):
-    LOCAL_AUTHOR = "local_author"
-    ACTIVE_REMOTE_NODE = "active_remote_node"
-    INACTIVE_REMOTE_NODE = "inactive_remote_node"  # we can deactivate nodes by just changing their type
-
-
-class Author(AbstractUser):
+class Author(AbstractUser, AuthorMixin):
     """
     Fields:
     - Inherited fields not shown below:
@@ -29,7 +23,6 @@ class Author(AbstractUser):
 
     from: https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
     """
-    URL_PATH = "authors"
 
     # Remove this unnecessary fields
     first_name = None
@@ -45,72 +38,3 @@ class Author(AbstractUser):
     objects = AuthorManager()
 
     REQUIRED_FIELDS = ['email', 'password']
-
-    def get_url(self):
-        """
-        Returns author_url following the local_author's format
-        Example:
-            - http://socioecon/authors/{self.official_id}
-            - http://{local_host}/authors/{self.official_id}
-        """
-        return self.get_id()
-
-    def get_id(self):
-        """
-        Returns author_url following the local_author's format
-        Example:
-            - http://socioecon/authors/{self.official_id}
-            - http://{local_host}/authors/{self.official_id}
-        """
-        return f"http://{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
-
-    @staticmethod
-    def get_serializer_field_name():
-        return "author"
-
-    def __str__(self):
-        return self.display_name if self.display_name else self.username
-
-    @property
-    def is_authenticated(self):
-        """
-        :return: True if the current user is an authenticated local_author or active_remote_node.
-        """
-        return self.author_type != AuthorType.INACTIVE_REMOTE_NODE and super().is_authenticated
-
-    @property
-    def is_authenticated_user(self):
-        """
-        :return: True if the current user is an authenticated or logged in local_author.
-        """
-        return self.author_type == AuthorType.LOCAL_AUTHOR and super().is_authenticated
-
-    @property
-    def is_authenticated_node(self):
-        """
-        :return: True if the current user is an authenticated active_remote_node.
-        """
-        return self.author_type == AuthorType.ACTIVE_REMOTE_NODE and super(Author, self).is_authenticated
-
-    @staticmethod
-    def get_author(official_id: str):
-        """
-        Gets a local author ONLY. Nodes are ignored.
-        :param official_id:
-        :return: A local_author
-        """
-        try:
-            return Author.objects.get(
-                official_id=official_id,
-                author_type=AuthorType.LOCAL_AUTHOR
-            )
-        except Author.DoesNotExist:
-            return None
-
-    @staticmethod
-    def get_all_authors():
-        """
-        Gets all local_author. Nodes are ignored.
-        :return: All local_authors.
-        """
-        return Author.objects.filter(author_type=AuthorType.LOCAL_AUTHOR)

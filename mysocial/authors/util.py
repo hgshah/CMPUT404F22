@@ -1,9 +1,10 @@
 import pathlib
-from urllib.parse import urlparse
 
 from django.core.exceptions import ValidationError
 
 from authors.models.author import Author
+from authors.models.author_mixin import AuthorMixin
+from authors.serializers.author_serializer import AuthorSerializer
 from mysocial.settings import base
 
 
@@ -30,26 +31,26 @@ class AuthorUtil:
 
             # do logic with author
         """
-        # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
-        _, domain, path, _, _, _ = urlparse(author_url)
+        serializer = AuthorSerializer(data={'url': author_url})
+        if not serializer.is_valid():
+            return None, ValidationError(f'{author_url} cannot be deserialized to an Author')
 
-        if domain == base.CURRENT_DOMAIN:
-            local_id = AuthorUtil.from_author_url_to_local_id(path)
-            author = Author.get_author(official_id=local_id)
-            err = None
-            if author is None:
-                err = ValidationError(f'There is no local_author with id {path.name}')
-            return author, err
+        first_author: AuthorMixin = serializer.validated_data
+        if first_author.is_local():
+            # guaranteed complete!
+            return first_author, None  # <- GOOD RESULT
 
-        # check if we have this server
-        node_config = base.REMOTE_CONFIG.get(domain)
+        # second pass for remote authors to get the most fields possible
+        node_config = base.REMOTE_CONFIG.get(first_author.host)
         if node_config is None:
             return None, ValidationError(f'{author_url} does not have any corresponding domain')
 
-        author = node_config.get_author_via_url(author_url)
-        if author is None:
-            return None, ValidationError(f'{author_url} does not exist in the domain {domain}')
-        return author, None
+        remote_author = node_config.get_author_via_url(author_url)
+        if remote_author is None:
+            print('from_author_url_to_author: get_author_via_url returned None')
+            return None, ValidationError('from_author_url_to_author: get_author_via_url returned None')
+
+        return remote_author, None
 
     @staticmethod
     def validate_author_url(author_url: str):
