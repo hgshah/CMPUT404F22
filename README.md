@@ -47,8 +47,35 @@ brew services start postgresql
 To stop the database:
 brew services stop postgresql
 
-You must run the postgres database as you're running the server!
+Windows Instruction:
 
+1. pip install -r requirements.txt
+
+2. Download postgres through here https://www.enterprisedb.com/downloads/postgres-postgresql-downloads password = password, port = 5432
+
+3. Add the postgres path here: https://blog.sqlbackupandftp.com/setting-windows-path-for-postgres-tools
+
+4. Re-open a new command prompt so the path variables can reset
+
+5. Go into cmput404-project/mysocial
+
+6. psql postgres, password: password
+
+7. CREATE DATABASE mysocialdb;
+
+8. \connect mysocialdb
+
+9. CREATE ROLE mysocialuser WITH LOGIN PASSWORD 'password';
+
+10. ALTER ROLE mysocialuser CREATEDB;
+
+11. CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO mysocialuser; GRANT ALL ON SCHEMA public TO public;
+
+12. \q to exit out of psql
+
+Continue from step 8
+
+You must run the postgres database as you're running the server!
 References:
 Amanda
 https://stackoverflow.com/questions/5255913/kwargs-in-django
