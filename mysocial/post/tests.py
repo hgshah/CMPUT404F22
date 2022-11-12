@@ -128,7 +128,7 @@ class PostFailTestCase(APITestCase):
         }
         self.author1 = Author.objects.create_user(**author1_data)
         self.author2 = Author.objects.create_user(**author2_data)
-        self.existing_post = Post.objects.create(author = self.author1, title = "test", description = "test", published = datetime.datetime.now(tz=timezone.utc))
+        self.existing_post = TestHelper.create_post(author = self.author1) 
 
     # Updating a post as a different user
     def test_modify_as_different_user(self):
