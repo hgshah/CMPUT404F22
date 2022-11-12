@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include('comment.urls')),
     path('', include('follow.urls')),
     path('', include('tokens.urls')),
+    path('', include('inbox.urls')),
     # DOCUMENTATION
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:

@@ -7,8 +7,7 @@ from django.core.paginator import Paginator
 from authors.models.author import Author
 from .models import Post, Visibility
 from rest_framework import status
-import logging, json
-from urllib.request import urlopen
+import logging
 from common.pagination_helper import PaginationHelper
 
 logger = logging.getLogger("mylogger")

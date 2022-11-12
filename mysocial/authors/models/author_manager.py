@@ -16,6 +16,7 @@ class AuthorManager(BaseUserManager):
             user = self.model(email=email, password=password, **kwargs)
             user.set_password(password)  # encrypts the password
             user.save()
+
             return user
         except Exception as e:
             logger.info(e)

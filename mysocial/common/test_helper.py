@@ -1,4 +1,5 @@
 from authors.models.author import Author, AuthorType
+from post.models import Post
 
 
 class TestHelper:
@@ -49,3 +50,14 @@ class TestHelper:
                 default_args[key] = default_args[key].format(placeholder=username)
 
         return Author.objects.create_user(**default_args)
+
+    @staticmethod
+    def create_post(author: Author) -> Post:
+        default_args = {
+            "title": "test title",
+            "description": "test description",
+            "author": author
+        }
+
+        return Post.objects.create(**default_args)
+
