@@ -12,6 +12,8 @@ Note: Most of the documentation here are based on @TurnipXenon's experience.
     1. CURRENT_DOMAIN: your app's domain
     2. DATABASE_CONFIG: a STRICT json file of database config to override the current production one
     3. DJANGO_SETTINGS_MODULE: mysocial.settings.production
+    4. REMOTE_NODE_CREDENTIALS: todo json format
+    5. PREFILLED_USERS (optional): todo json format
 
     - your Config Vars might look like this:
 

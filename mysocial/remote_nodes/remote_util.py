@@ -1,6 +1,10 @@
+import json
+import os
+
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework.request import Request
 
+from common.test_helper import TestHelper
 from mysocial.settings import base
 from remote_nodes.potato_oomfie import PotatoOomfie
 from remote_nodes.turnip_oomfie import TurnipOomfie
@@ -31,6 +35,22 @@ class RemoteUtil:
         """
         Setup all remote node configs and logic
         """
+        # setup remote config node type authors
+        for host, credentials in base.REMOTE_CONFIG_CREDENTIALS.items():
+            TestHelper.overwrite_node(credentials['username'], credentials['password'], host)
+
+        # todo: setup superuser???
+        prefilled_users: dict = {'username': 'oomfie', 'password': 'oomfie', 'is_staff': True}
+        if 'PREFILLED_USERS' in os.environ:
+            prefilled_users = json.loads(os.environ['PREFILLED_USERS'])
+            # prefilled_users: dict = {
+            #     'items': [{'username': 'super', 'password': 'super', 'is_staff': True, 'email': "super@gmail.com"}]}
+            for user in prefilled_users['items']:
+                username = user['username']
+                other_args: dict = user
+                other_args.pop('username')
+                TestHelper.overwrite_author(username, other_args)
+
         for config in (TurnipOomfie, PotatoOomfie):
             base.REMOTE_CONFIG_CREDENTIALS.update(config.create_dictionary_entry())
 
