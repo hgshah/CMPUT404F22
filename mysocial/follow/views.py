@@ -341,9 +341,11 @@ class FollowersView(GenericAPIView):
         if isinstance(response_json, int):
             return Response(status=response_json)
         try:
+            actor_json = response_json['actor']
+            target_json = response_json['object']
             follow = Follow.objects.create(
-                actor=response_json['actor'],
-                target=response_json['object'],
+                actor=actor_json['url'],
+                target=target_json['url'],
                 has_accepted=response_json['hasAccepted'],
                 remote_url=response_json['localUrl']
             )
