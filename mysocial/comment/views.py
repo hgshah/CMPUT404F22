@@ -1,5 +1,8 @@
-from venv import create
+
 from django.http.response import HttpResponse, HttpResponseNotFound
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework.decorators import action
+from rest_framework import serializers
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -21,6 +24,18 @@ class CommentView(GenericAPIView):
     def get_queryset(self):
         return Comment.objects.all()
 
+    @extend_schema(
+        summary = "comment_get_comments_for_post",
+        responses = inline_serializer(
+            name='CommentList',
+            fields={
+                'type': serializers.CharField(),
+                'items': CommentSerializer(many=True)
+            }
+        ),
+        tags=['comment']
+    )
+    @action(detail=True, methods=['get'], url_name='comment_get')
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
         try:
             post = Post.objects.get(official_id=kwargs['post_id'])
@@ -31,6 +46,14 @@ class CommentView(GenericAPIView):
             logger.info(e)
             return HttpResponseNotFound
 
+    @extend_schema(
+            summary = "comment_create_comment",
+            request = CreateCommentSerializer,
+            
+            responses = CommentSerializer,
+            tags=['comment']
+        )
+    @action(detail=True, methods=['get'], url_name='comment_post')
     def post(self, request: Request, *args, **kwargs) -> HttpResponse:
         """
         User story: As an author, I want to comment on posts that I can access
