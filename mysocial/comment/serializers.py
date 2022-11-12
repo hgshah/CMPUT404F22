@@ -2,19 +2,20 @@ from rest_framework import serializers
 from authors.serializers.author_serializer import AuthorSerializer
 from post.serializer import PostSerializer 
 from .models import Comment, ContentType
+from drf_spectacular.utils import extend_schema_field
 
 class CommentSerializer(serializers.ModelSerializer):
-    type = serializers.CharField()
     id = serializers.SerializerMethodField()
-    comment = serializers.CharField()
     published = serializers.DateTimeField()
     author = serializers.SerializerMethodField()
     contentType = serializers.ChoiceField(ContentType)
 
+    @extend_schema_field(AuthorSerializer)
     def get_author(self, obj):
         author = AuthorSerializer(obj.author).data
         return author
     
+    @extend_schema_field(PostSerializer)
     def get_post(self, obj):
         post = PostSerializer(obj.post).data
         return post

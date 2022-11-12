@@ -5,6 +5,7 @@ from authors.models.author import Author
 from django.utils import timezone
 import logging, uuid
 import datetime
+from common.test_helper import TestHelper
 
 logger = logging.getLogger("mylogger")
 #pymike00, October 29, https://www.youtube.com/watch?v=1FqxfnlQPi8&ab_channel=pymike00
@@ -18,26 +19,11 @@ class PostTestCase(APITestCase):
     }
     
     def setUp(self) -> None:
-        author1_data = {
-            "username": "user1",
-            "email": "user1@gmail.com",
-            "password": "1234567",
-            "display_name": "display_name",
-            "github": "https://github.com/crouton/",
-            "host": "www.crouton.net"
-        }
-        author2_data = {
-            "username": "user2",
-            "email": "user2@gmail.com",
-            "password": "1234567",
-            "display_name": "display_name",
-            "host": "www.crouton.net"
-        }
-        self.author1 = Author.objects.create_user(**author1_data)
-        self.author2 = Author.objects.create_user(**author2_data)
-        self.existing_post = Post.objects.create(author = self.author1, title = "test", description = "test", published = datetime.datetime.now(tz=timezone.utc))
-        self.private_post = Post.objects.create(author = self.author1, title = "test", description = "test", published = datetime.datetime.now(tz=timezone.utc), visibility = Visibility.FRIENDS)
-        self.author2_post = Post.objects.create(author = self.author2, title = "test2", description = "test2", published = datetime.datetime.now(tz=timezone.utc))
+        self.author1 =  TestHelper.create_author(username = "author1", other_args = {"host": "127.0.0.1:8000"})
+        self.author2 = TestHelper.create_author(username = "author2", other_args = {"host": "127.0.0.1:8000"})
+        self.existing_post = TestHelper.create_post(author = self.author1)
+        self.private_post = TestHelper.create_post(author = self.author1, other_args = {"visibility": Visibility.FRIENDS}) 
+        self.author2_post = TestHelper.create_post(author = self.author2)
 
     # GET posts/public
     def test_get_all_public_posts(self):
@@ -114,7 +100,6 @@ class PostTestCase(APITestCase):
 
         self.assertEqual(response.data["id"], self.get_expected_official_id(new_uuid))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
     
     def get_expected_official_id(self, post_id):
         return f"http://{self.author1.host}/{Author.URL_PATH}/{self.author1.official_id}/posts/{post_id}"
