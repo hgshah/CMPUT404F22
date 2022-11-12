@@ -93,7 +93,7 @@ class NodeConfigBase:
         """Make call to remote node to follow"""
         target_author_url = self.from_author_id_to_url(target_id)
         if target_author_url is None:
-            return None
+            return 404
         url = f'{target_author_url}/followers/'
         response = requests.post(url,
                                  auth=(self.username, self.password),
@@ -103,4 +103,6 @@ class NodeConfigBase:
                 return json.loads(response.content.decode('utf-8'))
             except Exception as e:
                 print(f"Failed to deserialize response: {response.content}")
-        return None
+        else:
+            print(f"post_local_follow_remote: remote server response: {response.status_code}")
+        return response.status_code

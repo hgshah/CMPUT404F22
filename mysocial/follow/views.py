@@ -338,8 +338,8 @@ class FollowersView(GenericAPIView):
             print(f"post_local_follow_remote: missing config: {node_target}")
             return HttpResponseNotFound()
         response_json = node_config.post_local_follow_remote(request.user.get_url(), author_target_id)
-        if response_json is None:
-            return Response(status=502)
+        if isinstance(response_json, int):
+            return Response(status=response_json)
         try:
             follow = Follow.objects.create(
                 actor=response_json['actor'],
