@@ -37,6 +37,11 @@ class AuthorSerializer(serializers.ModelSerializer):
         return base.CURRENT_DOMAIN
 
     def to_internal_value(self, data):
+        """
+        Does not work with remote Author
+        :param data:
+        :return: Access serializers.validated_data for deserialized version of the json converted to Author
+        """
         if 'url' not in data:
             raise serializers.ValidationError('Missing url')
 

@@ -31,7 +31,7 @@ class AuthorView(GenericViewSet):
 
     @staticmethod
     @extend_schema(
-        parameters=PaginationHelper.OPEN_API_PARAMETERS + RemoteUtil.REMOTE_NODE_PARAMETERS,
+        parameters=PaginationHelper.OPEN_API_PARAMETERS + RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=inline_serializer(
             name='AuthorList',
             fields={
@@ -84,7 +84,7 @@ class AuthorView(GenericViewSet):
 
     @staticmethod
     @extend_schema(
-        parameters=RemoteUtil.REMOTE_NODE_PARAMETERS,
+        parameters=RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializer,
         summary="authors_retrieve"
     )

@@ -4,6 +4,7 @@ import os
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework.request import Request
 
+from common.pagination_helper import PaginationHelper
 from common.test_helper import TestHelper
 from mysocial.settings import base
 from remote_nodes.potato_oomfie import PotatoOomfie
@@ -21,14 +22,16 @@ class RemoteUtil:
 
     NODE_TARGET_QUERY_PARAM = 'node-target'
 
-    REMOTE_NODE_PARAMETERS = [
+    REMOTE_NODE_SINGLE_PARAMS = [
         OpenApiParameter(name=NODE_TARGET_QUERY_PARAM, location=OpenApiParameter.QUERY,
                          description='The domain name for the remote node we want to target. For example: '
-                                     'node=app.herokuapp.com. We currently support the following nodes:\n'
+                                     '`?node-target=app.herokuapp.com`. We currently support the following nodes:\n'
                                      '- potato-oomfie.herokuapp.com\n '
                                      '- turnip-oomfie-1.herokuapp.com',
                          required=False, type=str),
     ]
+
+    REMOTE_NODE_MULTIL_PARAMS = REMOTE_NODE_SINGLE_PARAMS + PaginationHelper.OPEN_API_PARAMETERS
 
     @staticmethod
     def setup():
@@ -40,7 +43,6 @@ class RemoteUtil:
             TestHelper.overwrite_node(credentials['username'], credentials['password'], host)
 
         # todo: setup superuser???
-        prefilled_users: dict = {'username': 'oomfie', 'password': 'oomfie', 'is_staff': True}
         if 'PREFILLED_USERS' in os.environ:
             prefilled_users = json.loads(os.environ['PREFILLED_USERS'])
             # prefilled_users: dict = {

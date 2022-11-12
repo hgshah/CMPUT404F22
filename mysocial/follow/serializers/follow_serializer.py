@@ -15,6 +15,8 @@ class FollowRequestSerializer(serializers.ModelSerializer):
     hasAccepted = serializers.BooleanField(source='has_accepted')
     actor = serializers.SerializerMethodField('get_actor')
     object = serializers.SerializerMethodField('get_object')
+    localUrl = serializers.SerializerMethodField('get_local_url')
+    remoteUrl = serializers.SerializerMethodField('get_remote_url')
 
     def get_type(self, model) -> str:
         return "Follow"
@@ -42,6 +44,13 @@ class FollowRequestSerializer(serializers.ModelSerializer):
             raise ValidationError(f"Cannot find author: {model.target} with code {response.status_code}")
         return json.loads(response.content.decode('utf-8'))
 
+    def get_local_url(self, model: Follow):
+        return model.get_local_url()
+
+    def get_remote_url(self, model: Follow):
+        return model.remote_url
+
+
     def to_internal_value(self, data):
         if 'id' not in data:
             raise serializers.ValidationError('Missing id')
@@ -52,7 +61,7 @@ class FollowRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
-        fields = ('type', 'id', 'summary', 'hasAccepted', 'object', 'actor')
+        fields = ('type', 'id', 'summary', 'hasAccepted', 'object', 'actor', 'localUrl', 'remoteUrl')
 
 
 class FollowRequestListSerializer(serializers.ModelSerializer):

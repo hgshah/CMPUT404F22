@@ -17,6 +17,8 @@ class FollowUtil:
         :return:
 
         Remember to catch errors!
+
+        todo(turnip): support remote authors
         """
         follower_paths = Follow.objects.values_list('actor', flat=True).filter(target=target.get_url(), has_accepted=True)
         follow_ids = list(map(lambda f: AuthorUtil.from_author_url_to_local_id(f), follower_paths))

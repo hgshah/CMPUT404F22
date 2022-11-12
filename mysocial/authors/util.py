@@ -18,6 +18,9 @@ class AuthorUtil:
         :param author_url:
         :return: Returns a pair of Author and ValidationError
 
+        Note: this is still not on par with what I want. It may either return an Author or the dictionary form of
+        an Author. I want to hopefully make this something like an Author, whether remote or local
+
         Example:
             author, err = from_url_to_author(url)
 

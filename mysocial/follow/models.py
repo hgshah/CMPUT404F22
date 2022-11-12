@@ -1,11 +1,11 @@
 from django.db import models
 
 from authors.util import AuthorUtil
+from mysocial.settings import base
 
 
 class Follow(models.Model):
     """
-    todo(turnip): WIP
     actor follows target
     """
     FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'
@@ -14,9 +14,22 @@ class Follow(models.Model):
     target = models.URLField(validators=[AuthorUtil.validate_author_url])
     has_accepted = models.BooleanField(default=False)
 
+    """
+    remote_url is the url pointing to a related and more authoritative Follow object
+    If this is not empty, the other Follow object is our source of truth
+    If this is empty, this is the source of truth and you may disregard the other object
+    """
+    remote_url = models.URLField(blank=True)
+
     class Meta:
         unique_together = (('actor', 'target'),)
         get_latest_by = 'id'
+
+    def get_local_url(self):
+        """
+        Returns the url to get this Follow object
+        """
+        return f"http://{base.CURRENT_DOMAIN}/follows/{self.id}"
 
     @staticmethod
     def get_serializer_field_name():

@@ -33,7 +33,6 @@ class TestRemoteNodeView(TestCase):
                 header = {
                     'HTTP_AUTHORIZATION': f'Basic {token}'
                 }
-                print(header)
 
             response = self.client.get('/remote-node/', **header)
             self.assertEqual(response.status_code, case.result, case.user)

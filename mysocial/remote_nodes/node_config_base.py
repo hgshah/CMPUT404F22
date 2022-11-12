@@ -33,7 +33,6 @@ class NodeConfigBase:
             return
 
         credentials = base.REMOTE_NODE_CREDENTIALS[base.CURRENT_DOMAIN]
-        print(credentials)
         self.username = credentials['username']
         self.password = credentials['password']
         # todo(turnip): check entry in Author, check if inactive?
@@ -90,16 +89,18 @@ class NodeConfigBase:
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
-    def post_local_follow_remote(self, actor_url: str, target_id: str):
+    def post_local_follow_remote(self, actor_url: str, target_id: str) -> dict:
         """Make call to remote node to follow"""
         target_author_url = self.from_author_id_to_url(target_id)
         if target_author_url is None:
-            return HttpResponseNotFound()
+            return None
         url = f'{target_author_url}/followers/'
         response = requests.post(url,
                                  auth=(self.username, self.password),
                                  data={'actor': actor_url})
         if 200 <= response.status_code < 300:
-            return Response(json.loads(response.content.decode('utf-8')))
-        # todo: fix non-RESTful response; some cases need to return 500
-        return Response(status=response.status_code)
+            try:
+                return json.loads(response.content.decode('utf-8'))
+            except Exception as e:
+                print(f"Failed to deserialize response: {response.content}")
+        return None
