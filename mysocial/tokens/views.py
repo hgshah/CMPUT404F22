@@ -1,6 +1,8 @@
-from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.response import Response
 
 from authors.serializers.author_serializer import AuthorSerializer
 
@@ -8,10 +10,26 @@ from authors.serializers.author_serializer import AuthorSerializer
 # from https://stackoverflow.com/q/66264736/17836168
 class ObtainCookieAuthToken(ObtainAuthToken):
     """
-    Override default ObtainAuthToken view from rest_framework to set the token into a
-    HttpOnly cookie.
+    Override default ObtainAuthToken view from rest_framework. This is how frontend should log in.
     """
 
+    @extend_schema(
+        request=inline_serializer(
+            name='Login',
+            fields={
+                'username': serializers.CharField(),
+                'password': serializers.CharField(),
+            }
+        ),
+        responses=inline_serializer(
+            name='Token',
+            fields={
+                'type': serializers.CharField(),
+                'token': serializers.CharField(),
+                'author': AuthorSerializer()
+            }
+        ),
+    )
     def post(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():

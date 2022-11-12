@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'drf_spectacular',
 ]
 
 LOGGING = {
@@ -105,6 +106,7 @@ WSGI_APPLICATION = 'mysocial.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'PAGE_SIZE': 100,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
@@ -195,6 +197,16 @@ CORS_EXPOSE_HEADERS = [
     'cookie',
 ]
 
+# docs
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Sociocon API',
+    'DESCRIPTION': 'Note: application/json is best supported by our servers so remember to toggle the Payload Content '
+                   'type drop-down choice to application/json. Check out our [Github repository]('
+                   'https://github.com/hgshah/cmput404-project) to file an Issue.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
 
 # overriding configurations using environment variables
 

@@ -17,21 +17,21 @@ class AuthorSerializer(serializers.ModelSerializer):
     host = serializers.SerializerMethodField('get_host')
 
     @staticmethod
-    def get_type(model: Author):
+    def get_type(model: Author) -> str:
         return model.get_serializer_field_name()
 
     @staticmethod
-    def get_url(model: Author):
+    def get_url(model: Author) -> str:
         # they're the same as id, for now
         return AuthorSerializer.get_id(model)
 
     @staticmethod
-    def get_id(model: Author):
+    def get_id(model: Author) -> str:
         # the path after host may vary, e.g. authors/ vs authors/id
         return f"http://{AuthorSerializer.get_host(model)}/{Author.URL_PATH}/{model.official_id}"
 
     @staticmethod
-    def get_host(model: Author):
+    def get_host(model: Author) -> str:
         # todo(turnip): if remote node: use host
         return base.CURRENT_DOMAIN
 
