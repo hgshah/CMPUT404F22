@@ -2,5 +2,5 @@
 
 for p in "authors" "comment" "common" "follow" "post" "tokens"; do
   # from https://unix.stackexchange.com/a/589382
-  python manage.py test $p || break
+  python manage.py test $p --settings mysocial.settings.local || break
 done
