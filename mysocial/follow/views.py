@@ -354,7 +354,7 @@ class FollowersView(GenericAPIView):
         except IntegrityError:
             return HttpResponseBadRequest('You\'re either following this account or have already made a follow request')
         except Exception as e:
-            logger.error(f'FollowersView: post: unknown error: {e}')
+            logger.error(f'FollowersView: post_local_follow_remote: post: unknown error: {e}')
             return HttpResponseBadRequest()
         return Response(data=data, status=201)
 

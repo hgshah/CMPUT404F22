@@ -10,8 +10,8 @@ class Follow(models.Model):
     """
     FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'
 
-    actor = models.URLField(validators=[AuthorUtil.validate_author_url])
-    target = models.URLField(validators=[AuthorUtil.validate_author_url])
+    actor = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
+    target = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
     has_accepted = models.BooleanField(default=False)
 
     """
@@ -19,7 +19,7 @@ class Follow(models.Model):
     If this is not empty, the other Follow object is our source of truth
     If this is empty, this is the source of truth and you may disregard the other object
     """
-    remote_url = models.URLField(blank=True)
+    remote_url = models.URLField(blank=True, max_length=1000)
 
     class Meta:
         unique_together = (('actor', 'target'),)
