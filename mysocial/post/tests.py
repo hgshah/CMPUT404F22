@@ -76,7 +76,7 @@ class PostTestCase(APITestCase):
 
         response = self.client.delete(request)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
     
     #POST /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     def test_update_post(self):
