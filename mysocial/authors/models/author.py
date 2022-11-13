@@ -6,7 +6,6 @@ from django.db import models
 from mysocial.settings import base
 from .author_manager import AuthorManager
 
-
 class AuthorType(models.TextChoices):
     LOCAL_AUTHOR = "local_author"
     ACTIVE_REMOTE_NODE = "active_remote_node"

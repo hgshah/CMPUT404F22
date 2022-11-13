@@ -3,17 +3,15 @@ import urllib.parse
 
 import requests
 from django.http import HttpResponseNotFound
-from django.utils.baseconv import base64
 from rest_framework.response import Response
 
-from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from mysocial.settings import base
 
 
 class NodeConfigBase:
     """
-    Sample and base config
+    Serves as sample and base configuration for remote server/node specific implementations
 
     Remember to call super whenever possible; use good judgment to determine when to call super in the method body.
     """

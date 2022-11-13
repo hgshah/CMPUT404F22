@@ -2,6 +2,7 @@ from rest_framework import serializers
 from authors.serializers.author_serializer import AuthorSerializer 
 from .models import Post, ContentType, Visibility
 from comment.models import Comment
+from drf_spectacular.utils import extend_schema_field
 import logging 
 
 import logging, json
@@ -10,26 +11,18 @@ from urllib.request import urlopen
 logger = logging.getLogger("mylogger")
 
 class PostSerializer(serializers.ModelSerializer):
-    type = serializers.CharField()
     id = serializers.SerializerMethodField()
-    title = serializers.CharField()
-    source = serializers.URLField()
-    origin = serializers.URLField()
-    #categories = serializers.ListField()
+    categories = serializers.SerializerMethodField()
     count = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
-    published = serializers.DateTimeField()
-    description = serializers.CharField()
-    unlisted = serializers.BooleanField()
     author = serializers.SerializerMethodField()
-    visibility = serializers.ChoiceField(Visibility)
-    contentType = serializers.ChoiceField(ContentType)
 
+    @extend_schema_field(AuthorSerializer)
     def get_author(self, obj):
         author = AuthorSerializer(obj.author).data
         return author
     
-    def get_id(self, obj):
+    def get_id(self, obj) -> str:
         author_id = AuthorSerializer(obj.author).data["id"]
         return f"{author_id}/posts/{obj.official_id}"
 
@@ -38,10 +31,19 @@ class PostSerializer(serializers.ModelSerializer):
     
     def get_count(self, obj):
         return Comment.objects.filter(post=obj).count()
+    
+    @extend_schema_field(list[str])
+    def get_categories(self, obj):
+        category_list = []
+        
+        for category in obj.categories:
+            category_list.append(category)
+
+        return category_list
 
     class Meta:
         model = Post
-        fields = ('type', 'title', 'id', 'source', 'origin','count', 'comments', 'description','contentType', 'author', 'published', 'visibility', 'unlisted')
+        fields = ('type', 'title', 'id', 'source', 'origin','description','contentType',  'author', 'categories', 'count', 'comments', 'published', 'visibility', 'unlisted')
 
 class CreatePostSerializer(serializers.ModelSerializer,):
     def create(self, validated_data):
@@ -49,4 +51,4 @@ class CreatePostSerializer(serializers.ModelSerializer,):
         return post
     class Meta:
         model = Post
-        fields = ('title', 'description','visibility','source', 'origin', 'contentType', 'unlisted')
+        fields = ('title', 'description','visibility','source', 'origin', 'categories', 'contentType', 'unlisted')

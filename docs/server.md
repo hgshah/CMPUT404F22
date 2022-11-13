@@ -1,21 +1,28 @@
-# Staging
+# Server
 
 Note: Most of the documentation here are based on @TurnipXenon's experience.
 
-## Setting up an app
+## Setting up a Heroku app (server instance)
 
 1. Fork the repository. Heroku only works on main or master branch, sadly.
 2. Create a Heroku app.
 3. Under the Resources tab, create a Postgres add-on.
 4. Go to your Postgres add-on's setting, and click **View Credentials** to see your **Database Credentials**
 5. In your app's Settings tab, under the Config Vars' section. Add the following key-value pair Config Vars:
-    1. CURRENT_DOMAIN: your app's domain
-    2. DATABASE_CONFIG: a STRICT json file of database config to override the current production one
-    3. DJANGO_SETTINGS_MODULE: mysocial.settings.production
-    4. REMOTE_NODE_CREDENTIALS: todo json format
-    5. PREFILLED_USERS (optional): todo json format
+    1. CURRENT_DOMAIN (required): your app's domain
+    2. DATABASE_CONFIG (required unless it's local or the production instance): a STRICT json file of database config to
+       override the current production one
+    3. DATABASE_URL (required; auto-generated): URL to the Postgres Resource you made in Step 3
+    4. DJANGO_SETTINGS_MODULE (required): mysocial.settings.production
+    5. REMOTE_NODE_CREDENTIALS (required): A dictionary of username-password credentials for a particular domain. This
+       makes remote node type Author objects for you, and activates them.
+    6. PREFILLED_USERS (optional): A dictionary containing the field items, which is a list of Authors we want to
+       pre-populate our server with. Useful for having an initial superuser or not having to need to make Authors again
+       every time you wipe your database
 
-    - your Config Vars might look like this:
+    - Tip for making JSON files: JSON structures can be a little strict leading to parsing errors. Make an empty JSON
+      file, and edit them in your IDE. Install plugins that prettifies or lints JSON files
+    - This is what the Config Vars potato-oomfie.herokuapp.com looks like this:
 
 ```
 CURRENT_DOMAIN: potato-oomfie.herokuapp.com
@@ -35,15 +42,74 @@ DATABASE_CONFIG: {
    }
 }
 
+DATABASE_URL: postgres://url
+
 DJANGO_SETTINGS_MODULE: mysocial.settings.production
+
+# A dictionary of domain-credential pairs
+# Credentials follow the following pattern:
+# "domain_url": {
+#   "username": string,
+#   "password": string,
+#   "is_active": bool
+# } 
+# Implicitly creates and activates a node-type Author for node-to-node communication
+# You can explcitly activate a node by saying is_active = True
+# You can explcitly disable a node by saying is_active = False
+# If a node was previously inactive and the is_active field was missing, it will be activated
+REMOTE_NODE_CREDENTIALS: {
+  "127.0.0.1:8000": {
+    "username": "local",
+    "password": "password"
+  },
+  "potato-oomfie.herokuapp.com": {
+    "username": "potato",
+    "password": "password",
+    "is_active": True
+  },
+  "turnip-oomfie-1.herokuapp.com": {
+    "username": "turnip",
+    "password": "password",
+    "is_active": False
+  }
+}
+
+# A list of Authors following the pattern:
+# {
+#   "items": [
+#    {
+#       "username": string/required,
+#       "password": string/required,
+#       "is_staff": bool/optional
+#    }
+# ]
+# }
+PREFILLED_USERS: {
+  "items": [
+    {
+      "username": "super",
+      "password": "super",
+      "is_staff": true
+    },
+    {
+      "username": "actor",
+      "password": "actor"
+    },
+    {
+      "username": "target",
+      "password": "target"
+    }
+  ]
+}
 ```
 
-6. Under your app's Deploy tab, connect to Github
+6. Under your app's Deploy tab, connect to Github (or manually push via heroku's cli)
 7. It would be nice to auto-deploy to so Enable Automatic Deploy if you like
     - Note: if you have multiple apps connected to the same Github repo, both will fail deploying since the free tier
       can only support one build at a time.
 8. Either push to your main or manually deploy your branch under the Deploy tab in your app.
 9. Remember to create a superuser!
+    - This is another way of making a user! Or you can use the PREFILLED_USERS ConfigVar in Step 5.
     - In the heroku CLI, you can
       do `heroku run python mysocial/manage.py createsuperuser --settings mysocial.settings.production --app app-name`
     - In the heroku web GUI

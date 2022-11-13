@@ -26,14 +26,13 @@ class Post(models.Model):
     title = models.CharField(max_length=500)
     source = models.CharField(max_length=500, blank = True)
     origin = models.CharField(max_length=500, blank = True)
-    #categories = ArrayField(models.CharField(max_length = 30), default=list)
+    categories = ArrayField(models.CharField(max_length = 30), default=list)
     published = models.DateTimeField(default=datetime.now)
     description = models.CharField(max_length=500, blank=True)
     unlisted = models.BooleanField(default=False)
 
     # comments
     count = models.PositiveIntegerField(default = 0, blank = True)
-    # size = models.PositiveIntegerField(default = 0, blank = True)
 
     author = models.ForeignKey('authors.Author', on_delete = models.CASCADE)
 
