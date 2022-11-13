@@ -127,7 +127,15 @@ class InboxTestCase(APITestCase):
         for item in response.data["items"]:
             response_types.append(item["type"])
         self.assertEqual(response_types, ['Follow', 'comment'])
+
+    def test_get_diff_author_fails(self):
+        self.client.force_login(self.author1)
+        request = f"/authors/{self.author2.official_id}/inbox/all"
+
+        response = self.client.get(request)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
+
     '''
     Helper Functions
     '''
