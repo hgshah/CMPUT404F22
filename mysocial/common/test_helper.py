@@ -12,9 +12,10 @@ class TestHelper:
             node.host = host
             node.save()
         except Author.DoesNotExist:
-            TestHelper.create_node(username, password, host)
+            return TestHelper.create_node(username, password, host)
         except Exception as e:
             print(f"Unknown error: {e}")
+            return None
 
     @staticmethod
     def create_user(username: str, password: str, host: str):

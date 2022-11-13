@@ -4,6 +4,7 @@ import os
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework.request import Request
 
+from authors.models.author import Author, AuthorType
 from common.pagination_helper import PaginationHelper
 from common.test_helper import TestHelper
 from mysocial.settings import base
@@ -40,7 +41,14 @@ class RemoteUtil:
         """
         # setup remote config node type authors
         for host, credentials in base.REMOTE_NODE_CREDENTIALS.items():
-            TestHelper.overwrite_node(credentials['username'], credentials['password'], host)
+            node: Author = TestHelper.overwrite_node(credentials['username'], credentials['password'], host)
+            is_active = credentials.get('is_active')
+            if is_active is None and not isinstance(is_active, bool):
+                continue
+            elif is_active:
+                node.author_type = AuthorType.ACTIVE_REMOTE_NODE
+            else:
+                node.author_type = AuthorType.INACTIVE_REMOTE_NODE
 
         # todo: setup superuser???
         if 'PREFILLED_USERS' in os.environ:
