@@ -7,6 +7,13 @@ from mysocial.settings import base
 class Follow(models.Model):
     """
     actor follows target
+
+    A Follow object is authoritative if:
+    1. It's local author following a local author
+    2. It's a remote author following a local author
+
+    A Follow object is a reference only if:
+    1. It's a local author following a remote author
     """
     FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'
 

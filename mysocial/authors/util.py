@@ -39,7 +39,7 @@ class AuthorUtil:
         # second pass for remote authors to get the most fields possible
         node_config = base.REMOTE_CONFIG.get(first_author.host)
         if node_config is None:
-            return None, ValidationError(f'{author_url} does not have any corresponding domain')
+            return None, ValidationError(f'{author_url} does not have any corresponding domain. domain/host={first_author.host}')
 
         remote_author = node_config.get_author_via_url(author_url)
         if remote_author is None:
