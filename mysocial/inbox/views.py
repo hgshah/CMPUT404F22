@@ -67,7 +67,7 @@ class InboxView(GenericAPIView):
             inbox.items = []
             inbox.save()
             serializer = InboxSerializer(inbox)
-            return Response(serializer.data, status = status.HTTP_200_OK)
+            return Response(status = status.HTTP_204_NO_CONTENT)
         except Exception as e:
             print(e)
             return HttpResponseNotFound()
