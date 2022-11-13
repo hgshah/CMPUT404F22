@@ -5,6 +5,7 @@ import requests
 from django.http import HttpResponseNotFound
 from rest_framework.response import Response
 
+from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from mysocial.settings import base
 

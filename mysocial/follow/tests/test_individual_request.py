@@ -1,3 +1,4 @@
+from authors.util import AuthorUtil
 from follow.models import Follow
 from follow.tests.base_test_follower_view import BaseTestFollowerView
 
@@ -10,7 +11,8 @@ class TestRequestView(BaseTestFollowerView):
 
     def test_get_successful(self):
         # Either the target or the actor can see this page
-        for author in (self.follow.local_follower, self.follow.target):
+        for author_url in (self.follow.actor, self.follow.target):
+            author,_ = AuthorUtil.from_author_url_to_author(author_url)
             self.client.logout()
             self.client.force_login(author)
             response = self.client.get(f'/follows/{self.follow.id}/', content_type='application/json')
@@ -53,7 +55,8 @@ class TestRequestView(BaseTestFollowerView):
     def test_put_forbidden_follower(self):
         # special case: followers cannot accept their own pending request
         self.client.logout()
-        self.client.force_login(self.follow.local_follower)
+        author, _ = AuthorUtil.from_author_url_to_author(self.follow.actor)
+        self.client.force_login(author)
         response = self.client.put(self.path, content_type='application/json')
         self.assertEqual(response.status_code, 404)
 
@@ -66,5 +69,7 @@ class TestRequestView(BaseTestFollowerView):
             self.assertEqual(response.status_code, 400)
 
     def test_delete_successful(self):
-        response = self.client.delete(self.path, content_type='application/json')
+        follow = Follow.objects.latest()
+        path = f'/follows/{follow.id}/'
+        response = self.client.delete(path, content_type='application/json')
         self.assertEqual(response.status_code, 204)

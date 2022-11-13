@@ -116,8 +116,8 @@ class IndividualRequestView(GenericAPIView):
         https://github.com/hgshah/cmput404-project/blob/main/endpoints.txt#L137
         """
         try:
-            follow = Follow.objects.get(id=follow_id)
-            if follow.target != request.user and follow.local_follower != request.user:
+            follow: Follow = Follow.objects.get(id=follow_id)
+            if follow.target != request.user.get_url() and follow.actor != request.user.get_url():
                 # Only the two accounts should be able to delete an account
                 # Returning not found due to security concerns
                 return HttpResponseNotFound()
@@ -148,7 +148,7 @@ class IndividualRequestView(GenericAPIView):
         """
         try:
             follow = Follow.objects.get(id=follow_id)
-            if follow.target != request.user:
+            if follow.target != request.user.get_url():
                 # Only the two accounts should be able to delete an account
                 # Returning not found due to security concerns
                 return HttpResponseNotFound()
@@ -179,8 +179,8 @@ class IndividualRequestView(GenericAPIView):
             return HttpResponseNotFound()
 
         try:
-            follow = Follow.objects.get(id=follow_id)
-            if follow.target != request.user and follow.local_follower != request.user:
+            follow: Follow = Follow.objects.get(id=follow_id)
+            if follow.target != request.user.get_url() and follow.actor != request.user.get_url():
                 # Only the two accounts should be able to delete an account
                 # Returning not found due to security concerns
                 return HttpResponseNotFound()
