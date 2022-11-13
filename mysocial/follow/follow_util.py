@@ -48,7 +48,7 @@ class FollowUtil:
         :return:
         """
         try:
-            Follow.objects.get(actor=follower, target=target, has_accepted=True)
+            Follow.objects.get(actor=follower.get_url(), target=target.get_url(), has_accepted=True)
             return True  # did not return a does not exist error
         except Follow.DoesNotExist:
             return False
@@ -69,17 +69,26 @@ class FollowUtil:
         # reference: https://stackoverflow.com/a/9727050/17836168
         # to get real friends, get all my followers (A) and get everyone who follows me (B)
         # then, intersect at A and B, those are real friends
-        follower_ids = Follow.objects.values_list('actor', flat=True).filter(target=actor, has_accepted=True)
-        following_ids = Follow.objects.values_list('target', flat=True).filter(actor=actor, has_accepted=True)
+        follower_ids = Follow.objects.values_list('actor', flat=True).filter(target=actor.get_url(), has_accepted=True)
+        following_ids = Follow.objects.values_list('target', flat=True).filter(actor=actor.get_url(), has_accepted=True)
         # reference: https://stackoverflow.com/a/6369558/17836168
         friend_ids = set(follower_ids).intersection(following_ids)
-        return Author.objects.filter(official_id__in=friend_ids)
+
+        author_list = []
+        for author_url in friend_ids:
+            author, err = AuthorUtil.from_author_url_to_author(author_url)
+            if err is None:
+                author_list.append(author)
+            else:
+                print(f"get_followers: Failed getting author from url {author_url} with error: {err}")
+
+        return author_list
 
     @staticmethod
     def are_real_friends(actor: Author, target: Author) -> bool:
         try:
-            Follow.objects.get(actor=actor, target=target, has_accepted=True)
-            Follow.objects.get(actor=target, target=actor, has_accepted=True)
+            Follow.objects.get(actor=actor.get_url(), target=target.get_url(), has_accepted=True)
+            Follow.objects.get(actor=target.get_url(), target=actor.get_url(), has_accepted=True)
             return True  # did not return a does not exist error
         except Follow.DoesNotExist:
             return False
