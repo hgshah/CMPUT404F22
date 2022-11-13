@@ -4,7 +4,6 @@ from urllib.parse import urlparse
 from rest_framework import serializers
 
 from authors.models.author import Author
-from authors.models.author_mixin import AuthorMixin
 from mysocial.settings import base
 
 
@@ -61,7 +60,7 @@ class AuthorSerializer(serializers.ModelSerializer):
                 author = Author.objects.get(official_id=local_id)
             else:
                 # deserialize a remote author; take not it's missing some stuff so check with is_local()
-                author = AuthorMixin()
+                author = Author()
                 for index, key in enumerate(AuthorSerializer.Meta.fields):
                     internal_field = AuthorSerializer.Meta.internal_field_equivalents[index]
                     if key not in data or internal_field == '_':

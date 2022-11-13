@@ -3,7 +3,6 @@ import pathlib
 from django.core.exceptions import ValidationError
 
 from authors.models.author import Author
-from authors.models.author_mixin import AuthorMixin
 from authors.serializers.author_serializer import AuthorSerializer
 from mysocial.settings import base
 
@@ -19,9 +18,6 @@ class AuthorUtil:
         :param author_url:
         :return: Returns a pair of Author and ValidationError
 
-        Note: this is still not on par with what I want. It may either return an Author or the dictionary form of
-        an Author. I want to hopefully make this something like an Author, whether remote or local
-
         Example:
             author, err = from_url_to_author(url)
 
@@ -35,7 +31,7 @@ class AuthorUtil:
         if not serializer.is_valid():
             return None, ValidationError(f'{author_url} cannot be deserialized to an Author')
 
-        first_author: AuthorMixin = serializer.validated_data
+        first_author: Author = serializer.validated_data
         if first_author.is_local():
             # guaranteed complete!
             return first_author, None  # <- GOOD RESULT

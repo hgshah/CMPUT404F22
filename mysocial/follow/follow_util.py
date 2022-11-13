@@ -1,5 +1,7 @@
 import logging
 
+from rest_framework.exceptions import ValidationError
+
 from authors.models.author import Author
 from authors.util import AuthorUtil
 from follow.models import Follow
@@ -14,18 +16,26 @@ class FollowUtil:
         Get all followers for target Author
 
         :param target:
-        :return:
+        :return: List of Authors
 
         Remember to catch errors!
-
-        todo(turnip): support remote authors
         """
-        follower_paths = Follow.objects.values_list('actor', flat=True).filter(target=target.get_url(), has_accepted=True)
+        follower_url_list = Follow.objects.values_list('actor', flat=True).filter(target=target.get_url(),
+                                                                                  has_accepted=True)
 
-        # todo: obtain all local paths then do the logic below
-        follow_ids = list(map(lambda f: AuthorUtil.from_author_url_to_local_id(f), follower_paths))
-        # todo(turnip): support remote author; call the paths and deserialize with AuthorSerializer
-        return Author.objects.filter(official_id__in=follow_ids)
+        # todo: we could optimize this (later) by saving a list of local urls and doing a single database query for
+        #  local authors; this implementation gets the local authors one-by-one; alternative will need another list
+        #  for local authors, identify which ones are local based on the url, then do an is_in query in Author.objects
+        #  doing it like this to make it readable for now
+        author_list = []
+        for author_url in follower_url_list:
+            author, err = AuthorUtil.from_author_url_to_author(author_url)
+            if err is None:
+                author_list.append(author)
+            else:
+                print(f"get_followers: Failed getting author from url {author_url} with error: {err}")
+
+        return author_list
 
     @staticmethod
     def are_followers(follower: Author, target: Author):
