@@ -4,11 +4,12 @@ POST /authors/{AUTHOR_UUID}/posts/
 {
     "title": "test",
     "description": "test",
-    "visibility": friend,
+    "visibility": "public",
     "source": "sourceurl",
     "origin": "originURL",
-    "contentType": text/plain,
-    "unlisted": false
+    "contentType": "text/plain",
+    "unlisted": "False",
+    "categories": ["test"]
 }
 
 TO GET POSTS BY AN AUTHOR:

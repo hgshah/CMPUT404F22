@@ -1,6 +1,7 @@
 from authors.models.author import Author, AuthorType
-
-
+from post.models import Post, ContentType, Visibility
+import datetime
+from django.utils import timezone
 class TestHelper:
     DEFAULT_PASSWORD = '1234567'
 
@@ -82,3 +83,24 @@ class TestHelper:
         if 'is_superuser' in default_args:
             return Author.objects.create_superuser(**default_args)
         return Author.objects.create_user(**default_args)
+    
+    @staticmethod
+    def create_post(author: Author, other_args: dict = None) -> Post:
+        default_args = {
+            "title": "This is my title",
+            "author": author,
+            "description": "This is a description",
+            "visibility": Visibility.PUBLIC,
+            "source": "sourceurl",
+            "categories": ["test"],
+            "origin": "originURL",
+            "contentType": ContentType.PLAIN,
+            "unlisted": "False",
+            "published": f"{datetime.datetime.now(tz=timezone.utc)}"
+        }
+       
+        # override
+        if other_args is not None:
+            default_args.update(other_args)
+
+        return Post.objects.create(**default_args)
