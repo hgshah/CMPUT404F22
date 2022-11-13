@@ -1,4 +1,5 @@
 from authors.models.author import Author, AuthorType
+from mysocial.settings import base
 from post.models import Post, ContentType, Visibility
 import datetime
 from django.utils import timezone
@@ -65,7 +66,7 @@ class TestHelper:
             'password': TestHelper.DEFAULT_PASSWORD,
             'display_name': '{placeholder}',
             'github': 'https://github.com/{placeholder}/',
-            'host': '127.0.0.1:8000',
+            'host': base.CURRENT_DOMAIN,
             'is_staff': False,
         }
 

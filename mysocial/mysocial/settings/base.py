@@ -214,7 +214,7 @@ That's where we store the os.environ stuff!
 
 # keys
 CURRENT_DOMAIN_KEY = "CURRENT_DOMAIN"
-CURRENT_DOMAIN = None
+CURRENT_DOMAIN = "127.0.0.1:8000"
 
 if CURRENT_DOMAIN_KEY in os.environ:
     CURRENT_DOMAIN = os.environ[CURRENT_DOMAIN_KEY]
