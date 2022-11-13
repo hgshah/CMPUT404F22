@@ -13,7 +13,8 @@ class FollowUtil:
     @staticmethod
     def get_followers(target: Author):
         """
-        Get all followers for target Author
+        Get all followers for target Author. Be careful because this gets both remote Author and local Author. Check
+        if it's a local author by using author.is_local()
 
         :param target:
         :return: List of Authors
@@ -38,7 +39,7 @@ class FollowUtil:
         return author_list
 
     @staticmethod
-    def are_followers(follower: Author, target: Author):
+    def are_followers(follower: Author, target: Author) -> bool:
         """
         Checks if follower Author follows target Author
 
@@ -57,10 +58,11 @@ class FollowUtil:
     @staticmethod
     def get_real_friends(actor: Author):
         """
-        Get all real friends
+        Get all real friends or mutual followers for target Author. Be careful because this gets both remote Author and
+        local Author. Check if it's a local author by using author.is_local()
 
         :param actor:
-        :return:
+        :return: List of Authors
 
         Remember to catch errors!
         """
@@ -74,7 +76,7 @@ class FollowUtil:
         return Author.objects.filter(official_id__in=friend_ids)
 
     @staticmethod
-    def are_real_friends(actor: Author, target: Author):
+    def are_real_friends(actor: Author, target: Author) -> bool:
         try:
             Follow.objects.get(actor=actor, target=target, has_accepted=True)
             Follow.objects.get(actor=target, target=actor, has_accepted=True)

@@ -29,6 +29,7 @@ class Author(AbstractUser):
 
     from: https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
     """
+    URL_PATH = 'authors'
 
     # Remove this unnecessary fields
     first_name = None

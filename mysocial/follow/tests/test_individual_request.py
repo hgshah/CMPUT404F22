@@ -10,7 +10,7 @@ class TestRequestView(BaseTestFollowerView):
 
     def test_get_successful(self):
         # Either the target or the actor can see this page
-        for author in (self.follow.actor, self.follow.target):
+        for author in (self.follow.local_follower, self.follow.target):
             self.client.logout()
             self.client.force_login(author)
             response = self.client.get(f'/follows/{self.follow.id}/', content_type='application/json')
@@ -53,7 +53,7 @@ class TestRequestView(BaseTestFollowerView):
     def test_put_forbidden_follower(self):
         # special case: followers cannot accept their own pending request
         self.client.logout()
-        self.client.force_login(self.follow.actor)
+        self.client.force_login(self.follow.local_follower)
         response = self.client.put(self.path, content_type='application/json')
         self.assertEqual(response.status_code, 404)
 

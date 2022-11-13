@@ -63,7 +63,7 @@ class TestHelper:
             'password': TestHelper.DEFAULT_PASSWORD,
             'display_name': '{placeholder}',
             'github': 'https://github.com/{placeholder}/',
-            'host': 'www.crouton.net',
+            'host': '127.0.0.1:8000',
             'is_staff': False,
         }
 

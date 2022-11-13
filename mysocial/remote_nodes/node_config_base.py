@@ -28,8 +28,8 @@ class NodeConfigBase:
     def __init__(self):
         if base.CURRENT_DOMAIN not in base.REMOTE_NODE_CREDENTIALS:
             print(f'{self.__class__.domain} is not in ConfigVars REMOTE_CONFIG_CREDENTIALS')
-            self.username = 'username'
-            self.password = 'password'
+            self.username = '127.0.0.1:8000'
+            self.password = '127.0.0.1:8000'
             return
 
         credentials = base.REMOTE_NODE_CREDENTIALS[base.CURRENT_DOMAIN]
@@ -70,7 +70,7 @@ class NodeConfigBase:
         return HttpResponseNotFound()
 
     def get_author_via_url(self, author_url: str) -> Author:
-        response = requests.get(author_url, auth=(self.username, self.password))
+        response = requests.get(author_url)
 
         if response.status_code == 200:
             author_json = json.loads(response.content.decode('utf-8'))
