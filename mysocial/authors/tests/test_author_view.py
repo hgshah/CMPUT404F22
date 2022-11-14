@@ -18,8 +18,8 @@ class TestAuthorView(TestCase):
         )
         output_data = {
             "type": "author",
-            "id": f"http://www.crouton.net/authors/{user.official_id}",
-            "url": f"http://www.crouton.net/authors/{user.official_id}",
+            "id": f"http://127.0.0.1:8000/authors/{user.official_id}",
+            "url": f"http://127.0.0.1:8000/authors/{user.official_id}",
             "host": user.host,
             "displayName": user.display_name,
             "github": user.github,

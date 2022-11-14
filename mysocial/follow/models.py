@@ -36,7 +36,6 @@ class Follow(models.Model):
         return "Follow"
 
     def __str__(self):
-        # todo(turnip): make calls to server
         actor, _ = AuthorUtil.from_author_url_to_author(self.actor)
         actor_name = ""
         if actor is not None:

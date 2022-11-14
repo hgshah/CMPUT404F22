@@ -5,6 +5,7 @@ import requests
 from django.http import HttpResponseNotFound
 from rest_framework.response import Response
 
+from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from mysocial.settings import base
 
@@ -26,8 +27,8 @@ class NodeConfigBase:
     def __init__(self):
         if base.CURRENT_DOMAIN not in base.REMOTE_NODE_CREDENTIALS:
             print(f'{self.__class__.domain} is not in ConfigVars REMOTE_CONFIG_CREDENTIALS')
-            self.username = 'username'
-            self.password = 'password'
+            self.username = '127.0.0.1:8000'
+            self.password = '127.0.0.1:8000'
             return
 
         credentials = base.REMOTE_NODE_CREDENTIALS[base.CURRENT_DOMAIN]
@@ -67,14 +68,19 @@ class NodeConfigBase:
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
-    def get_author_via_url(self, author_url: str) -> dict:
-        response = requests.get(author_url, auth=(self.username, self.password))
+    def get_author_via_url(self, author_url: str) -> Author:
+        response = requests.get(author_url)
 
         if response.status_code == 200:
-            # todo(turnip): map to our author?
-            return json.loads(response.content.decode('utf-8'))
-        else:
-            return None
+            author_json = json.loads(response.content.decode('utf-8'))
+            serializer = AuthorSerializer(data=author_json)
+
+            if serializer.is_valid():
+                return serializer.validated_data # <- GOOD RESULT HERE!!!
+
+            print('GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
+
+        return None
 
     def get_all_followers_request(self, params: dict, author_id: str):
         url = f'http://{self.__class__.domain}/authors/{author_id}/followers/'

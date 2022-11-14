@@ -24,7 +24,7 @@ class BaseTestFollowerView(TestCase):
                 self.followers.append(oomfie)
                 has_accepted = True
 
-            Follow.objects.create(actor=oomfie, target=self.target, has_accepted=has_accepted)
+            Follow.objects.create(actor=oomfie.get_url(), target=self.target.get_url(), has_accepted=has_accepted)
 
         self.follower_names = list(map(lambda f: f.display_name, self.followers))
         self.non_follower_names = list(map(lambda f: f.display_name, self.non_followers))

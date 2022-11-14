@@ -45,7 +45,6 @@ class FollowRequestSerializer(serializers.ModelSerializer):
     def get_remote_url(self, model: Follow):
         return model.remote_url
 
-
     def to_internal_value(self, data):
         if 'id' not in data:
             raise serializers.ValidationError('Missing id')
