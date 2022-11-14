@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .author_manager import AuthorManager
 
-
 class AuthorType(models.TextChoices):
     LOCAL_AUTHOR = "local_author"
     ACTIVE_REMOTE_NODE = "active_remote_node"
