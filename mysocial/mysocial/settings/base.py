@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-import django_on_heroku
-from pathlib import Path
+import json
 import os
 from pathlib import Path
 
+import django_on_heroku
 from corsheaders.defaults import default_headers
+
+from remote_nodes.node_config_base import NodeConfigBase
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '8zox7ox(g#^5%*))!ywyjs1c9k3zwzpkefc1t$3r3ej19(20b*'
 
-ALLOWED_HOSTS = ['127.0.0.1:8000', 'socioecon.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'socioecon.herokuapp.com']
 
 
 # Application definition
@@ -156,11 +158,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, '/staticfiles/')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 django_on_heroku.settings(locals())
 
-# CORS_ORIGIN_ALLOW_ALL = True
+
 CORS_ALLOW_CREDENTIALS = True
 
 # later if the above causes issue
@@ -208,7 +208,13 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
-# overriding configurations using environment variables
+
+"""
+Heroku Config under!
+
+Check out the settings page of Heroku, and look at the Config Vars section.
+That's where we store the os.environ stuff!
+"""
 
 # keys
 CURRENT_DOMAIN_KEY = "CURRENT_DOMAIN"
@@ -216,3 +222,10 @@ CURRENT_DOMAIN = None
 
 if CURRENT_DOMAIN_KEY in os.environ:
     CURRENT_DOMAIN = os.environ[CURRENT_DOMAIN_KEY]
+
+# remote config credentials
+
+REMOTE_CONFIG_CREDENTIALS: dict = {}
+REMOTE_NODE_CREDENTIALS_KEY = 'REMOTE_NODE_CREDENTIALS'
+if REMOTE_NODE_CREDENTIALS_KEY in os.environ:
+    REMOTE_CONFIG_CREDENTIALS = json.loads(os.environ[REMOTE_NODE_CREDENTIALS_KEY])

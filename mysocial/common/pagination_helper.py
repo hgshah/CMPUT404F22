@@ -12,10 +12,10 @@ class PaginationHelper:
     # use this for documenting endpoints that can be paginated
     OPEN_API_PARAMETERS = [
         OpenApiParameter(name='page', location=OpenApiParameter.QUERY,
-                         description='A page number greater than zero',
+                         description='A page number greater than zero. If this was given, size is required.',
                          required=False, type=int),
         OpenApiParameter(name='size', location=OpenApiParameter.QUERY,
-                         description='The size of a page greater than zero',
+                         description='The size of a page greater than zero. If this was given, page is required.',
                          required=False, type=int),
     ]
 
