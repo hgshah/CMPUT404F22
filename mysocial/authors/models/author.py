@@ -1,15 +1,10 @@
-import pathlib
 import uuid
-from urllib.parse import urlparse
 
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from mysocial.settings import base
-from remote_nodes.remote_util import RemoteUtil
 from .author_manager import AuthorManager
-
 
 class AuthorType(models.TextChoices):
     LOCAL_AUTHOR = "local_author"
@@ -49,6 +44,24 @@ class Author(AbstractUser):
     objects = AuthorManager()
 
     REQUIRED_FIELDS = ['email', 'password']
+
+    def get_url(self):
+        """
+        Returns author_url following the local_author's format
+        Example:
+            - http://socioecon/authors/{self.official_id}
+            - http://{local_host}/authors/{self.official_id}
+        """
+        return self.get_id()
+
+    def get_id(self):
+        """
+        Returns author_url following the local_author's format
+        Example:
+            - http://socioecon/authors/{self.official_id}
+            - http://{local_host}/authors/{self.official_id}
+        """
+        return f"http://{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
 
     @staticmethod
     def get_serializer_field_name():
@@ -100,27 +113,3 @@ class Author(AbstractUser):
         :return: All local_authors.
         """
         return Author.objects.filter(author_type=AuthorType.LOCAL_AUTHOR)
-
-
-def validate_author_url(author_url: str):
-    # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
-    _, domain, path, _, _, _ = urlparse(author_url)
-
-    if domain == base.CURRENT_DOMAIN:
-        # todo: check if it exists on our end
-        # from:
-        path = pathlib.PurePath(path)
-        author = Author.get_author(official_id=path.name)
-        if author is None:
-            raise ValidationError(f'There is no local_author with id {path.name}')
-        return
-
-    # check if we have this server
-    if domain not in RemoteUtil.CONFIG:
-        raise ValidationError(f'{author_url} does not have any corresponding domain')
-
-    # todo: otherwise, check it at the other server
-    node_config = RemoteUtil.CONFIG[domain]
-    author = node_config.get_author(author_url)
-    if author is None:
-        raise ValidationError(f'{author_url} does not exist in the domain {domain}')

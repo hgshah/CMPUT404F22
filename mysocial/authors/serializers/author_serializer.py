@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from authors.models.author import Author
+from authors.util import AuthorUtil
 from mysocial.settings import base
 
 
@@ -28,12 +29,27 @@ class AuthorSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_id(model: Author) -> str:
         # the path after host may vary, e.g. authors/ vs authors/id
-        return f"http://{AuthorSerializer.get_host(model)}/{Author.URL_PATH}/{model.official_id}"
+        return model.get_url()
 
     @staticmethod
     def get_host(model: Author) -> str:
         # todo(turnip): if remote node: use host
         return base.CURRENT_DOMAIN
+
+    def to_internal_value(self, data):
+        """
+        Does not work with remote Author
+        :param data:
+        :return: Access serializers.validated_data for deserialized version of the json converted to Author
+        """
+        if 'url' not in data:
+            raise serializers.ValidationError('Missing url')
+
+        url = data['url']
+        author, err = AuthorUtil.from_author_url_to_author(url)
+        if author is None:
+            raise err
+        return author
 
     class Meta:
         model = Author

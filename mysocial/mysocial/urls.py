@@ -14,8 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+
+from remote_nodes.remote_util import RemoteUtil
+
+# one time script after settings.py
+# has to be called last to prevent circular dependency error
+RemoteUtil.setup()
 
 urlpatterns = [
     path('', include('authors.urls')),
@@ -24,6 +30,7 @@ urlpatterns = [
     path('', include('comment.urls')),
     path('', include('follow.urls')),
     path('', include('tokens.urls')),
+    path('', include('inbox.urls')),
     # DOCUMENTATION
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:

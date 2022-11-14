@@ -1,6 +1,5 @@
 from mysocial.settings import base
 from mysocial.settings.base import *
-from remote_nodes.remote_util import RemoteUtil
 
 DEBUG = False
 
@@ -25,6 +24,3 @@ if DATABASE_CONFIG_KEY in os.environ:
 
 if base.CURRENT_DOMAIN is None:
     base.CURRENT_DOMAIN = 'socioecon.herokuapp.com'
-
-# has to be called last to prevent circular dependency error
-RemoteUtil.setup()

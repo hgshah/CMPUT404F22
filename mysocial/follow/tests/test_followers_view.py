@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from common.test_helper import TestHelper
 from follow.models import Follow
+from follow.serializers.follow_serializer import FollowRequestSerializer
 from follow.tests.base_test_follower_view import BaseTestFollowerView
 
 
@@ -20,10 +21,13 @@ class TestFollowersViewPost(TestCase):
 
         self.assertEqual(response.status_code, 201)
 
-        follow = response.data
-        self.assertEqual(follow['hasAccepted'], False)
-        self.assertEqual(follow['actor']['displayName'], 'user1')
-        self.assertEqual(follow['object']['displayName'], 'user2')
+        serializer = FollowRequestSerializer(data=response.data)
+        self.assertTrue(serializer.is_valid())
+
+        follow: Follow = serializer.validated_data
+        self.assertEqual(follow.has_accepted, False)
+        self.assertEqual(self.actor.get_id(), follow.actor)
+        self.assertEqual(self.target.get_id(), follow.target)
 
     def test_post_unauthenticated(self):
         response = self.client.post(
@@ -56,12 +60,14 @@ class TestFollowersViewPost(TestCase):
 
         for test_value in (True, False):
             with transaction.atomic():  # need because we're intentionally causing an error here
-                f = Follow.objects.create(actor=self.actor, target=self.target, has_accepted=test_value)
+                f = Follow.objects.create(actor=self.actor.get_id(),
+                                          target=self.target.get_id(),
+                                          has_accepted=test_value)
                 response = self.client.post(
                     f'/authors/{self.target.official_id}/followers/',
                     content_type='application/json',
                 )
-                self.assertEqual(response.status_code, 400)
+                self.assertEqual(400, response.status_code)
             f.delete()
 
 
