@@ -88,7 +88,8 @@ REMOTE_NODE_CREDENTIALS: {
 #    {
 #       "username": string/required,
 #       "password": string/required,
-#       "is_staff": bool/optional
+#       "is_staff": bool/optional, <- if you need admin
+#       "is_superuser": bool/optional, <- if you need admin
 #    }
 # ]
 # }
@@ -97,7 +98,8 @@ PREFILLED_USERS: {
     {
       "username": "super",
       "password": "super",
-      "is_staff": true
+      "is_staff": true,
+      "is_superuser: true
     },
     {
       "username": "actor",
