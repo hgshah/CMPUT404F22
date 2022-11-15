@@ -114,7 +114,7 @@ python manage.py runserver --settings mysocial.settings.local_mirror 8080
 ```
 
 Note:
-- The port number 8080 doesn't matter.
+- The port 8080 matters because that's the node we want to connect to based on NODE_CREDENTIALS. See RemoteUtils.py.
 - The port number being the last argument matters, though!
 
 You must run the postgres database as you're running the server!
