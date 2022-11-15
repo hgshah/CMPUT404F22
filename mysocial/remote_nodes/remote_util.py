@@ -50,9 +50,9 @@ class RemoteUtil:
         """
         Setup all remote node configs and logic
         """
+
         # special remote node configs if you're running locally
         # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
-
         if '127.0.0.1' in base.CURRENT_DOMAIN:
             local_credentials = {
                 '127.0.0.1:8000': {
@@ -91,7 +91,10 @@ class RemoteUtil:
                 other_args.pop('username')
                 TestHelper.overwrite_author(username, other_args)
 
-        for config in (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, LocalDefault, LocalMirror):
+        additional_nodes = ()
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            additional_nodes = (LocalDefault, LocalMirror)
+        for config in (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan) + additional_nodes:
             base.REMOTE_CONFIG.update(config.create_dictionary_entry())
 
     @staticmethod
