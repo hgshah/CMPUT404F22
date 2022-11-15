@@ -12,6 +12,8 @@ from remote_nodes.macewan import MacEwan
 from remote_nodes.potato_oomfie import PotatoOomfie
 from remote_nodes.turnip_oomfie import TurnipOomfie
 from remote_nodes.ualberta import UAlberta
+from remote_nodes.local_default import LocalDefault
+from remote_nodes.local_mirror import LocalMirror
 
 
 class RemoteUtil:
@@ -48,6 +50,25 @@ class RemoteUtil:
         """
         Setup all remote node configs and logic
         """
+
+        # special remote node configs if you're running locally
+        # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            local_credentials = {
+                '127.0.0.1:8000': {
+                    'username': 'local_default',
+                    'password': 'local_default'
+                },
+                '127.0.0.1:8080': {
+                    'username': 'local_mirror',
+                    'password': 'local_mirror'
+                }
+            }
+            # tricky technique to make the user's config var override ours; useful for other teams!
+            local_credentials.update(base.REMOTE_NODE_CREDENTIALS)
+            # then set it back to our app's remote credentials
+            base.REMOTE_NODE_CREDENTIALS = local_credentials
+
         # setup remote config node type authors
         for host, credentials in base.REMOTE_NODE_CREDENTIALS.items():
             node: Author = TestHelper.overwrite_node(credentials['username'], credentials['password'], host)
@@ -70,7 +91,13 @@ class RemoteUtil:
                 other_args.pop('username')
                 TestHelper.overwrite_author(username, other_args)
 
-        for config in (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan):
+        # This is where the endpoints and configs are added!
+        # When it's local (contains 127.0.0.1), we add 127.0.0.1:8000 and 127.0.0.1:8080
+        # Then, we add the endpoints, like turnip-oomfie-1.herokuapp.com (TurnipOomfie)
+        additional_nodes = ()
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            additional_nodes = (LocalDefault, LocalMirror)
+        for config in (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan) + additional_nodes:
             base.REMOTE_CONFIG.update(config.create_dictionary_entry())
 
     @staticmethod

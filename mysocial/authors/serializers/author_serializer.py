@@ -35,8 +35,10 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_host(model: Author) -> str:
-        # todo(turnip): if remote node: use host
-        return base.CURRENT_DOMAIN
+        if model.host == '':
+            return base.CURRENT_DOMAIN
+
+        return model.host
 
     def to_internal_value(self, data: dict) -> Author:
         """
