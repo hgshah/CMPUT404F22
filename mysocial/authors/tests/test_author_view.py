@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from authors.models.author import Author
 from common.test_helper import TestHelper
+from mysocial.settings import base
 
 
 class TestAuthorView(TestCase):
@@ -18,8 +19,8 @@ class TestAuthorView(TestCase):
         )
         output_data = {
             "type": "author",
-            "id": f"http://127.0.0.1:8000/authors/{user.official_id}",
-            "url": f"http://127.0.0.1:8000/authors/{user.official_id}",
+            "id": f"http://{base.CURRENT_DOMAIN}/authors/{user.official_id}",
+            "url": f"http://{base.CURRENT_DOMAIN}/authors/{user.official_id}",
             "host": user.host,
             "displayName": user.display_name,
             "github": user.github,

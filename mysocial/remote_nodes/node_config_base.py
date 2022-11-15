@@ -27,8 +27,8 @@ class NodeConfigBase:
     def __init__(self):
         if base.CURRENT_DOMAIN not in base.REMOTE_NODE_CREDENTIALS:
             print(f'{self.__class__.domain} is not in ConfigVars REMOTE_CONFIG_CREDENTIALS')
-            self.username = '127.0.0.1:8000'
-            self.password = '127.0.0.1:8000'
+            self.username = base.CURRENT_DOMAIN
+            self.password = base.CURRENT_DOMAIN
             return
 
         credentials = base.REMOTE_NODE_CREDENTIALS[base.CURRENT_DOMAIN]
