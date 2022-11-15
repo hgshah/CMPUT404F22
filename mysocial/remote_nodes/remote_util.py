@@ -8,8 +8,10 @@ from authors.models.author import Author, AuthorType
 from common.pagination_helper import PaginationHelper
 from common.test_helper import TestHelper
 from mysocial.settings import base
+from remote_nodes.macewan import MacEwan
 from remote_nodes.potato_oomfie import PotatoOomfie
 from remote_nodes.turnip_oomfie import TurnipOomfie
+from remote_nodes.ualberta import UAlberta
 
 
 class RemoteUtil:
@@ -61,7 +63,7 @@ class RemoteUtil:
                 other_args.pop('username')
                 TestHelper.overwrite_author(username, other_args)
 
-        for config in (TurnipOomfie, PotatoOomfie):
+        for config in (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan):
             base.REMOTE_CONFIG.update(config.create_dictionary_entry())
 
     @staticmethod

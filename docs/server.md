@@ -5,6 +5,14 @@ Note: Most of the documentation here are based on @TurnipXenon's experience.
 ## Setting up a Heroku app (server instance)
 
 1. Fork the repository. Heroku only works on main or master branch, sadly.
+   ```
+   # How to add a staging branch locally (exampple)
+   git remote add amanda-staging git@github.com:CMPUT301W20T10/amanda-staging.git
+   git fetch amanda-staging
+   git checkout -b amanda-staging amanda-staging/main
+   git pull origin staging # or main
+   git push amanda-staging main
+   ```
 2. Create a Heroku app.
 3. Under the Resources tab, create a Postgres add-on.
 4. Go to your Postgres add-on's setting, and click **View Credentials** to see your **Database Credentials**
@@ -126,12 +134,40 @@ PREFILLED_USERS: {
     different configs. Note that automatic deployment will fail if more than one Django is being built in one Heroku
     account.
 
+### Code Changes
+
+To add another node instance, and let our code handle logic for it differently. We a NodeConfig class for it. To do
+that:
+
+1. Create a class that inherits **NodeConfigBase**. See `remote_nodes/potato_oomfie.py` as a basic reference
+    - The extent that we override functions or values is up to how different our Node is (not relevant for Team 10 lol)
+
+```python
+from remote_nodes.node_config_base import NodeConfigBase
+
+
+class PotatoOomfie(NodeConfigBase):
+    domain = 'potato-oomfie.herokuapp.com'  # update based on your domain!
+```
+
+2. Register this class in **RemoteUtil.py**
+
+```python
+class RemoteUtil:
+
+    @staticmethod
+    def setup():
+        """Register your NodeConfig class over here"""
+        for config in (TurnipOomfie, PotatoOomfie):  # add you class here!!!
+            base.REMOTE_CONFIG.update(config.create_dictionary_entry())
+```
+
 ## Workflow
 
 1. Work on a branch based on staging, let's call this *current-branch*.
 2. If I want to test my changes locally, I can run `python manage.py runserver --settings mysocial.settings.production`.
 3. If I want to test my changes in heroku, I push my changes to my personal main fork by running the git.
-   command `git push your-fork-origin current-branch:main`.
+   command `git push your-fork-origin current-branch:main`. (like `git push amanda-staging amanda-staging:main`)
     - This follows the format: `git push origin diff-branch:main` which pushes your local `diff-branch` to the
       branch `main` at the remote repository `origin`.
     - If this is confusing and prone to errors, you may just push your differently-named branch to your fork's
