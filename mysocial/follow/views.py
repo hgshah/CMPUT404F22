@@ -99,6 +99,9 @@ class IndividualRequestView(GenericAPIView):
         return None
 
     @staticmethod
+    @extend_schema(
+        tags=['follows', RemoteUtil.REMOTE_WIP_TAG],
+    )
     def get(request: Request, follow_id: str = None) -> HttpResponse:
         """
         Get an individual follow request
@@ -117,10 +120,18 @@ class IndividualRequestView(GenericAPIView):
         """
         try:
             follow: Follow = Follow.objects.get(id=follow_id)
-            if follow.target != request.user.get_url() and follow.actor != request.user.get_url():
+            user_url = request.user.get_url()
+            if follow.target != user_url and follow.actor != user_url:
                 # Only the two accounts should be able to delete an account
                 # Returning not found due to security concerns
                 return HttpResponseNotFound()
+
+            # if remote_url is present, and we are not authoritative, sync!
+            if follow.remote_url != '' and follow.actor == user_url:
+                # todo(turnip): get Follow object from remote
+                # todo(turnip): update our current Follow object
+                pass
+
             serializers = FollowRequestSerializer(follow)
             return Response(data=serializers.data)
         except Follow.DoesNotExist:
@@ -130,6 +141,9 @@ class IndividualRequestView(GenericAPIView):
             return HttpResponseBadRequest()
 
     @staticmethod
+    @extend_schema(
+        tags=['follows', RemoteUtil.REMOTE_WIP_TAG],
+    )
     def put(request: Request, follow_id: str = None) -> HttpResponse:
         """
         Accept a follow request
@@ -146,6 +160,8 @@ class IndividualRequestView(GenericAPIView):
         See the step-by-step calls to follow or befriend someone at:
         https://github.com/hgshah/cmput404-project/blob/main/endpoints.txt#L137
         """
+        # todo(turnip): implement case where remote node informs us that our Follow request was accepted
+
         try:
             follow = Follow.objects.get(id=follow_id)
             if follow.target != request.user.get_url():
@@ -159,6 +175,9 @@ class IndividualRequestView(GenericAPIView):
 
             follow.has_accepted = True
             follow.save()
+
+            # todo(turnip): update the Follow reference from the remote server
+
             serializers = FollowRequestSerializer(follow)
             return Response(data=serializers.data)
         except Follow.DoesNotExist:
@@ -168,6 +187,9 @@ class IndividualRequestView(GenericAPIView):
             return HttpResponseBadRequest()
 
     @staticmethod
+    @extend_schema(
+        tags=['follows', RemoteUtil.REMOTE_WIP_TAG],
+    )
     def delete(request: Request, follow_id: str = None) -> HttpResponse:
         """
         Delete, decline, or cancel a follow request
@@ -186,6 +208,9 @@ class IndividualRequestView(GenericAPIView):
                 return HttpResponseNotFound()
 
             follow.delete()
+
+            # todo(turnip): if remote, delete Follow reference or mirror from the remote server
+
             return Response(status=204)
         except Follow.DoesNotExist:
             return HttpResponseNotFound()
@@ -205,7 +230,7 @@ class FollowersView(GenericAPIView):
     @extend_schema(
         parameters=RemoteUtil.REMOTE_NODE_MULTIL_PARAMS,
         summary='get_all_followers',
-        tags=['follows'],
+        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
         responses=inline_serializer(
             name='Followers',
             fields={
@@ -254,7 +279,7 @@ class FollowersView(GenericAPIView):
     @extend_schema(
         parameters=RemoteUtil.REMOTE_NODE_MULTIL_PARAMS,
         summary='post_followers',
-        tags=['follows'],
+        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
         request=inline_serializer(
             name='FollowRequestRequest',
             fields={

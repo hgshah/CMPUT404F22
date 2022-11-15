@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 from authors.util import AuthorUtil
@@ -7,9 +9,17 @@ from mysocial.settings import base
 class Follow(models.Model):
     """
     actor follows target
+
+    A Follow object is authoritative if:
+    1. It's local author following a local author
+    2. It's a remote author following a local author
+
+    A Follow object is a reference only if:
+    1. It's a local author following a remote author
     """
     FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
     target = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
     has_accepted = models.BooleanField(default=False)

@@ -39,7 +39,8 @@ class AuthorView(GenericViewSet):
                 'items': AuthorSerializer(many=True)
             }
         ),
-        summary="authors_retrieve_all"
+        summary="authors_retrieve_all",
+        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
     @action(detail=True, methods=['get'], url_name='retrieve_all')
     def retrieve_all(request: Request):
@@ -86,7 +87,8 @@ class AuthorView(GenericViewSet):
     @extend_schema(
         parameters=RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializer,
-        summary="authors_retrieve"
+        summary="authors_retrieve",
+        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
     def retrieve(request: Request, author_id: str) -> HttpResponse:
         """Get an individual author"""
@@ -131,6 +133,9 @@ class RemoteNodeView(GenericAPIView):
         return None
 
     @staticmethod
+    @extend_schema(
+        tags=["remote-debug", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+    )
     def get(request) -> HttpResponse:
         return Response({
             'type': 'remoteNode',

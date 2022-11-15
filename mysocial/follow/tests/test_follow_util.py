@@ -11,7 +11,7 @@ class TestFollowUtil(TestCase):
         self.local_follower = TestHelper.create_author('actor')
 
         # this one is an actual remote author! might break if it disappears!
-        self.remote_follower_url = 'http://potato-oomfie.herokuapp.com/authors/7a50a4b3-7a0b-4891-ab3e-da51c9119443'
+        self.remote_follower_url = 'http://potato-oomfie.herokuapp.com/authors/7f384aee-8f3f-4326-baad-f0cd372a7662'
 
     def test_get_followers_local(self):
         # test a local author with a local follower
