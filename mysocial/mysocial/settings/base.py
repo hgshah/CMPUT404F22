@@ -8,6 +8,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import json
 import os
+import sys
 from pathlib import Path
 
 import django_on_heroku
@@ -213,8 +214,17 @@ That's where we store the os.environ stuff!
 """
 
 # keys
+
+CURRENT_PORT = 8000
+# if port was passed through command line
+try:
+    # from https://stackoverflow.com/a/48148250/17836168
+    CURRENT_PORT = int(sys.argv[-1])
+except:
+    pass
+
 CURRENT_DOMAIN_KEY = "CURRENT_DOMAIN"
-CURRENT_DOMAIN = "127.0.0.1:8000"
+CURRENT_DOMAIN = f"127.0.0.1:{CURRENT_PORT}"
 
 if CURRENT_DOMAIN_KEY in os.environ:
     CURRENT_DOMAIN = os.environ[CURRENT_DOMAIN_KEY]

@@ -18,7 +18,7 @@ class TestRequestView(BaseTestFollowerView):
             response = self.client.get(f'/follows/{self.follow.id}/', content_type='application/json')
             self.assertEqual(response.status_code, 200)
             self.assertIsNotNone(response.data)
-            self.assertEqual(response.data['id'], self.follow.id)
+            self.assertEqual(response.data['id'], str(self.follow.id))
 
     def test_forbidden(self):
         self.client.logout()
