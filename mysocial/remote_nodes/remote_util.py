@@ -91,6 +91,9 @@ class RemoteUtil:
                 other_args.pop('username')
                 TestHelper.overwrite_author(username, other_args)
 
+        # This is where the endpoints and configs are added!
+        # When it's local (contains 127.0.0.1), we add 127.0.0.1:8000 and 127.0.0.1:8080
+        # Then, we add the endpoints, like turnip-oomfie-1.herokuapp.com (TurnipOomfie)
         additional_nodes = ()
         if '127.0.0.1' in base.CURRENT_DOMAIN:
             additional_nodes = (LocalDefault, LocalMirror)
