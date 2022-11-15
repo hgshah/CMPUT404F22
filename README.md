@@ -6,13 +6,21 @@ hsmalhi
 manuba
 junhong1
 
+## Setup
+
 Before you start:
 Start your virtual env!
 pip install -r requirements.txt
 
-To run locally:
+## Running locally
+
+Due to the project's structure, we only support running this server in two ports: `8000` (default) and `8080`
+
+To run locally in the `8000` port:
 
 ```bash
+python manage.py runserver
+# If things don't work, try
 python manage.py runserver --settings mysocial.settings.local
 ```
 
@@ -20,12 +28,21 @@ Note: I tested this out. I find it weird how it works without the mysocial.setti
 behaves more closely to Unix) but does not work in windows powershell (running Pycharm django runserver). If omitting
 the settings key causes an error, try adding it.
 
-Switching to PostgresDB (MACOS)
+To run locally in the `8080` port:
+
+```bash
+python manage.py runserver 8080
+# If things don't work, try...
+python manage.py runserver --settings mysocial.settings.local 8080
+```
+
+**Note**: the **port** argument should always be last.
+
+## Switching to PostgresDB (MACOS)
 https://daily-dev-tips.com/posts/installing-postgresql-on-a-mac-with-homebrew/
 Installing postgres
 
 1. brew update
-
 2. brew install postgresql
 
 To start the database:
