@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 from authors.util import AuthorUtil
@@ -17,6 +19,7 @@ class Follow(models.Model):
     """
     FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
     target = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
     has_accepted = models.BooleanField(default=False)
