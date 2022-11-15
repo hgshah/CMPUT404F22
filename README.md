@@ -82,6 +82,41 @@ Windows Instruction:
 
 Continue from step 8
 
+## Mirror instance
+
+This is a setup on how to run another Django server in a different port
+
+### Postgres
+
+These instructions are in Windows! Inside `psql`:
+
+1. `CREATE DATABASE mysocialdb_mirror;`
+2. `\connect mysocialdb_mirror`
+3. `ALTER ROLE mysocialuser CREATEDB;`
+   - Note: if you followed the initial step of making a database, you should have mysocialuser already
+4. `GRANT ALL ON SCHEMA public TO mysocialuser; GRANT ALL ON SCHEMA public TO public;`
+   - Schema public already exists!
+
+### Migration
+
+Migration is slightly different!
+
+```bash
+python manage.py migrate --settings mysocial.settings.local_mirror
+```
+
+### Running your mirror server
+
+Then, to run your mirror server:
+
+```bash
+python manage.py runserver --settings mysocial.settings.local_mirror 8080
+```
+
+Note:
+- The port number 8080 doesn't matter.
+- The port number being the last argument matters, though!
+
 You must run the postgres database as you're running the server!
 References:
 Amanda
