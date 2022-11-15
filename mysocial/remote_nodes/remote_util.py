@@ -24,6 +24,8 @@ class RemoteUtil:
     """
 
     NODE_TARGET_QUERY_PARAM = 'node-target'
+    REMOTE_IMPLEMENTED_TAG = 'remote implemented'
+    REMOTE_WIP_TAG = 'remote wip'
 
     REMOTE_NODE_SINGLE_PARAMS = [
         OpenApiParameter(name=NODE_TARGET_QUERY_PARAM, location=OpenApiParameter.QUERY,

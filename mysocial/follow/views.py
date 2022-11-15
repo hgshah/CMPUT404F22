@@ -99,6 +99,9 @@ class IndividualRequestView(GenericAPIView):
         return None
 
     @staticmethod
+    @extend_schema(
+        tags=['follows', RemoteUtil.REMOTE_WIP_TAG],
+    )
     def get(request: Request, follow_id: str = None) -> HttpResponse:
         """
         Get an individual follow request
@@ -138,6 +141,9 @@ class IndividualRequestView(GenericAPIView):
             return HttpResponseBadRequest()
 
     @staticmethod
+    @extend_schema(
+        tags=['follows', RemoteUtil.REMOTE_WIP_TAG],
+    )
     def put(request: Request, follow_id: str = None) -> HttpResponse:
         """
         Accept a follow request
@@ -181,6 +187,9 @@ class IndividualRequestView(GenericAPIView):
             return HttpResponseBadRequest()
 
     @staticmethod
+    @extend_schema(
+        tags=['follows', RemoteUtil.REMOTE_WIP_TAG],
+    )
     def delete(request: Request, follow_id: str = None) -> HttpResponse:
         """
         Delete, decline, or cancel a follow request
@@ -221,7 +230,7 @@ class FollowersView(GenericAPIView):
     @extend_schema(
         parameters=RemoteUtil.REMOTE_NODE_MULTIL_PARAMS,
         summary='get_all_followers',
-        tags=['follows'],
+        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
         responses=inline_serializer(
             name='Followers',
             fields={
@@ -270,7 +279,7 @@ class FollowersView(GenericAPIView):
     @extend_schema(
         parameters=RemoteUtil.REMOTE_NODE_MULTIL_PARAMS,
         summary='post_followers',
-        tags=['follows'],
+        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
         request=inline_serializer(
             name='FollowRequestRequest',
             fields={
