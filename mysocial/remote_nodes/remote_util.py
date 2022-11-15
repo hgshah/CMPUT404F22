@@ -51,9 +51,10 @@ class RemoteUtil:
         Setup all remote node configs and logic
         """
         # special remote node configs if you're running locally
-        # you may add your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
+        # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
+
         if '127.0.0.1' in base.CURRENT_DOMAIN:
-            base.REMOTE_NODE_CREDENTIALS.update({
+            local_credentials = {
                 '127.0.0.1:8000': {
                     'username': 'local_default',
                     'password': 'local_default'
@@ -62,7 +63,11 @@ class RemoteUtil:
                     'username': 'local_mirror',
                     'password': 'local_mirror'
                 }
-            })
+            }
+            # tricky technique to make the user's config var override ours; useful for other teams!
+            local_credentials.update(base.REMOTE_NODE_CREDENTIALS)
+            # then set it back to our app's remote credentials
+            base.REMOTE_NODE_CREDENTIALS = local_credentials
 
         # setup remote config node type authors
         for host, credentials in base.REMOTE_NODE_CREDENTIALS.items():
