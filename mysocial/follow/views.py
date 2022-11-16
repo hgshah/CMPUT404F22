@@ -17,6 +17,7 @@ from authors.serializers.author_serializer import AuthorSerializer
 from common.pagination_helper import PaginationHelper
 from follow.follow_util import FollowUtil
 from follow.models import Follow
+from follow.serializers.follow_confirmed_serializer import FollowConfirmedRequestSerializer
 from follow.serializers.follow_serializer import FollowRequestListSerializer, FollowRequestSerializer
 from mysocial.settings import base
 from remote_nodes.remote_util import RemoteUtil
@@ -425,16 +426,24 @@ class FollowersIndividualView(GenericAPIView):
         return None
 
     def get_serializer_class(self):
-        return FollowRequestSerializer
+        return FollowConfirmedRequestSerializer
 
     @staticmethod
-    def get(request: Request, *args, **kwargs) -> HttpResponse:
+    @extend_schema(
+        summary="check_if_follower",
+        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+    )
+    def get(request: Request, author_id: str, follower_id: str) -> HttpResponse:
         """
-        Check if foreign ID is a follower of Author ID
+        Check if foreign ID is a follower of Author ID.
+
+        Use Basic Auth for remote nodes!
+
+        **author_id:** ID of the local author we want to check followers of
+
+        **follower_id:** ID of the remote author we want to check is a follower of author with author_id
         """
         node: Author = request.user
-        author_id = kwargs['author_id']
-        follower_id = kwargs['follower_id']
 
         try:
             target = Author.objects.get(official_id=author_id)
@@ -451,8 +460,8 @@ class FollowersIndividualView(GenericAPIView):
             return HttpResponseNotFound(f"Cannot find user at {node.host}")
 
         try:
-            follow = Follow.objects.filter(target=target.get_url(), actor=follower.get_url(), has_accepted=True)
-            serializer = AuthorSerializer(follower)
+            follow = Follow.objects.get(target=target.get_url(), actor=follower.get_url(), has_accepted=True)
+            serializer = FollowConfirmedRequestSerializer(follow)
             return Response(serializer.data)
         except Follow.DoesNotExist:
             return HttpResponseNotFound("User does not follow the following author on our end")
