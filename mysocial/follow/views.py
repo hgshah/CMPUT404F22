@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authors.models.author import Author
+from authors.util import AuthorUtil
+from authors.permissions import NodeIsAuthenticated
 from authors.serializers.author_serializer import AuthorSerializer
 from common.pagination_helper import PaginationHelper
 from follow.follow_util import FollowUtil
@@ -414,6 +416,49 @@ class FollowersView(GenericAPIView):
             print(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
         return Response(data=data, status=201)
+
+
+class FollowersIndividualView(GenericAPIView):
+    permission_classes = [NodeIsAuthenticated]
+
+    def get_queryset(self):
+        return None
+
+    def get_serializer_class(self):
+        return FollowRequestSerializer
+
+    @staticmethod
+    def get(request: Request, *args, **kwargs) -> HttpResponse:
+        """
+        Check if foreign ID is a follower of Author ID
+        """
+        node: Author = request.user
+        author_id = kwargs['author_id']
+        follower_id = kwargs['follower_id']
+
+        try:
+            target = Author.objects.get(official_id=author_id)
+        except Follow.DoesNotExist:
+            return HttpResponseNotFound("User not exist on our end")
+        except Exception as e:
+            print(f"FollowersIndividualView: {e}")
+            return HttpResponseNotFound("User not exist on our end")
+
+        base_url: str = node.host
+        follower, err = AuthorUtil.from_author_url_to_author(f'{base_url}/authors/{follower_id}')
+        if err is not None:
+            print(f"FollowersIndividualView: {err}")
+            return HttpResponseNotFound(f"Cannot find user at {node.host}")
+
+        try:
+            follow = Follow.objects.filter(target=target.get_url(), actor=follower.get_url(), has_accepted=True)
+            serializer = AuthorSerializer(follower)
+            return Response(serializer.data)
+        except Follow.DoesNotExist:
+            return HttpResponseNotFound("User does not follow the following author on our end")
+        except Exception as e:
+            print(f"FollowersIndividualView: {e}")
+            return HttpResponseNotFound("User does not follow the following author on our end")
 
 
 # todo(turnip): add test

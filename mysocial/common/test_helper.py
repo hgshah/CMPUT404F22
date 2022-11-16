@@ -13,6 +13,7 @@ class TestHelper:
             node.set_password(password)
             node.host = host
             node.save()
+            return node
         except Author.DoesNotExist:
             return TestHelper.create_node(username, password, host)
         except Exception as e:
@@ -46,6 +47,7 @@ class TestHelper:
                 else:
                     author.__setattr__(k, v)
             author.save()
+            return author
         except Author.DoesNotExist:
             return TestHelper.create_author(username, other_args)
         except Exception as e:
