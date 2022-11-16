@@ -14,4 +14,6 @@ DATABASES = {
     }
 }
 
+
+# for debugging purposes: figure out which setting you're on
 local.LOCAL_STATE = 'MIRROR'
