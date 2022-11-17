@@ -26,3 +26,7 @@ Call POST on `127.0.0.1:8014/api/nodes` with this payload:
   "team": 10
 }
 ```
+
+We call their endpoint with auth_username and auth_password.
+
+They call our endpoint with node_name and password.

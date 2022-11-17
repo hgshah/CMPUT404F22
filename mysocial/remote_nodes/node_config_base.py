@@ -34,11 +34,13 @@ class NodeConfigBase:
     }
 
     def __init__(self):
-        # todo
-        self.node_author = Author.objects.get(username=self.__class__.username)
-        self.node_detail = self.node_author.node_detail
-        self.username = self.node_detail.remote_username
-        self.password = self.node_detail.remote_password
+        try:
+            self.node_author = Author.objects.get(username=self.__class__.username)
+            self.node_detail = self.node_author.node_detail
+            self.username = self.node_detail.remote_username
+            self.password = self.node_detail.remote_password
+        except Exception as e:
+            print('Author does not exist yet...')
 
     @classmethod
     def create_dictionary_entry(cls):
