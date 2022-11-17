@@ -69,7 +69,11 @@ class AuthorSerializer(serializers.ModelSerializer):
                         continue
                     elif key == 'url':
                         # special case
-                        sanitized = data[key].lstrip('http://').lstrip('https://')
+                        sanitized: str = data[key]
+                        for start in ('http://', 'https://'):
+                            if sanitized.startswith(start):
+                                sanitized = sanitized[len(start):]
+                        print("test:", sanitized, data[key])
                         setattr(author, internal_field, f'http://{sanitized}')
                     else:
                         setattr(author, internal_field, data[key])
