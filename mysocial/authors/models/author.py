@@ -74,7 +74,10 @@ class Author(AbstractUser):
             return self.url
 
         # local authors
-        return f"https://{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
+        prefix = 'https://'
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            prefix = 'http://'
+        return f"{prefix}{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
 
     def is_local(self) -> bool:
         """
