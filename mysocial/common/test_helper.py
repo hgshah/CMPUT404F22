@@ -1,9 +1,11 @@
-from authors.models.author import Author, AuthorType
+import datetime
+
+from django.utils import timezone
+
+from authors.models.author import Author
 from authors.models.remote_node import RemoteNode
 from mysocial.settings import base
-from post.models import Post, ContentType, Visibility
-import datetime
-from django.utils import timezone
+from post.models import ContentType, Post, Visibility
 
 
 class TestHelper:
@@ -41,7 +43,6 @@ class TestHelper:
             username=username,
             other_args={'password': password,
                         'host': host,
-                        'author_type': AuthorType.ACTIVE_REMOTE_NODE
                         }
         )
 

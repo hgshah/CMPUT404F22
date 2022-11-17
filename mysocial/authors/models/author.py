@@ -5,13 +5,7 @@ from django.db import models
 
 from mysocial.settings import base
 from .author_manager import AuthorManager
-from .remote_node import RemoteNode
-
-
-class AuthorType(models.TextChoices):
-    LOCAL_AUTHOR = "local_author"
-    ACTIVE_REMOTE_NODE = "active_remote_node"
-    INACTIVE_REMOTE_NODE = "inactive_remote_node"  # we can deactivate nodes by just changing their type
+from .remote_node import NodeStatus, RemoteNode
 
 
 class Author(AbstractUser):
@@ -42,14 +36,19 @@ class Author(AbstractUser):
     github = models.TextField(blank=True)
     profile_image = models.ImageField(blank=True)
     node_detail = models.ForeignKey(RemoteNode, on_delete=models.CASCADE, null=True, blank=True)
-    author_type = models.CharField(choices=AuthorType.choices, default=AuthorType.LOCAL_AUTHOR, max_length=25)
 
     objects = AuthorManager()
 
     REQUIRED_FIELDS = ['email', 'password']
 
+    def is_node(self):
+        return self.node_detail is not None
+
     def is_active_node(self):
-        return self.node_detail is not None and self.node_detail != ''
+        return self.node_detail is not None and self.node_detail.status == NodeStatus.ACTIVE
+
+    def is_inactive_node(self):
+        return self.node_detail is not None and self.node_detail.status == NodeStatus.INACTIVE
 
     def get_url(self):
         """
@@ -95,22 +94,21 @@ class Author(AbstractUser):
         """
         :return: True if the current user is an authenticated local_author or active_remote_node.
         """
-        self.node_detail
-        return self.author_type != AuthorType.INACTIVE_REMOTE_NODE and super().is_authenticated
+        return not self.is_inactive_node() and super().is_authenticated
 
     @property
     def is_authenticated_user(self):
         """
         :return: True if the current user is an authenticated or logged in local_author.
         """
-        return self.author_type == AuthorType.LOCAL_AUTHOR and super().is_authenticated
+        return not self.is_node() is None and super().is_authenticated
 
     @property
     def is_authenticated_node(self):
         """
         :return: True if the current user is an authenticated active_remote_node.
         """
-        return self.author_type == AuthorType.ACTIVE_REMOTE_NODE and super().is_authenticated
+        return self.is_active_node() and super().is_authenticated
 
     @staticmethod
     def get_serializer_field_name():
@@ -126,7 +124,7 @@ class Author(AbstractUser):
         try:
             return cls.objects.get(
                 official_id=official_id,
-                author_type=AuthorType.LOCAL_AUTHOR
+                node_detail__isnull=True
             )
         except cls.DoesNotExist:
             return None
@@ -137,4 +135,4 @@ class Author(AbstractUser):
         Gets all local_author. Nodes are ignored.
         :return: All local_authors.
         """
-        return cls.objects.filter(author_type=AuthorType.LOCAL_AUTHOR)
+        return cls.objects.filter(node_detail__isnull=True)

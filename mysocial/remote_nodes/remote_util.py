@@ -4,18 +4,19 @@ import os
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework.request import Request
 
-from authors.models.author import Author, AuthorType
+from authors.models.author import Author
+from authors.models.remote_node import NodeStatus
 from common.pagination_helper import PaginationHelper
 from common.test_helper import TestHelper
 from mysocial.settings import base
+from remote_nodes.local_default import LocalDefault
+from remote_nodes.local_mirror import LocalMirror
 from remote_nodes.macewan import MacEwan
 from remote_nodes.potato_oomfie import PotatoOomfie
 from remote_nodes.team14_local import Team14Local
 from remote_nodes.team14_main import Team14Main
 from remote_nodes.turnip_oomfie import TurnipOomfie
 from remote_nodes.ualberta import UAlberta
-from remote_nodes.local_default import LocalDefault
-from remote_nodes.local_mirror import LocalMirror
 
 
 class RemoteUtil:
@@ -77,9 +78,11 @@ class RemoteUtil:
             if is_active is None and not isinstance(is_active, bool):
                 continue
             elif is_active:
-                node.author_type = AuthorType.ACTIVE_REMOTE_NODE
+                node.node_detail.status = NodeStatus.ACTIVE
+                node.node_detail.save()
             else:
-                node.author_type = AuthorType.INACTIVE_REMOTE_NODE
+                node.node_detail.status = NodeStatus.INACTIVE
+                node.node_detail.save()
 
         # todo: setup superuser???
         if 'PREFILLED_USERS' in os.environ:

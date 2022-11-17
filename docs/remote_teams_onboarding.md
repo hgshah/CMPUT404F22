@@ -37,7 +37,9 @@ If you can add an environment variables, set `REMOTE_NODE_CREDENTIALS` to the fo
 {
   "127.0.0.1:8000": {
     "username": "team-oomf",
-    "password": "hunter2"
+    "password": "hunter2",
+    "remote_username": "team-oomf",
+    "remote_password": "hunter3"
   }
 }
 ```
