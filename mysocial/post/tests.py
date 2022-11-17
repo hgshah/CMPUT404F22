@@ -103,7 +103,7 @@ class PostTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def get_expected_official_id(self, post_id):
-        return f"http://{self.author1.host}/{Author.URL_PATH}/{self.author1.official_id}/posts/{post_id}"
+        return f"https://{self.author1.host}/{Author.URL_PATH}/{self.author1.official_id}/posts/{post_id}"
 
 class PostFailTestCase(APITestCase):
     CREATE_POST_PAYLOAD = {

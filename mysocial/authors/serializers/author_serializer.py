@@ -63,11 +63,24 @@ class AuthorSerializer(serializers.ModelSerializer):
             else:
                 # deserialize a remote author; take not it's missing some stuff so check with is_local()
                 author = Author()
-                for index, key in enumerate(AuthorSerializer.Meta.fields):
-                    internal_field = AuthorSerializer.Meta.internal_field_equivalents[index]
-                    if key not in data or internal_field == '_':
+                node_config = base.REMOTE_CONFIG.get(host)
+                if node_config is None:
+                    print(f"AuthorSerializer: Host not found: {host}")
+                    return serializers.ValidationError(f"AuthorSerializer: Host not found: {host}")
+                remote_fields: dict = node_config.remote_fields
+
+                for remote_field, local_field in remote_fields.items():
+                    if remote_field not in data:
                         continue
-                    setattr(author, internal_field, data[key])
+                    elif remote_field == 'url':
+                        # special case
+                        sanitized: str = data[remote_field]
+                        for start in ('http://', 'https://'):
+                            if sanitized.startswith(start):
+                                sanitized = sanitized[len(start):]
+                        setattr(author, local_field, f'https://{sanitized}')
+                    else:
+                        setattr(author, local_field, data[remote_field])
                 author.host = host  # force a set even if field was not given
         except Exception as e:
             print(f"AuthorSerializer: failed serializing {e}")
@@ -81,4 +94,3 @@ class AuthorSerializer(serializers.ModelSerializer):
 
         # custom fields
         required_fields = ('url',)
-        internal_field_equivalents = ('_', '_', 'url', 'host', 'display_name', 'github', 'profile_image')
