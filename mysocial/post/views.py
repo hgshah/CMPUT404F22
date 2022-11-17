@@ -11,6 +11,9 @@ from .models import Post, Visibility
 from rest_framework import status
 import logging
 from common.pagination_helper import PaginationHelper
+from follow.follow_util import FollowUtil
+from inbox.models import Inbox
+from mysocial.settings import base
 
 logger = logging.getLogger("mylogger")
 
@@ -264,5 +267,37 @@ class CreationPostView(GenericAPIView):
                 return Response(PostSerializer(post).data, status = status.HTTP_200_OK)
         except Exception as e:
             logger.info(e)
+            return HttpResponseNotFound()
+
+class SharePostView(GenericAPIView):
+    serializer_class = PostSerializer
+    @extend_schema(
+        summary = "post_share_post",
+        tags=['post']
+    )
+    @action(detail=True, methods=['put'], url_name='post_share_post')
+    def put(self, request: Request, *args, **kwargs):
+        try:
+            post = PostSerializer(Post.objects.get(official_id = kwargs['post_id'])).data
+            requesting_author = Author.objects.get(official_id = self.request.user.official_id)
+            followers = FollowUtil.get_followers(requesting_author)
+
+            if len(followers) == 0:
+                return Response("You currently have no followers", status = status.HTTP_202_ACCEPTED)
+         
+            for follower in followers: 
+                if follower.is_local():
+                    inbox = Inbox.objects.get(author = follower)
+                    inbox.add_to_inbox(post)
+                else:
+                    node_config = base.REMOTE_CONFIG.get(follower.host)
+                    response = node_config.share_to_remote_inbox(follower.get_url(), post)
+                    if response != status.HTTP_200_OK:
+                        return Response("Failed to send data to remote inbox", status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            return Response("Successfully added to all followers inbox", status = status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
             return HttpResponseNotFound()
 

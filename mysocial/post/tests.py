@@ -6,6 +6,7 @@ from django.utils import timezone
 import logging, uuid
 import datetime
 from common.test_helper import TestHelper
+from inbox.models import Inbox 
 
 logger = logging.getLogger("mylogger")
 #pymike00, October 29, https://www.youtube.com/watch?v=1FqxfnlQPi8&ab_channel=pymike00
@@ -148,6 +149,8 @@ class PostFailTestCase(APITestCase):
         response = self.client.delete(request)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
 
 
 

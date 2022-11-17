@@ -110,3 +110,13 @@ class NodeConfigBase:
         else:
             print(f"post_local_follow_remote: remote server response: {response.status_code}")
         return response.status_code
+
+    ## will have to change the url depending on what team it is 
+    # dictionary: [host + endpoint, formatted url]
+    # will have to change the data for team 10
+    def share_to_remote_inbox(self, target_author_url: str, data):
+        if target_author_url is None:
+            return 404
+        url = f'{target_author_url}/inbox'
+        response = requests.post(url = url, data = data, auth = (self.username, self.password))
+        return response.status_code
