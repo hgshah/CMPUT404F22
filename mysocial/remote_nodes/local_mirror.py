@@ -12,7 +12,7 @@ class LocalMirror(LocalDefault):
             cls.domain: {
                 'username': 'local_mirror',
                 'password': 'local_mirror',
-                'remote_username': 'local_mirror_remote',
-                'remote_password': 'local_mirror_remote',
+                'remote_username': 'local_mirror',
+                'remote_password': 'local_mirror',
             }
         }
