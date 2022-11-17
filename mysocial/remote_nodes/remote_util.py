@@ -52,32 +52,27 @@ class RemoteUtil:
         """
         Setup all remote node configs and logic
         """
+        connected_nodes = ()
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            connected_nodes = (LocalDefault, LocalMirror, Team14Local)
+        else:
+            connected_nodes = (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main)
 
         # special remote node configs if you're running locally
         # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
         if '127.0.0.1' in base.CURRENT_DOMAIN:
-            local_credentials = {
-                '127.0.0.1:8000': {
-                    'username': 'local_default',
-                    'password': 'local_default'
-                },
-                '127.0.0.1:8080': {
-                    'username': 'local_mirror',
-                    'password': 'local_mirror'
-                },
-                '127.0.0.1:8014': {
-                    'username': 'team14',
-                    'password': 'team14'
-                },
-            }
             # tricky technique to make the user's config var override ours; useful for other teams!
-            local_credentials.update(base.REMOTE_NODE_CREDENTIALS)
+            local_credentials: dict = {}
+            for node in connected_nodes:
+                local_credentials.update(node.create_node_credentials())
             # then set it back to our app's remote credentials
             base.REMOTE_NODE_CREDENTIALS = local_credentials
 
         # setup remote config node type authors
         for host, credentials in base.REMOTE_NODE_CREDENTIALS.items():
-            node: Author = TestHelper.overwrite_node(credentials['username'], credentials['password'], host)
+            node: Author = TestHelper.overwrite_node(credentials['username'], credentials['password'],
+                                                     credentials['remote_username'], credentials['remote_password'],
+                                                     host)
             is_active = credentials.get('is_active')
             if is_active is None and not isinstance(is_active, bool):
                 continue
@@ -100,10 +95,7 @@ class RemoteUtil:
         # This is where the endpoints and configs are added!
         # When it's local (contains 127.0.0.1), we add 127.0.0.1:8000 and 127.0.0.1:8080
         # Then, we add the endpoints, like turnip-oomfie-1.herokuapp.com (TurnipOomfie)
-        additional_nodes = ()
-        if '127.0.0.1' in base.CURRENT_DOMAIN:
-            additional_nodes = (LocalDefault, LocalMirror)
-        for config in (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Local, Team14Main) + additional_nodes:
+        for config in connected_nodes:
             base.REMOTE_CONFIG.update(config.create_dictionary_entry())
 
     @staticmethod

@@ -5,6 +5,8 @@ from django.db import models
 
 from mysocial.settings import base
 from .author_manager import AuthorManager
+from .remote_node import RemoteNode
+
 
 class AuthorType(models.TextChoices):
     LOCAL_AUTHOR = "local_author"
@@ -39,11 +41,15 @@ class Author(AbstractUser):
     display_name = models.TextField(blank=True)
     github = models.TextField(blank=True)
     profile_image = models.ImageField(blank=True)
+    node_detail = models.ForeignKey(RemoteNode, on_delete=models.CASCADE, null=True, blank=True)
     author_type = models.CharField(choices=AuthorType.choices, default=AuthorType.LOCAL_AUTHOR, max_length=25)
 
     objects = AuthorManager()
 
     REQUIRED_FIELDS = ['email', 'password']
+
+    def is_active_node(self):
+        return self.node_detail is not None and self.node_detail != ''
 
     def get_url(self):
         """
@@ -89,6 +95,7 @@ class Author(AbstractUser):
         """
         :return: True if the current user is an authenticated local_author or active_remote_node.
         """
+        self.node_detail
         return self.author_type != AuthorType.INACTIVE_REMOTE_NODE and super().is_authenticated
 
     @property

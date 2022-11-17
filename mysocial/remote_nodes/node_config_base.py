@@ -22,19 +22,23 @@ class NodeConfigBase:
     Inheriting classes may not need it unless when needed
     """
     domain = 'domain.herokuapp.com'
+    username = 'domain'
     author_serializer = AuthorSerializer
+    """Mapping: remote to local"""
+    remote_fields = {
+        'url': 'url',
+        'host': 'host',
+        'displayName': 'display_name',
+        'github': 'github',
+        'profileImage': 'profile_image'
+    }
 
     def __init__(self):
-        if base.CURRENT_DOMAIN not in base.REMOTE_NODE_CREDENTIALS:
-            print(f'{self.__class__.domain} is not in ConfigVars REMOTE_CONFIG_CREDENTIALS')
-            self.username = base.CURRENT_DOMAIN
-            self.password = base.CURRENT_DOMAIN
-            return
-
-        credentials = base.REMOTE_NODE_CREDENTIALS[base.CURRENT_DOMAIN]
-        self.username = credentials['username']
-        self.password = credentials['password']
-        # todo(turnip): check entry in Author, check if inactive?
+        # todo
+        self.node_author = Author.objects.get(username=self.__class__.username)
+        self.node_detail = self.node_author.node_detail
+        self.username = self.node_detail.remote_username
+        self.password = self.node_detail.remote_password
 
     @classmethod
     def create_dictionary_entry(cls):
@@ -57,7 +61,7 @@ class NodeConfigBase:
 
     def from_author_id_to_url(self, author_id: str) -> dict:
         url = f'{self.get_base_url()}/authors/{author_id}/'
-        response = requests.get(url)
+        response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
             # todo(turnip): map to our author?
             json_dict = json.loads(response.content)
@@ -65,21 +69,21 @@ class NodeConfigBase:
         return None
 
     def get_author_request(self, author_id: str):
-        response = requests.get(f'{self.get_base_url()}/authors/{author_id}/')
+        response = requests.get(f'{self.get_base_url()}/authors/{author_id}/', auth=(self.username, self.password))
         if response.status_code == 200:
             # todo(turnip): map to our author?
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
     def get_author_via_url(self, author_url: str) -> Author:
-        response = requests.get(author_url)
+        response = requests.get(author_url, auth=(self.username, self.password))
 
         if response.status_code == 200:
             author_json = json.loads(response.content.decode('utf-8'))
             serializer = AuthorSerializer(data=author_json)
 
             if serializer.is_valid():
-                return serializer.validated_data # <- GOOD RESULT HERE!!!
+                return serializer.validated_data  # <- GOOD RESULT HERE!!!
 
             print('GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
 
@@ -90,7 +94,7 @@ class NodeConfigBase:
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
             url += '?' + query_param
-        response = requests.get(url)
+        response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
             # todo(turnip): map to our author?
             return Response(json.loads(response.content))

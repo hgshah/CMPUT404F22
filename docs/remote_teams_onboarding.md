@@ -21,7 +21,7 @@ python manage.py shell
 
 ```python 
 from common.test_helper import TestHelper
-node = TestHelper.create_node(username='team-oomf', password='hunter2', host='www.team-oomf.herokuapp.com')
+node = TestHelper.create_node(username='team-oomf', password='hunter2', remote_username='team-oomf', remote_password='hunter3', host='www.team-oomf.herokuapp.com')
 node.save()
 ```
 

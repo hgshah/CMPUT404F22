@@ -1,23 +1,32 @@
 from authors.models.author import Author, AuthorType
+from authors.models.remote_node import RemoteNode
 from mysocial.settings import base
 from post.models import Post, ContentType, Visibility
 import datetime
 from django.utils import timezone
+
+
 class TestHelper:
     DEFAULT_PASSWORD = '1234567'
 
     @staticmethod
-    def overwrite_node(username: str, password: str, host: str):
+    def overwrite_node(username: str, password: str, remote_username: str, remote_password: str, host: str):
         try:
-            node = Author.objects.get(username=username)
-            node.set_password(password)
-            node.host = host
-            node.save()
+            node_author = Author.objects.get(username=username)
         except Author.DoesNotExist:
-            return TestHelper.create_node(username, password, host)
+            return TestHelper.create_node(username, password, remote_username, remote_password, host)
         except Exception as e:
             print(f"Unknown error: {e}")
             return None
+
+        node_author.set_password(password)
+        node_author.host = host
+        node_author.save()
+
+        node_detail = RemoteNode.objects.get(id=node_author.node_detail.id)
+        node_detail.remote_username = remote_username
+        node_detail.remote_password = remote_password
+        node_detail.save()
 
     @staticmethod
     def create_user(username: str, password: str, host: str):
@@ -27,14 +36,19 @@ class TestHelper:
         )
 
     @staticmethod
-    def create_node(username: str, password: str, host: str):
-        return TestHelper.create_author(
+    def create_node(username: str, password: str, remote_username: str, remote_password: str, host: str) -> Author:
+        node_author = TestHelper.create_author(
             username=username,
             other_args={'password': password,
                         'host': host,
                         'author_type': AuthorType.ACTIVE_REMOTE_NODE
                         }
         )
+
+        node_detail = RemoteNode.objects.create(remote_username=remote_username, remote_password=remote_password)
+        node_author.node_detail = node_detail
+        node_author.save()
+        return node_author
 
     @staticmethod
     def overwrite_author(username: str, other_args: dict = None):
@@ -84,7 +98,7 @@ class TestHelper:
         if 'is_superuser' in default_args:
             return Author.objects.create_superuser(**default_args)
         return Author.objects.create_user(**default_args)
-    
+
     @staticmethod
     def create_post(author: Author, other_args: dict = None) -> Post:
         default_args = {
@@ -99,7 +113,7 @@ class TestHelper:
             "unlisted": "False",
             "published": f"{datetime.datetime.now(tz=timezone.utc)}"
         }
-       
+
         # override
         if other_args is not None:
             default_args.update(other_args)
