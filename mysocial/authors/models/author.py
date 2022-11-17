@@ -49,8 +49,8 @@ class Author(AbstractUser):
         """
         Returns author_url following the local_author's format
         Example:
-            - http://socioecon/authors/{self.official_id}
-            - http://{local_host}/authors/{self.official_id}
+            - https://socioecon/authors/{self.official_id}
+            - https://{local_host}/authors/{self.official_id}
         """
 
         return self.get_id()
@@ -59,8 +59,8 @@ class Author(AbstractUser):
         """
         Returns author_url following the local_author's format
         Example:
-            - http://socioecon/authors/{self.official_id}
-            - http://{local_host}/authors/{self.official_id}
+            - https://socioecon/authors/{self.official_id}
+            - https://{local_host}/authors/{self.official_id}
         """
 
         # this is a trick in the serializer for remote authors, look at AuthorSerializer.to_internal_value
@@ -69,7 +69,7 @@ class Author(AbstractUser):
             return self.url
 
         # local authors
-        return f"http://{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
+        return f"https://{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
 
     def is_local(self) -> bool:
         """

@@ -40,20 +40,23 @@ class NodeConfigBase:
     def create_dictionary_entry(cls):
         return {cls.domain: cls()}
 
+    def get_base_url(self):
+        return f'http://{self.__class__.domain}'
+
     # endpoints
     def get_all_authors_request(self, params: dict):
-        url = f'http://{self.__class__.domain}/authors/'
+        url = f'{self.get_base_url()}/authors/'
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
             url += '?' + query_param
-        response = requests.get(url)
+        response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
             # todo(turnip): map to our author?
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
     def from_author_id_to_url(self, author_id: str) -> dict:
-        url = f'http://{self.__class__.domain}/authors/{author_id}/'
+        url = f'{self.get_base_url()}/authors/{author_id}/'
         response = requests.get(url)
         if response.status_code == 200:
             # todo(turnip): map to our author?
@@ -62,7 +65,7 @@ class NodeConfigBase:
         return None
 
     def get_author_request(self, author_id: str):
-        response = requests.get(f'http://{self.__class__.domain}/authors/{author_id}/')
+        response = requests.get(f'{self.get_base_url()}/authors/{author_id}/')
         if response.status_code == 200:
             # todo(turnip): map to our author?
             return Response(json.loads(response.content))
@@ -83,7 +86,7 @@ class NodeConfigBase:
         return None
 
     def get_all_followers_request(self, params: dict, author_id: str):
-        url = f'http://{self.__class__.domain}/authors/{author_id}/followers/'
+        url = f'{self.get_base_url()}/authors/{author_id}/followers/'
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
             url += '?' + query_param

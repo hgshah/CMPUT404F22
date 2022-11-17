@@ -10,6 +10,8 @@ from common.test_helper import TestHelper
 from mysocial.settings import base
 from remote_nodes.macewan import MacEwan
 from remote_nodes.potato_oomfie import PotatoOomfie
+from remote_nodes.team14_local import Team14Local
+from remote_nodes.team14_main import Team14Main
 from remote_nodes.turnip_oomfie import TurnipOomfie
 from remote_nodes.ualberta import UAlberta
 from remote_nodes.local_default import LocalDefault
@@ -62,7 +64,11 @@ class RemoteUtil:
                 '127.0.0.1:8080': {
                     'username': 'local_mirror',
                     'password': 'local_mirror'
-                }
+                },
+                '127.0.0.1:8014': {
+                    'username': 'team14',
+                    'password': 'team14'
+                },
             }
             # tricky technique to make the user's config var override ours; useful for other teams!
             local_credentials.update(base.REMOTE_NODE_CREDENTIALS)
@@ -97,7 +103,7 @@ class RemoteUtil:
         additional_nodes = ()
         if '127.0.0.1' in base.CURRENT_DOMAIN:
             additional_nodes = (LocalDefault, LocalMirror)
-        for config in (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan) + additional_nodes:
+        for config in (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Local, Team14Main) + additional_nodes:
             base.REMOTE_CONFIG.update(config.create_dictionary_entry())
 
     @staticmethod

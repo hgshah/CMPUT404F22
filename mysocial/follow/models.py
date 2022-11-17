@@ -39,7 +39,7 @@ class Follow(models.Model):
         """
         Returns the url to get this Follow object
         """
-        return f"http://{base.CURRENT_DOMAIN}/follows/{self.id}"
+        return f"https://{base.CURRENT_DOMAIN}/follows/{self.id}"
 
     @staticmethod
     def get_serializer_field_name():

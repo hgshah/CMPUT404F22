@@ -67,7 +67,15 @@ class AuthorSerializer(serializers.ModelSerializer):
                     internal_field = AuthorSerializer.Meta.internal_field_equivalents[index]
                     if key not in data or internal_field == '_':
                         continue
-                    setattr(author, internal_field, data[key])
+                    elif key == 'url':
+                        # special case
+                        sanitized: str = data[key]
+                        for start in ('http://', 'https://'):
+                            if sanitized.startswith(start):
+                                sanitized = sanitized[len(start):]
+                        setattr(author, internal_field, f'https://{sanitized}')
+                    else:
+                        setattr(author, internal_field, data[key])
                 author.host = host  # force a set even if field was not given
         except Exception as e:
             print(f"AuthorSerializer: failed serializing {e}")

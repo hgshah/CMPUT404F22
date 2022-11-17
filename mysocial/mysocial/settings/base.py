@@ -162,18 +162,18 @@ CORS_ALLOW_CREDENTIALS = True
 
 # later if the above causes issue
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',  # for localhost (REACT Default)
-    'http://192.168.0.50:3000',  # for network
-    'http://localhost:8000',  # for localhost (Development)
-    'http://192.168.0.50:8000',  # for network (Development)
+    'https://localhost:3000',  # for localhost (REACT Default)
+    'https://192.168.0.50:3000',  # for network
+    'https://localhost:8000',  # for localhost (Development)
+    'https://192.168.0.50:8000',  # for network (Development)
 ]
 
 # from https://stackoverflow.com/a/72249293/17836168
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',  # for localhost (REACT Default)
-    'http://192.168.0.50:3000',  # for network
-    'http://localhost:8000',  # for localhost (Development)
-    'http://192.168.0.50:8000',  # for network (Development)
+    'https://localhost:3000',  # for localhost (REACT Default)
+    'https://192.168.0.50:3000',  # for network
+    'https://localhost:8000',  # for localhost (Development)
+    'https://192.168.0.50:8000',  # for network (Development)
 ]
 
 CORS_ALLOW_HEADERS = default_headers + (
