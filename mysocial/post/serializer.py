@@ -53,4 +53,7 @@ class CreatePostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ('title', 'description','visibility','source', 'origin', 'categories', 'contentType', 'unlisted')
 
-
+class SharePostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ()

@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
-from .serializer import PostSerializer, CreatePostSerializer
+from .serializer import PostSerializer, CreatePostSerializer, SharePostSerializer
 from rest_framework import serializers
 from authors.models.author import Author
 from .models import Post, Visibility
@@ -270,13 +270,13 @@ class CreationPostView(GenericAPIView):
             return HttpResponseNotFound()
 
 class SharePostView(GenericAPIView):
-    serializer_class = PostSerializer
+    serializer_class = SharePostSerializer
     @extend_schema(
         summary = "post_share_post",
-        tags=['post']
+        tags=['post', 'remote_implemented']
     )
     @action(detail=True, methods=['put'], url_name='post_share_post')
-    def put(self, request: Request, *args, **kwargs):
+    def put(self, request: Request, *args, **kwargs) -> HttpResponse:
         try:
             post = PostSerializer(Post.objects.get(official_id = kwargs['post_id'])).data
             requesting_author = Author.objects.get(official_id = self.request.user.official_id)
@@ -291,8 +291,8 @@ class SharePostView(GenericAPIView):
                     inbox.add_to_inbox(post)
                 else:
                     node_config = base.REMOTE_CONFIG.get(follower.host)
-                    response = node_config.share_to_remote_inbox(follower.get_url(), post)
-                    if response != status.HTTP_200_OK:
+                    response_status_code = node_config.share_to_remote_inbox(follower.get_url(), post)
+                    if response_status_code < 200 or response_status_code > 200:
                         return Response("Failed to send data to remote inbox", status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response("Successfully added to all followers inbox", status = status.HTTP_200_OK)
@@ -300,4 +300,6 @@ class SharePostView(GenericAPIView):
         except Exception as e:
             print(e)
             return HttpResponseNotFound()
+
+
 

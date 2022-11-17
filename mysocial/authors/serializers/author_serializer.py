@@ -78,7 +78,10 @@ class AuthorSerializer(serializers.ModelSerializer):
                         for start in ('http://', 'https://'):
                             if sanitized.startswith(start):
                                 sanitized = sanitized[len(start):]
-                        setattr(author, local_field, f'https://{sanitized}')
+                        prefix = 'https://'
+                        if '127.0.0.1' in base.CURRENT_DOMAIN:
+                            prefix = 'http://'
+                        setattr(author, local_field, f'{prefix}{sanitized}')
                     else:
                         setattr(author, local_field, data[remote_field])
                 author.host = host  # force a set even if field was not given

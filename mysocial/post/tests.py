@@ -1,12 +1,11 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
-from post.models import Post, Visibility
+from post.models import Visibility
 from authors.models.author import Author
-from django.utils import timezone
 import logging, uuid
-import datetime
 from common.test_helper import TestHelper
-from inbox.models import Inbox 
+from follow.models import Follow
+from inbox.models import Inbox
 
 logger = logging.getLogger("mylogger")
 #pymike00, October 29, https://www.youtube.com/watch?v=1FqxfnlQPi8&ab_channel=pymike00
@@ -103,7 +102,23 @@ class PostTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def get_expected_official_id(self, post_id):
-        return f"https://{self.author1.host}/{Author.URL_PATH}/{self.author1.official_id}/posts/{post_id}"
+        return f"http://{self.author1.host}/{Author.URL_PATH}/{self.author1.official_id}/posts/{post_id}"
+    
+    # sharing a post adds that post to your local followers
+    def test_share_post_sends_local_followers(self):
+        Follow.objects.create(
+            actor=self.author2.get_id(),
+            target=self.author1.get_id(),
+            has_accepted=True)
+
+        self.client.force_login(self.author1)
+
+        request = f"/authors/{self.author1.official_id}/posts/{self.existing_post.official_id}/share"
+        response = self.client.put(request)
+        follower_inbox = Inbox.objects.get(author = self.author2)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(follower_inbox.items[0].get('id'), self.get_expected_official_id(self.existing_post.official_id))
 
 class PostFailTestCase(APITestCase):
     CREATE_POST_PAYLOAD = {
