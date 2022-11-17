@@ -442,6 +442,8 @@ class FollowersIndividualView(GenericAPIView):
         **author_id:** ID of the local author we want to check followers of
 
         **follower_id:** ID of the remote author we want to check is a follower of author with author_id
+
+        PR with example: https://github.com/hgshah/cmput404-project/pull/99
         """
         node: Author = request.user
 
