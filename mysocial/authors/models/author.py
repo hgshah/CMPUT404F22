@@ -101,7 +101,7 @@ class Author(AbstractUser):
         """
         :return: True if the current user is an authenticated or logged in local_author.
         """
-        return not self.is_node() is None and super().is_authenticated
+        return not self.is_node() and super().is_authenticated
 
     @property
     def is_authenticated_node(self):
