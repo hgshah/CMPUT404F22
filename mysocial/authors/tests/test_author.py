@@ -2,14 +2,19 @@ from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 
 from authors.models.author import Author
+from authors.models.remote_node import NodeStatus
 from common.test_helper import TestHelper
 
 
 class TestAuthor(TestCase):
     def setUp(self) -> None:
         self.local_author = TestHelper.create_author('local_author')
-        self.active_node = TestHelper.create_author('active_node', {'author_type': 'active_remote_node'})
-        self.inactive_node = TestHelper.create_author('inactive_node', {'author_type': 'inactive_remote_node'})
+        self.active_node = TestHelper.create_node('active_node', 'active_node', 'active_node',
+                                                  'active_node', 'active_node')
+        self.inactive_node = TestHelper.create_node('inactive_node', 'inactive_node', 'inactive_node',
+                                                    'inactive_node', 'inactive_node')
+        self.inactive_node.node_detail.status = NodeStatus.INACTIVE
+        self.inactive_node.node_detail.save()
 
     class Case:
         def __init__(self, user, result, is_anon=False):

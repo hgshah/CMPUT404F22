@@ -124,7 +124,7 @@ class RemoteNodeView(GenericAPIView):
     Useful for debugging and "sanity-checking" with other groups.
 
     To use basic auth, do the following:
-    GET http://username:password@www.socioecon.herokuapp.com/remote-node/
+    GET https://username:password@www.socioecon.herokuapp.com/remote-node/
     """
 
     permission_classes = [NodeIsAuthenticated]
