@@ -51,12 +51,6 @@ If you can add an environment variables, set `REMOTE_NODE_CREDENTIALS` to the fo
     "password": "team14_local",
     "remote_username": "local_default",
     "remote_password": "local_default"
-  },
-  "127.0.0.1:8080": {
-    "username": "team14_local",
-    "password": "team14_local",
-    "remote_username": "local_mirror",
-    "remote_password": "local_mirror"
   }
 }
 ```
