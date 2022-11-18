@@ -44,7 +44,7 @@ class CommentTestCase(APITestCase):
         response = self.client.post(request, self.CREATE_COMMENT_PAYLOAD)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(str(self.author1.official_id) in response.data["author"]["id"])
+        self.assertEqual(self.author1.official_id, response.data["author"]["id"])
 
     # create a comment on another author's post
     def test_create_comment_on_diff_author_post(self):
@@ -55,7 +55,7 @@ class CommentTestCase(APITestCase):
         response = self.client.post(request, self.CREATE_COMMENT_PAYLOAD)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(str(self.author1.official_id) in response.data["author"]["id"])
+        self.assertEqual(self.author1.official_id, response.data["author"]["id"])
 
 
     # get all comments on a post 

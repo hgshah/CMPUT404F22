@@ -26,12 +26,12 @@ class AuthorSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_url(model: Author) -> str:
         # they're the same as id, for now
-        return AuthorSerializer.get_id(model)
+        return model.get_url()
 
     @staticmethod
     def get_id(model: Author) -> str:
         # the path after host may vary, e.g. authors/ vs authors/id
-        return model.get_url()
+        return model.official_id
 
     @staticmethod
     def get_host(model: Author) -> str:
@@ -97,3 +97,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
         # custom fields
         required_fields = ('url',)
+
+
+# trick to prevent circular dependency
+Author.SERIALIZER = AuthorSerializer
