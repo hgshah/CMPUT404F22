@@ -156,7 +156,7 @@ class InboxTestCase(APITestCase):
     
     def create_comment(self):
         self.client.force_login(self.author2)
-        request = f"/authors/{self.author2.official_id}/posts/{self.author1_post.official_id}/comments"
+        request = f"{self.author2_post.get('id')}/comments"
         return self.client.post(request, self.CREATE_COMMENT_PAYLOAD).data
 
     def create_follow_request(self):
