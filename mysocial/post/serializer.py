@@ -45,10 +45,15 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ('type', 'title', 'id', 'source', 'origin','description','contentType',  'author', 'categories', 'count', 'comments', 'published', 'visibility', 'unlisted')
 
-class CreatePostSerializer(serializers.ModelSerializer,):
+class CreatePostSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         post = Post.objects.create(**validated_data)
         return post
     class Meta:
         model = Post
         fields = ('title', 'description','visibility','source', 'origin', 'categories', 'contentType', 'unlisted')
+
+class SharePostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ()
