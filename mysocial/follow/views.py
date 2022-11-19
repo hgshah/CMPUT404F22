@@ -448,18 +448,20 @@ class FollowersIndividualView(GenericAPIView):
         node: Author = request.user
 
         try:
-            target = Author.objects.get(official_id=author_id)
+            target = Author.get_author(official_id=author_id)
         except Follow.DoesNotExist:
             return HttpResponseNotFound("User not exist on our end")
         except Exception as e:
             print(f"FollowersIndividualView: {e}")
             return HttpResponseNotFound("User not exist on our end")
 
-        base_url: str = node.host
-        follower, err = AuthorUtil.from_author_url_to_author(f'{base_url}/authors/{follower_id}')
-        if err is not None:
-            print(f"FollowersIndividualView: {err}")
-            return HttpResponseNotFound(f"Cannot find user at {node.host}")
+        try:
+            follower = Author.get_author(official_id=follower_id)
+        except Follow.DoesNotExist:
+            return HttpResponseNotFound("The given follower does not seem to exist as a user in any connected nodes")
+        except Exception as e:
+            print(f"FollowersIndividualView: {e}")
+            return HttpResponseNotFound("The given follower does not seem to exist as a user")
 
         try:
             follow = Follow.objects.get(target=target.get_url(), actor=follower.get_url(), has_accepted=True)
