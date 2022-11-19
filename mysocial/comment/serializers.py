@@ -9,6 +9,7 @@ class CommentSerializer(serializers.ModelSerializer):
     published = serializers.DateTimeField()
     author = serializers.SerializerMethodField()
     contentType = serializers.ChoiceField(ContentType)
+    url = serializers.SerializerMethodField()
 
     @extend_schema_field(AuthorSerializer)
     def get_author(self, obj):
