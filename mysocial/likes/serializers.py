@@ -7,9 +7,8 @@ class LikeSerializer(serializers.ModelSerializer):
     summary = serializers.SerializerMethodField()
     
     def get_summary(self, obj):
-        print(obj.author)
         display_name = obj.author.get('displayName')
-        return f'{display_name} Likes your post'
+        return f'{display_name} likes your {obj.object_type}'
     class Meta:
         model = Like
         fields = ('summary', 'author', 'type', 'object')

@@ -11,6 +11,7 @@ class Like(models.Model):
     author_id = models.TextField()
     object = models.TextField()
     object_type = models.CharField(choices = LikeType.choices, max_length= 20)
+
     class Meta:
         unique_together = ('author_id', 'object')
 

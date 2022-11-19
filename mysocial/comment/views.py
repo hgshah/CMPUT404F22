@@ -67,5 +67,5 @@ class CommentView(GenericAPIView):
                 comment = serializer.create(validated_data=data)
                 return Response(CommentSerializer(comment).data, status = status.HTTP_200_OK)
         except Exception as e:
-            logger.info(e)
+            print(e)
             return HttpResponseNotFound
