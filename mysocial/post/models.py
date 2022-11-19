@@ -38,3 +38,14 @@ class Post(models.Model):
 
     visibility = models.CharField(choices = Visibility.choices, default = Visibility.PUBLIC, max_length = 20)
     contentType = models.CharField(choices=ContentType.choices, default = ContentType.PLAIN, max_length = 20)
+
+    def get_id(self) -> str:
+        return str(self.official_id)
+
+    def get_url(self) -> str:
+        # note: we might have to refactor this if some other team has a funky posts url
+        return f'{self.author.get_url()}/posts/{self.official_id}'
+
+    def get_comments_url(self) -> str:
+        # note: we might have to refactor this if some other team has a funky comments url
+        return f'{self.author.get_url()}/posts/{self.official_id}/comments'

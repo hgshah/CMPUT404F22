@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from requests import ConnectionError
 
 from mysocial.settings import base
 from .author_manager import AuthorManager
@@ -26,10 +27,20 @@ class Author(AbstractUser):
     """
     URL_PATH = 'authors'
 
+    # placed over here to prevent circular dependency
+    SERIALIZER = None
+    connected_node_classes = ()
+    connected_nodes = []
+
     # Remove this unnecessary fields
     first_name = None
     last_name = None
 
+    """
+    Note about official_id: you will never be sure whether this is type UUID or string.
+    This depends on the other teams implementation. It may either be string, UUID, or int.
+    It's not recommended to directly use this. Use get_id() to make refactoring easier.
+    """
     official_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     host = models.TextField(blank=True)
     display_name = models.TextField(blank=True)
@@ -52,17 +63,10 @@ class Author(AbstractUser):
 
     def get_url(self):
         """
-        Returns author_url following the local_author's format
-        Example:
-            - https://socioecon/authors/{self.official_id}
-            - https://{local_host}/authors/{self.official_id}
-        """
+        Returns url to the exact resource which this Author exists in. This is both for the local author and remote author.
 
-        return self.get_id()
+        **This is recommended over using author.url**
 
-    def get_id(self):
-        """
-        Returns author_url following the local_author's format
         Example:
             - https://socioecon/authors/{self.official_id}
             - https://{local_host}/authors/{self.official_id}
@@ -78,6 +82,14 @@ class Author(AbstractUser):
         if '127.0.0.1' in base.CURRENT_DOMAIN:
             prefix = 'http://'
         return f"{prefix}{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
+
+    def get_id(self) -> str:
+        """
+        Forces UUID to be str. Use this for querying the database or for querying other nodes via NodeConfigBase
+
+        **This is recommended over using author.official_id**
+        """
+        return str(self.official_id)
 
     def is_local(self) -> bool:
         """
@@ -123,6 +135,7 @@ class Author(AbstractUser):
         Gets a local author ONLY. Nodes are ignored.
         :param official_id:
         :return: A local_author
+        :throws: Author.DoesNotExist if the Author does not exist
         """
         try:
             return cls.objects.get(
@@ -130,6 +143,20 @@ class Author(AbstractUser):
                 node_detail__isnull=True
             )
         except cls.DoesNotExist:
+            for node in cls.connected_nodes:
+                try:
+                    author = node.from_author_id_to_author(official_id)
+                except ConnectionError:
+                    continue
+                except Exception as e:
+                    print(f"Author.get_author: Unknown err: {e}")
+                    continue
+
+                if author is not None:
+                    return author  # <- GODD RESULT HERE
+            raise Author.DoesNotExist()
+        except Exception as e:
+            print(f"Cannot find author {official_id}: {e}")
             return None
 
     @classmethod

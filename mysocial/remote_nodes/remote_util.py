@@ -6,6 +6,7 @@ from rest_framework.request import Request
 
 from authors.models.author import Author
 from authors.models.remote_node import NodeStatus
+from authors.serializers.author_serializer import AuthorSerializer
 from common.pagination_helper import PaginationHelper
 from common.test_helper import TestHelper
 from mysocial.settings import base
@@ -53,18 +54,17 @@ class RemoteUtil:
         """
         Setup all remote node configs and logic
         """
-        connected_nodes = ()
         if '127.0.0.1' in base.CURRENT_DOMAIN:
-            connected_nodes = (LocalDefault, LocalMirror, Team14Local)
+            Author.connected_node_classes = (LocalDefault, LocalMirror, Team14Local)
         else:
-            connected_nodes = (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main)
+            Author.connected_node_classes = (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main)
 
         # special remote node configs if you're running locally
         # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
         if '127.0.0.1' in base.CURRENT_DOMAIN:
             # tricky technique to make the user's config var override ours; useful for other teams!
             local_credentials: dict = {}
-            for node in connected_nodes:
+            for node in Author.connected_node_classes:
                 local_credentials.update(node.create_node_credentials())
             # then set it back to our app's remote credentials
             base.REMOTE_NODE_CREDENTIALS = local_credentials
@@ -98,8 +98,13 @@ class RemoteUtil:
         # This is where the endpoints and configs are added!
         # When it's local (contains 127.0.0.1), we add 127.0.0.1:8000 and 127.0.0.1:8080
         # Then, we add the endpoints, like turnip-oomfie-1.herokuapp.com (TurnipOomfie)
-        for config in connected_nodes:
+        for config in Author.connected_node_classes:
             base.REMOTE_CONFIG.update(config.create_dictionary_entry())
+
+        # add all connected nodes but self to prevent infinite recursion
+        for _, value in base.REMOTE_CONFIG.items():
+            if value.domain != base.CURRENT_DOMAIN:
+                Author.connected_nodes.append(value)
 
     @staticmethod
     def extract_node_target(request: Request):
@@ -120,3 +125,10 @@ class RemoteUtil:
         if node_param not in base.REMOTE_CONFIG:
             return None
         return base.REMOTE_CONFIG[node_param]
+
+    @staticmethod
+    def get_http_or_https() -> str:
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            return 'http://'
+        else:
+            return 'https://'

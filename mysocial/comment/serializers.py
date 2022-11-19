@@ -9,6 +9,7 @@ class CommentSerializer(serializers.ModelSerializer):
     published = serializers.DateTimeField()
     author = serializers.SerializerMethodField()
     contentType = serializers.ChoiceField(ContentType)
+    url = serializers.SerializerMethodField()
 
     @extend_schema_field(AuthorSerializer)
     def get_author(self, obj):
@@ -20,13 +21,15 @@ class CommentSerializer(serializers.ModelSerializer):
         post = PostSerializer(obj.post).data
         return post
 
-    def get_id(self, obj):
-        post_id = PostSerializer(obj.post).data["id"]
-        return f"{post_id}/comments/{obj.official_id}"
+    def get_id(self, obj: Comment):
+        return obj.get_id()
+
+    def get_url(self, obj: Comment):
+        return obj.get_url()
 
     class Meta:
         model = Comment
-        fields = ('type', 'author', 'comment', 'contentType', 'published', 'id')
+        fields = ('type', 'author', 'comment', 'contentType', 'published', 'id', 'url')
 
 class CreateCommentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):

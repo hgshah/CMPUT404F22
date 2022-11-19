@@ -1,18 +1,38 @@
 import pathlib
 from urllib.parse import urlparse
 
+from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_schema_serializer
 from rest_framework import serializers
 
 from authors.models.author import Author
 from mysocial.settings import base
 
+AUTHOR_SERIALIZER_EXAMPLE = {
+    "type": "author",
+    "id": "9ae19cc1-4fbe-478a-bcbf-ffddbf906605",
+    "url": "http://127.0.0.1:8080/authors/9ae19cc1-4fbe-478a-bcbf-ffddbf906605",
+    "host": "127.0.0.1:8080",
+    "displayName": "super",
+    "github": "https://github.com/super/",
+    "profileImage": ""
+}
 
+
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            'Socioecon author',
+            value=AUTHOR_SERIALIZER_EXAMPLE,
+        ),
+    ]
+)
 class AuthorSerializer(serializers.ModelSerializer):
     """
     based on https://stackoverflow.com/a/18426235/17836168
     Note: We can generalize this btw to use in every serializer out there!
     """
     type = serializers.SerializerMethodField('get_type')
+    """Test"""
     id = serializers.SerializerMethodField('get_id')
     displayName = serializers.CharField(source='display_name')
     profileImage = serializers.CharField(source='profile_image')
@@ -26,12 +46,13 @@ class AuthorSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_url(model: Author) -> str:
         # they're the same as id, for now
-        return AuthorSerializer.get_id(model)
+        return model.get_url()
 
     @staticmethod
     def get_id(model: Author) -> str:
+        """Tests"""
         # the path after host may vary, e.g. authors/ vs authors/id
-        return model.get_url()
+        return model.official_id
 
     @staticmethod
     def get_host(model: Author) -> str:
@@ -97,3 +118,31 @@ class AuthorSerializer(serializers.ModelSerializer):
 
         # custom fields
         required_fields = ('url',)
+
+
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            'Socioecon author list',
+            value={
+                'type': 'authors',
+                'items': [AUTHOR_SERIALIZER_EXAMPLE],
+            },
+        ),
+    ]
+)
+class AuthorSerializerList(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField('get_type')
+    items = AuthorSerializer(many=True, read_only=True)
+
+    @staticmethod
+    def get_type(model: Author) -> str:
+        return model.get_serializer_field_name()
+
+    class Meta:
+        model = Author
+        fields = ('type', 'items')
+
+
+# trick to prevent circular dependency
+Author.SERIALIZER = AuthorSerializer
