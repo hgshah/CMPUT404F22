@@ -133,3 +133,11 @@ class NodeConfigBase:
         url = f'{target_author_url}/inbox'
         response = requests.post(url = url, data = data, auth = (self.username, self.password))
         return response.status_code
+    
+    def get_authors_liked_on_post(self, object_id):
+        url = f'{self.get_base_url()}/{object_id}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_liked_on_comment(self, object_id):
+        url = f'{self.get_base_url()}/{object_id}'
+        return requests.get(url = url, auth = (self.username, self.password))

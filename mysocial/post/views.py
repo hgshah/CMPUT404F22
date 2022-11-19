@@ -273,7 +273,7 @@ class SharePostView(GenericAPIView):
     serializer_class = SharePostSerializer
     @extend_schema(
         summary = "post_share_post",
-        tags=['post', 'remote_implemented']
+        tags=['post']
     )
     @action(detail=True, methods=['put'], url_name='post_share_post')
     def put(self, request: Request, *args, **kwargs) -> HttpResponse:
