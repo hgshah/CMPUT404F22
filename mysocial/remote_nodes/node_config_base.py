@@ -96,23 +96,19 @@ class NodeConfigBase:
 
         return None
 
-    def get_all_followers_request(self, params: dict, author_id: str):
-        url = f'{self.get_base_url()}/authors/{author_id}/followers/'
+    def get_all_followers_request(self, params: dict, author: Author):
+        url = f'{author.get_url()}/followers/'
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
             url += '?' + query_param
         response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
-            # todo(turnip): map to our author?
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
-    def post_local_follow_remote(self, actor_url: str, target_id: str) -> dict:
+    def post_local_follow_remote(self, actor_url: str, author_target: Author) -> dict:
         """Make call to remote node to follow"""
-        target_author_url = self.from_author_id_to_url(target_id)
-        if target_author_url is None:
-            return 404
-        url = f'{target_author_url}/followers/'
+        url = f'{author_target.get_url()}/followers/'
         response = requests.post(url,
                                  auth=(self.username, self.password),
                                  data={'actor': actor_url})

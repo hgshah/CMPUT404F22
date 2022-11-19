@@ -251,13 +251,20 @@ class FollowersView(GenericAPIView):
 
         User story: As an author, my server will know about my friends
         """
-        node_target, other_params = RemoteUtil.extract_node_target(request)
-        if node_target is not None:
-            return FollowersView.get_remote(request, node_target, other_params, author_id)
+        try:
+            author = Author.get_author(author_id)
+        except Author.DoesNotExist:
+            return HttpResponseNotFound()
+        except Exception as e:
+            print(f"FollowersView: get: unknown errr: {e}")
+            return HttpResponseNotFound()
+
+        if not author.is_local():
+            return FollowersView.get_remote(request, author, request.query_params)
 
         user = None
         try:
-            user = Author.objects.get(official_id=author_id)
+            user = Author.get_author(official_id=author_id)
         except Author.DoesNotExist:
             return HttpResponseNotFound()
         # reference: https://stackoverflow.com/a/9727050/17836168
@@ -272,11 +279,11 @@ class FollowersView(GenericAPIView):
         })
 
     @staticmethod
-    def get_remote(request: Request, node_param: str, params: dict, author_id: str):
-        node_config = base.REMOTE_CONFIG.get(node_param)
+    def get_remote(request: Request, author: Author, params: dict):
+        node_config = base.REMOTE_CONFIG.get(author.host)
         if node_config is None:
             return HttpResponseNotFound()
-        return node_config.get_all_followers_request(params, author_id)
+        return node_config.get_all_followers_request(params, author)
 
     @staticmethod
     @extend_schema(
@@ -323,12 +330,18 @@ class FollowersView(GenericAPIView):
 
         if request.user.is_authenticated_user:
             # let's figure out if we want to follow someone local or remote
-            node_target, _ = RemoteUtil.extract_node_target(request)
-            if node_target is None:
-                return FollowersView.post_local_follow_local(request, author_id=author_id)
+            try:
+                target_author = Author.get_author(author_id)
+            except Author.DoesNotExist:
+                return HttpResponseNotFound()
+            except Exception as e:
+                print(f"FollowersView: Unknown error: {e}")
+                return HttpResponseNotFound()
+
+            if target_author.is_local():
+                return FollowersView.post_local_follow_local(request, author_target=target_author)
             else:
-                return FollowersView.post_local_follow_remote(request, author_target_url=author_id,
-                                                              node_target=node_target)
+                return FollowersView.post_local_follow_remote(request, author_target=target_author)
 
         if request.user.is_authenticated_node:
             # a remote node tells us that one of its users wants to follow someone in our server
@@ -337,17 +350,15 @@ class FollowersView(GenericAPIView):
         return HttpResponseForbidden()
 
     @staticmethod
-    def post_local_follow_local(request: Request, author_id: str = None) -> HttpResponse:
-        actor: Author = request.user
-        target = None
+    def post_local_follow_local(request: Request, author_target: Author) -> HttpResponse:
+        author_actor: Author = request.user
         data = None
         try:
-            target = Author.objects.get(official_id=author_id)
-            if target == actor:
+            if author_target == author_actor:
                 # validation: do not follow self!
                 return HttpResponseBadRequest('You can not follow self')
 
-            follow = Follow.objects.create(actor=actor.get_url(), target=target.get_url(), has_accepted=False)
+            follow = Follow.objects.create(actor=author_actor.get_url(), target=author_target.get_url(), has_accepted=False)
             serializers = FollowRequestSerializer(follow)
             data = serializers.data
         except Author.DoesNotExist:
@@ -360,12 +371,12 @@ class FollowersView(GenericAPIView):
         return Response(data=data, status=201)
 
     @staticmethod
-    def post_local_follow_remote(request: Request, author_target_url: str, node_target: str) -> HttpResponse:
-        node_config = base.REMOTE_CONFIG.get(node_target)
+    def post_local_follow_remote(request: Request, author_target: Author) -> HttpResponse:
+        node_config = base.REMOTE_CONFIG.get(author_target.host)
         if node_config is None:
-            print(f"post_local_follow_remote: missing config: {node_target}")
+            print(f"post_local_follow_remote: missing config for host: {author_target.host}")
             return HttpResponseNotFound()
-        response_json = node_config.post_local_follow_remote(request.user.get_url(), author_target_url)
+        response_json = node_config.post_local_follow_remote(request.user.get_url(), author_target)
         if isinstance(response_json, int):
             return Response(status=response_json)
         try:
@@ -433,7 +444,7 @@ class FollowersIndividualView(GenericAPIView):
         summary="check_if_follower",
         tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
-    def get(request: Request, author_id: str, follower_id: str) -> HttpResponse:
+    def get(request: Request, target_id: str, follower_id: str) -> HttpResponse:
         """
         Check if foreign ID is a follower of Author ID.
 
@@ -448,7 +459,7 @@ class FollowersIndividualView(GenericAPIView):
         node: Author = request.user
 
         try:
-            target = Author.get_author(official_id=author_id)
+            target = Author.get_author(official_id=target_id)
         except Follow.DoesNotExist:
             return HttpResponseNotFound("User not exist on our end")
         except Exception as e:
