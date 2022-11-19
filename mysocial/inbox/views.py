@@ -91,7 +91,7 @@ class InboxView(GenericAPIView):
         
         # step one
         try:
-            requesting_author_id = self.request.user.official_id
+            requesting_author_id = self.request.user.get_id()
             requesting_author = Author.objects.get(official_id = requesting_author_id)
             json_author = AuthorSerializer(requesting_author).data 
         except:
@@ -103,7 +103,7 @@ class InboxView(GenericAPIView):
             return Response(f"Could not create Like object", status = status.HTTP_400_BAD_REQUEST)
 
         # step 2.A
-        actor_author_id = self.request.user.official_id
+        actor_author_id = self.request.user.get_id()
         actor_author = Author.objects.get(official_id = actor_author_id)
         like_data["actor"] = AuthorSerializer(actor_author).data["url"]
 
@@ -126,7 +126,7 @@ class InboxView(GenericAPIView):
         '''
         # step one
         try:
-            requesting_author_id = self.request.user.official_id
+            requesting_author_id = self.request.user.get_id()
             requesting_author = Author.objects.get(official_id = requesting_author_id)
             json_author = AuthorSerializer(requesting_author).data
         except:
