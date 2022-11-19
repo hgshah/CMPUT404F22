@@ -75,7 +75,13 @@ class TestAuthor(TestCase):
 
         for case in test_cases:
             with self.subTest(case=case.user):
-                self.assertEqual(Author.get_author(case.user.official_id), case.result)
+                try:
+                    author = Author.get_author(case.user.official_id)
+                    self.assertEqual(author, case.result)
+                except Author.DoesNotExist:
+                    self.assertIsNone(case.result)
+                except Exception as e:
+                    self.assertIsNone(e)
 
     def test_get_all_authors(self):
         test_cases = (

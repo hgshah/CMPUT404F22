@@ -1,3 +1,5 @@
+import json
+
 from rest_framework.test import APITestCase
 from rest_framework import status
 from post.models import Visibility
@@ -59,7 +61,7 @@ class PostTestCase(APITestCase):
 
         response = self.client.post(request, self.CREATE_POST_PAYLOAD)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(str(self.author1.official_id) in response.data["author"]["id"])
+        self.assertEqual(self.author1.official_id, response.data["author"]["id"])
 
     # GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     def test_get_specific_post(self):
@@ -98,7 +100,7 @@ class PostTestCase(APITestCase):
 
         response = self.client.put(request, self.CREATE_POST_PAYLOAD)
 
-        self.assertEqual(response.data["id"], self.get_expected_official_id(new_uuid))
+        self.assertEqual(response.data["id"], new_uuid)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def get_expected_official_id(self, post_id):
@@ -107,8 +109,8 @@ class PostTestCase(APITestCase):
     # sharing a post adds that post to your local followers
     def test_share_post_sends_local_followers(self):
         Follow.objects.create(
-            actor=self.author2.get_id(),
-            target=self.author1.get_id(),
+            actor=self.author2.get_url(),
+            target=self.author1.get_url(),
             has_accepted=True)
 
         self.client.force_login(self.author1)
@@ -116,9 +118,10 @@ class PostTestCase(APITestCase):
         request = f"/authors/{self.author1.official_id}/posts/{self.existing_post.official_id}/share"
         response = self.client.put(request)
         follower_inbox = Inbox.objects.get(author = self.author2)
+        inbox_item = json.loads(follower_inbox.items[0])
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(follower_inbox.items[0].get('id'), self.get_expected_official_id(self.existing_post.official_id))
+        self.assertEqual(inbox_item.get('id'), self.existing_post.get_id())
 
 class PostFailTestCase(APITestCase):
     CREATE_POST_PAYLOAD = {

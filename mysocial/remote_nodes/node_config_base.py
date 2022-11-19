@@ -25,6 +25,7 @@ class NodeConfigBase:
     author_serializer = AuthorSerializer
     """Mapping: remote to local"""
     remote_fields = {
+        'id': 'official_id',
         'url': 'url',
         'host': 'host',
         'displayName': 'display_name',
@@ -60,7 +61,7 @@ class NodeConfigBase:
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
-    def from_author_id_to_url(self, author_id: str) -> dict:
+    def from_author_id_to_url(self, author_id: str) -> str:
         url = f'{self.get_base_url()}/authors/{author_id}/'
         response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
@@ -68,6 +69,10 @@ class NodeConfigBase:
             json_dict = json.loads(response.content)
             return json_dict['url']
         return None
+
+    def from_author_id_to_author(self, author_id: str) -> Author:
+        url = f'{self.get_base_url()}/authors/{author_id}/'
+        return self.get_author_via_url(url)
 
     def get_author_request(self, author_id: str):
         response = requests.get(f'{self.get_base_url()}/authors/{author_id}/', auth=(self.username, self.password))

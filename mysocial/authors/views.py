@@ -1,7 +1,7 @@
 import logging
 
 from django.http.response import HttpResponse, HttpResponseNotFound
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.utils import OpenApiExample, extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
@@ -11,7 +11,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from authors.models.author import Author
 from authors.permissions import NodeIsAuthenticated
-from authors.serializers.author_serializer import AuthorSerializer
+from authors.serializers.author_serializer import AUTHOR_SERIALIZER_EXAMPLE, AuthorSerializer, AuthorSerializerList
 from common.pagination_helper import PaginationHelper
 from mysocial.settings import base
 from remote_nodes.remote_util import RemoteUtil
@@ -32,13 +32,7 @@ class AuthorView(GenericViewSet):
     @staticmethod
     @extend_schema(
         parameters=PaginationHelper.OPEN_API_PARAMETERS + RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
-        responses=inline_serializer(
-            name='AuthorList',
-            fields={
-                'type': serializers.CharField(),
-                'items': AuthorSerializer(many=True)
-            }
-        ),
+        responses=AuthorSerializerList,
         summary="authors_retrieve_all",
         tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
