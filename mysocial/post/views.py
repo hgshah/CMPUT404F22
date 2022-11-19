@@ -291,7 +291,7 @@ class SharePostView(GenericAPIView):
                     inbox.add_to_inbox(post)
                 else:
                     node_config = base.REMOTE_CONFIG.get(follower.host)
-                    response_status_code = node_config.share_to_remote_inbox(follower.get_url(), post)
+                    response_status_code = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = post)
                     if response_status_code < 200 or response_status_code > 200:
                         return Response("Failed to send data to remote inbox", status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
