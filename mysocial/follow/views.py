@@ -327,7 +327,7 @@ class FollowersView(GenericAPIView):
             if node_target is None:
                 return FollowersView.post_local_follow_local(request, author_id=author_id)
             else:
-                return FollowersView.post_local_follow_remote(request, author_target_id=author_id,
+                return FollowersView.post_local_follow_remote(request, author_target_url=author_id,
                                                               node_target=node_target)
 
         if request.user.is_authenticated_node:
@@ -347,7 +347,7 @@ class FollowersView(GenericAPIView):
                 # validation: do not follow self!
                 return HttpResponseBadRequest('You can not follow self')
 
-            follow = Follow.objects.create(actor=actor.get_id(), target=target.get_id(), has_accepted=False)
+            follow = Follow.objects.create(actor=actor.get_url(), target=target.get_url(), has_accepted=False)
             serializers = FollowRequestSerializer(follow)
             data = serializers.data
         except Author.DoesNotExist:
@@ -360,12 +360,12 @@ class FollowersView(GenericAPIView):
         return Response(data=data, status=201)
 
     @staticmethod
-    def post_local_follow_remote(request: Request, author_target_id: str, node_target: str) -> HttpResponse:
+    def post_local_follow_remote(request: Request, author_target_url: str, node_target: str) -> HttpResponse:
         node_config = base.REMOTE_CONFIG.get(node_target)
         if node_config is None:
             print(f"post_local_follow_remote: missing config: {node_target}")
             return HttpResponseNotFound()
-        response_json = node_config.post_local_follow_remote(request.user.get_url(), author_target_id)
+        response_json = node_config.post_local_follow_remote(request.user.get_url(), author_target_url)
         if isinstance(response_json, int):
             return Response(status=response_json)
         try:
@@ -405,7 +405,7 @@ class FollowersView(GenericAPIView):
         try:
             author_actor_url = request.data['actor']
             target = Author.objects.get(official_id=author_id)
-            follow = Follow.objects.create(actor=author_actor_url, target=target.get_id(), has_accepted=False)
+            follow = Follow.objects.create(actor=author_actor_url, target=target.get_url(), has_accepted=False)
             serializers = FollowRequestSerializer(follow)
             data = serializers.data
         except Author.DoesNotExist:

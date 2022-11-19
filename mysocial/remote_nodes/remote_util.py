@@ -4,16 +4,20 @@ import os
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework.request import Request
 
-from authors.models.author import Author, AuthorType
+from authors.models.author import Author
+from authors.models.remote_node import NodeStatus
+from authors.serializers.author_serializer import AuthorSerializer
 from common.pagination_helper import PaginationHelper
 from common.test_helper import TestHelper
 from mysocial.settings import base
-from remote_nodes.macewan import MacEwan
-from remote_nodes.potato_oomfie import PotatoOomfie
-from remote_nodes.turnip_oomfie import TurnipOomfie
-from remote_nodes.ualberta import UAlberta
 from remote_nodes.local_default import LocalDefault
 from remote_nodes.local_mirror import LocalMirror
+from remote_nodes.macewan import MacEwan
+from remote_nodes.potato_oomfie import PotatoOomfie
+from remote_nodes.team14_local import Team14Local
+from remote_nodes.team14_main import Team14Main
+from remote_nodes.turnip_oomfie import TurnipOomfie
+from remote_nodes.ualberta import UAlberta
 
 
 class RemoteUtil:
@@ -50,35 +54,35 @@ class RemoteUtil:
         """
         Setup all remote node configs and logic
         """
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            Author.connected_node_classes = (LocalDefault, LocalMirror, Team14Local)
+        else:
+            Author.connected_node_classes = (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main)
 
         # special remote node configs if you're running locally
         # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
         if '127.0.0.1' in base.CURRENT_DOMAIN:
-            local_credentials = {
-                '127.0.0.1:8000': {
-                    'username': 'local_default',
-                    'password': 'local_default'
-                },
-                '127.0.0.1:8080': {
-                    'username': 'local_mirror',
-                    'password': 'local_mirror'
-                }
-            }
             # tricky technique to make the user's config var override ours; useful for other teams!
-            local_credentials.update(base.REMOTE_NODE_CREDENTIALS)
+            local_credentials: dict = {}
+            for node in Author.connected_node_classes:
+                local_credentials.update(node.create_node_credentials())
             # then set it back to our app's remote credentials
             base.REMOTE_NODE_CREDENTIALS = local_credentials
 
         # setup remote config node type authors
         for host, credentials in base.REMOTE_NODE_CREDENTIALS.items():
-            node: Author = TestHelper.overwrite_node(credentials['username'], credentials['password'], host)
+            node: Author = TestHelper.overwrite_node(credentials['username'], credentials['password'],
+                                                     credentials['remote_username'], credentials['remote_password'],
+                                                     host)
             is_active = credentials.get('is_active')
             if is_active is None and not isinstance(is_active, bool):
                 continue
             elif is_active:
-                node.author_type = AuthorType.ACTIVE_REMOTE_NODE
+                node.node_detail.status = NodeStatus.ACTIVE
+                node.node_detail.save()
             else:
-                node.author_type = AuthorType.INACTIVE_REMOTE_NODE
+                node.node_detail.status = NodeStatus.INACTIVE
+                node.node_detail.save()
 
         # todo: setup superuser???
         if 'PREFILLED_USERS' in os.environ:
@@ -94,11 +98,13 @@ class RemoteUtil:
         # This is where the endpoints and configs are added!
         # When it's local (contains 127.0.0.1), we add 127.0.0.1:8000 and 127.0.0.1:8080
         # Then, we add the endpoints, like turnip-oomfie-1.herokuapp.com (TurnipOomfie)
-        additional_nodes = ()
-        if '127.0.0.1' in base.CURRENT_DOMAIN:
-            additional_nodes = (LocalDefault, LocalMirror)
-        for config in (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan) + additional_nodes:
+        for config in Author.connected_node_classes:
             base.REMOTE_CONFIG.update(config.create_dictionary_entry())
+
+        # add all connected nodes but self to prevent infinite recursion
+        for _, value in base.REMOTE_CONFIG.items():
+            if value.domain != base.CURRENT_DOMAIN:
+                Author.connected_nodes.append(value)
 
     @staticmethod
     def extract_node_target(request: Request):
@@ -119,3 +125,10 @@ class RemoteUtil:
         if node_param not in base.REMOTE_CONFIG:
             return None
         return base.REMOTE_CONFIG[node_param]
+
+    @staticmethod
+    def get_http_or_https() -> str:
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            return 'http://'
+        else:
+            return 'https://'

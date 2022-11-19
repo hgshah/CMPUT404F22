@@ -2,14 +2,11 @@ import uuid
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from requests import ConnectionError
 
 from mysocial.settings import base
 from .author_manager import AuthorManager
-
-class AuthorType(models.TextChoices):
-    LOCAL_AUTHOR = "local_author"
-    ACTIVE_REMOTE_NODE = "active_remote_node"
-    INACTIVE_REMOTE_NODE = "inactive_remote_node"  # we can deactivate nodes by just changing their type
+from .remote_node import NodeStatus, RemoteNode
 
 
 class Author(AbstractUser):
@@ -30,37 +27,49 @@ class Author(AbstractUser):
     """
     URL_PATH = 'authors'
 
+    # placed over here to prevent circular dependency
+    SERIALIZER = None
+    connected_node_classes = ()
+    connected_nodes = []
+
     # Remove this unnecessary fields
     first_name = None
     last_name = None
 
+    """
+    Note about official_id: you will never be sure whether this is type UUID or string.
+    This depends on the other teams implementation. It may either be string, UUID, or int.
+    It's not recommended to directly use this. Use get_id() to make refactoring easier.
+    """
     official_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     host = models.TextField(blank=True)
     display_name = models.TextField(blank=True)
     github = models.TextField(blank=True)
     profile_image = models.ImageField(blank=True)
-    author_type = models.CharField(choices=AuthorType.choices, default=AuthorType.LOCAL_AUTHOR, max_length=25)
+    node_detail = models.ForeignKey(RemoteNode, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = AuthorManager()
 
     REQUIRED_FIELDS = ['email', 'password']
 
+    def is_node(self):
+        return self.node_detail is not None
+
+    def is_active_node(self):
+        return self.node_detail is not None and self.node_detail.status == NodeStatus.ACTIVE
+
+    def is_inactive_node(self):
+        return self.node_detail is not None and self.node_detail.status == NodeStatus.INACTIVE
+
     def get_url(self):
         """
-        Returns author_url following the local_author's format
-        Example:
-            - http://socioecon/authors/{self.official_id}
-            - http://{local_host}/authors/{self.official_id}
-        """
+        Returns url to the exact resource which this Author exists in. This is both for the local author and remote author.
 
-        return self.get_id()
+        **This is recommended over using author.url**
 
-    def get_id(self):
-        """
-        Returns author_url following the local_author's format
         Example:
-            - http://socioecon/authors/{self.official_id}
-            - http://{local_host}/authors/{self.official_id}
+            - https://socioecon/authors/{self.official_id}
+            - https://{local_host}/authors/{self.official_id}
         """
 
         # this is a trick in the serializer for remote authors, look at AuthorSerializer.to_internal_value
@@ -69,7 +78,18 @@ class Author(AbstractUser):
             return self.url
 
         # local authors
-        return f"http://{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
+        prefix = 'https://'
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            prefix = 'http://'
+        return f"{prefix}{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
+
+    def get_id(self) -> str:
+        """
+        Forces UUID to be str. Use this for querying the database or for querying other nodes via NodeConfigBase
+
+        **This is recommended over using author.official_id**
+        """
+        return str(self.official_id)
 
     def is_local(self) -> bool:
         """
@@ -89,21 +109,21 @@ class Author(AbstractUser):
         """
         :return: True if the current user is an authenticated local_author or active_remote_node.
         """
-        return self.author_type != AuthorType.INACTIVE_REMOTE_NODE and super().is_authenticated
+        return not self.is_inactive_node() and super().is_authenticated
 
     @property
     def is_authenticated_user(self):
         """
         :return: True if the current user is an authenticated or logged in local_author.
         """
-        return self.author_type == AuthorType.LOCAL_AUTHOR and super().is_authenticated
+        return not self.is_node() and super().is_authenticated
 
     @property
     def is_authenticated_node(self):
         """
         :return: True if the current user is an authenticated active_remote_node.
         """
-        return self.author_type == AuthorType.ACTIVE_REMOTE_NODE and super().is_authenticated
+        return self.is_active_node() and super().is_authenticated
 
     @staticmethod
     def get_serializer_field_name():
@@ -115,13 +135,28 @@ class Author(AbstractUser):
         Gets a local author ONLY. Nodes are ignored.
         :param official_id:
         :return: A local_author
+        :throws: Author.DoesNotExist if the Author does not exist
         """
         try:
             return cls.objects.get(
                 official_id=official_id,
-                author_type=AuthorType.LOCAL_AUTHOR
+                node_detail__isnull=True
             )
         except cls.DoesNotExist:
+            for node in cls.connected_nodes:
+                try:
+                    author = node.from_author_id_to_author(official_id)
+                except ConnectionError:
+                    continue
+                except Exception as e:
+                    print(f"Author.get_author: Unknown err: {e}")
+                    continue
+
+                if author is not None:
+                    return author  # <- GODD RESULT HERE
+            raise Author.DoesNotExist()
+        except Exception as e:
+            print(f"Cannot find author {official_id}: {e}")
             return None
 
     @classmethod
@@ -130,4 +165,4 @@ class Author(AbstractUser):
         Gets all local_author. Nodes are ignored.
         :return: All local_authors.
         """
-        return cls.objects.filter(author_type=AuthorType.LOCAL_AUTHOR)
+        return cls.objects.filter(node_detail__isnull=True)

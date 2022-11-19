@@ -19,7 +19,7 @@ class TestAuthorView(TestCase):
         )
         output_data = {
             "type": "author",
-            "id": f"http://{base.CURRENT_DOMAIN}/authors/{user.official_id}",
+            "id": user.official_id,
             "url": f"http://{base.CURRENT_DOMAIN}/authors/{user.official_id}",
             "host": user.host,
             "displayName": user.display_name,

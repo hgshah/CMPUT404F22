@@ -16,6 +16,7 @@ class PostSerializer(serializers.ModelSerializer):
     count = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
 
     @extend_schema_field(AuthorSerializer)
     def get_author(self, obj):
@@ -23,8 +24,10 @@ class PostSerializer(serializers.ModelSerializer):
         return author
     
     def get_id(self, obj) -> str:
-        author_id = AuthorSerializer(obj.author).data["id"]
-        return f"{author_id}/posts/{obj.official_id}"
+        return obj.official_id
+
+    def get_url(self, obj: Post) -> str:
+        return obj.get_url()
 
     def get_comments(self, obj):
         return f"{self.get_id(obj)}/comments"
@@ -43,12 +46,17 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('type', 'title', 'id', 'source', 'origin','description','contentType',  'author', 'categories', 'count', 'comments', 'published', 'visibility', 'unlisted')
+        fields = ('type', 'title', 'id', 'source', 'origin','description','contentType',  'author', 'categories', 'count', 'comments', 'published', 'visibility', 'unlisted', 'url')
 
-class CreatePostSerializer(serializers.ModelSerializer,):
+class CreatePostSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         post = Post.objects.create(**validated_data)
         return post
     class Meta:
         model = Post
         fields = ('title', 'description','visibility','source', 'origin', 'categories', 'contentType', 'unlisted')
+
+class SharePostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ()

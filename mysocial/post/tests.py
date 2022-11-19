@@ -1,11 +1,13 @@
+import json
+
 from rest_framework.test import APITestCase
 from rest_framework import status
-from post.models import Post, Visibility
+from post.models import Visibility
 from authors.models.author import Author
-from django.utils import timezone
 import logging, uuid
-import datetime
 from common.test_helper import TestHelper
+from follow.models import Follow
+from inbox.models import Inbox
 
 logger = logging.getLogger("mylogger")
 #pymike00, October 29, https://www.youtube.com/watch?v=1FqxfnlQPi8&ab_channel=pymike00
@@ -59,7 +61,7 @@ class PostTestCase(APITestCase):
 
         response = self.client.post(request, self.CREATE_POST_PAYLOAD)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(str(self.author1.official_id) in response.data["author"]["id"])
+        self.assertEqual(self.author1.official_id, response.data["author"]["id"])
 
     # GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     def test_get_specific_post(self):
@@ -98,11 +100,28 @@ class PostTestCase(APITestCase):
 
         response = self.client.put(request, self.CREATE_POST_PAYLOAD)
 
-        self.assertEqual(response.data["id"], self.get_expected_official_id(new_uuid))
+        self.assertEqual(response.data["id"], new_uuid)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def get_expected_official_id(self, post_id):
         return f"http://{self.author1.host}/{Author.URL_PATH}/{self.author1.official_id}/posts/{post_id}"
+    
+    # sharing a post adds that post to your local followers
+    def test_share_post_sends_local_followers(self):
+        Follow.objects.create(
+            actor=self.author2.get_url(),
+            target=self.author1.get_url(),
+            has_accepted=True)
+
+        self.client.force_login(self.author1)
+
+        request = f"/authors/{self.author1.official_id}/posts/{self.existing_post.official_id}/share"
+        response = self.client.put(request)
+        follower_inbox = Inbox.objects.get(author = self.author2)
+        inbox_item = json.loads(follower_inbox.items[0])
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(inbox_item.get('id'), self.existing_post.get_id())
 
 class PostFailTestCase(APITestCase):
     CREATE_POST_PAYLOAD = {
@@ -148,6 +167,8 @@ class PostFailTestCase(APITestCase):
         response = self.client.delete(request)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
 
 
 
