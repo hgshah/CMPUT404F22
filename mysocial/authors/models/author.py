@@ -64,6 +64,9 @@ class Author(AbstractUser):
     def get_url(self):
         """
         Returns url to the exact resource which this Author exists in. This is both for the local author and remote author.
+
+        **This is recommended over using author.url**
+
         Example:
             - https://socioecon/authors/{self.official_id}
             - https://{local_host}/authors/{self.official_id}
@@ -83,6 +86,8 @@ class Author(AbstractUser):
     def get_id(self) -> str:
         """
         Forces UUID to be str. Use this for querying the database or for querying other nodes via NodeConfigBase
+
+        **This is recommended over using author.official_id**
         """
         return str(self.official_id)
 
