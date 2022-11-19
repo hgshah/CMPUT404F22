@@ -135,6 +135,7 @@ class Author(AbstractUser):
         Gets a local author ONLY. Nodes are ignored.
         :param official_id:
         :return: A local_author
+        :throws: Author.DoesNotExist if the Author does not exist
         """
         try:
             return cls.objects.get(

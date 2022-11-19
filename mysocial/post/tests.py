@@ -1,4 +1,4 @@
-from unittest import skip
+import json
 
 from rest_framework.test import APITestCase
 from rest_framework import status
@@ -93,7 +93,6 @@ class PostTestCase(APITestCase):
         self.assertEqual(response.data["description"], new_data["description"])
 
     #PUT /authors/{AUTHOR_UUID}/posts/{POST_UUID}
-    @skip("todo: fix id vs url")
     def test_update_or_create_post(self):
         self.client.force_login(self.author1)
         new_uuid = uuid.uuid4()
@@ -101,14 +100,13 @@ class PostTestCase(APITestCase):
 
         response = self.client.put(request, self.CREATE_POST_PAYLOAD)
 
-        self.assertEqual(response.data["id"], self.get_expected_official_id(new_uuid))
+        self.assertEqual(response.data["id"], new_uuid)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def get_expected_official_id(self, post_id):
         return f"http://{self.author1.host}/{Author.URL_PATH}/{self.author1.official_id}/posts/{post_id}"
     
     # sharing a post adds that post to your local followers
-    @skip("Add UUID serializer later")
     def test_share_post_sends_local_followers(self):
         Follow.objects.create(
             actor=self.author2.get_url(),
@@ -120,9 +118,10 @@ class PostTestCase(APITestCase):
         request = f"/authors/{self.author1.official_id}/posts/{self.existing_post.official_id}/share"
         response = self.client.put(request)
         follower_inbox = Inbox.objects.get(author = self.author2)
+        inbox_item = json.loads(follower_inbox.items[0])
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(follower_inbox.items[0].get('id'), self.get_expected_official_id(self.existing_post.official_id))
+        self.assertEqual(inbox_item.get('id'), self.existing_post.get_id())
 
 class PostFailTestCase(APITestCase):
     CREATE_POST_PAYLOAD = {
