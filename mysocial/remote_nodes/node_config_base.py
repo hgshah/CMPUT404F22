@@ -7,7 +7,6 @@ from rest_framework.response import Response
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
-from mysocial.settings import base
 
 
 class NodeConfigBase:
@@ -123,7 +122,7 @@ class NodeConfigBase:
     ## will have to change the url depending on what team it is 
     # dictionary: [host + endpoint, formatted url]
     # will have to change the data for team 10
-    def share_to_remote_inbox(self, target_author_url: str, data):
+    def send_to_remote_inbox(self, data, target_author_url):
         if target_author_url is None:
             return 404
         url = f'{target_author_url}/inbox'

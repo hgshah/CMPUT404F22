@@ -14,6 +14,7 @@ class InboxSerializer(serializers.ModelSerializer):
     items = serializers.SerializerMethodField()
 
     def get_author(self, obj):
+        print(obj)
         author = AuthorSerializer(obj.author).data
         return author
     
