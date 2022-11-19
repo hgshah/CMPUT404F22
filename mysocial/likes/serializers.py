@@ -11,4 +11,4 @@ class LikeSerializer(serializers.ModelSerializer):
         return f'{display_name} likes your {obj.object_type}'
     class Meta:
         model = Like
-        fields = ('summary', 'author', 'type', 'object')
+        fields = ('type', 'summary', 'author', 'object')
