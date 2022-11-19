@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from requests import ConnectionError
 
 from mysocial.settings import base
 from .author_manager import AuthorManager
@@ -139,14 +140,15 @@ class Author(AbstractUser):
             for node in cls.connected_nodes:
                 try:
                     author = node.from_author_id_to_author(official_id)
+                except ConnectionError:
+                    continue
                 except Exception as e:
-                    # todo: make error more specific; figure out which exception to actually raise and print errors
-                    #  otherwise
+                    print(f"Author.get_author: Unknown err: {e}")
                     continue
 
                 if author is not None:
-                    return author
-            return None
+                    return author  # <- GODD RESULT HERE
+            raise Author.DoesNotExist()
         except Exception as e:
             print(f"Cannot find author {official_id}: {e}")
             return None
