@@ -150,3 +150,7 @@ class NodeConfigBase:
     def get_post_by_post_id(self, post_url):
         url = f'{self.get_base_url()}/{post_url}'
         return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_posts(self, author_posts_path):
+        url = f'{self.get_base_url()}/{author_posts_path}'
+        return requests.get(url = url, auth = (self.username, self.password))
