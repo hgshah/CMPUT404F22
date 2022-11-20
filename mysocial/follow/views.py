@@ -101,7 +101,7 @@ class IndividualRequestView(APIView):
 
     @staticmethod
     @extend_schema(
-        tags=['follows', RemoteUtil.REMOTE_WIP_TAG],
+        tags=['possibly-deprecating'],
     )
     def get(request: Request, follow_id: str = None) -> HttpResponse:
         """
@@ -143,7 +143,7 @@ class IndividualRequestView(APIView):
 
     @staticmethod
     @extend_schema(
-        tags=['follows', RemoteUtil.REMOTE_WIP_TAG],
+        tags=['possibly-deprecating'],
     )
     def put(request: Request, follow_id: str = None) -> HttpResponse:
         """
@@ -189,7 +189,7 @@ class IndividualRequestView(APIView):
 
     @staticmethod
     @extend_schema(
-        tags=['follows', RemoteUtil.REMOTE_WIP_TAG],
+        tags=['possibly-deprecating'],
     )
     def delete(request: Request, follow_id: str = None) -> HttpResponse:
         """
@@ -472,6 +472,8 @@ class FollowersIndividualView(GenericAPIView):
         **author_id:** ID of the author we want to check followers of
         **follower_id:** ID of the author we want to check is a follower of author with author_id
 
+        https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#followers
+        GET [local, remote] check if FOREIGN_AUTHOR_ID is a follower of AUTHOR_ID
 
         PR with example: https://github.com/hgshah/cmput404-project/pull/99
         More details about the fields returned at: https://github.com/hgshah/cmput404-project/blob/staging/mysocial/follow/serializers/follow_serializer.py
@@ -527,6 +529,30 @@ class FollowersIndividualView(GenericAPIView):
 
             follow_serializer = FollowRequestSerializer(follow)
             return Response(follow_serializer.data)
+
+    @staticmethod
+    @extend_schema(
+        summary="accept_follow_request",
+        tags=['follows', RemoteUtil.REMOTE_WIP_TAG]
+    )
+    def put(request: Request, target_id: str, follower_id: str):
+        """
+        https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#followers
+        PUT [local]: Add FOREIGN_AUTHOR_ID as a follower of AUTHOR_ID (must be authenticated)
+        """
+        return HttpResponseNotFound()
+
+    @staticmethod
+    @extend_schema(
+        summary="delete_follow_request",
+        tags=['follows', RemoteUtil.REMOTE_WIP_TAG]
+    )
+    def delete(request: Request, target_id: str, follower_id: str):
+        """
+        https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#followers
+        DELETE [local]: remove FOREIGN_AUTHOR_ID as a follower of AUTHOR_ID
+        """
+        return HttpResponseNotFound()
 
 
 # todo(turnip): add test
