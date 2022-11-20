@@ -104,8 +104,7 @@ class InboxTestCase(APITestCase):
         self.assertEqual(len(author1_inbox.items), 0)
 
         request = f"/authors/{self.author1.official_id}/inbox"
-        response = self.client.post(request, author2_post, format = "json")
-        print(response.content)
+        self.client.post(request, author2_post, format = "json")
         author1_inbox = Inbox.objects.get(author = self.author1)
         self.assertEqual(len(author1_inbox.items), 1)
 
