@@ -14,6 +14,7 @@ from common.pagination_helper import PaginationHelper
 from follow.follow_util import FollowUtil
 from inbox.models import Inbox
 from mysocial.settings import base
+import json
 
 logger = logging.getLogger("mylogger")
 
@@ -46,13 +47,46 @@ class PostView(GenericAPIView):
         """
         Get specific post by post id
         """
-        try:
-            post = Post.objects.get(official_id=kwargs['post_id'])
-            serializer = PostSerializer(post)
-            return Response(serializer.data)
-        except Exception as e:
-            logger.info(e)
+        node: Author = request.user
+        if not node.is_authenticated:
             return HttpResponseNotFound()
+
+        if node.is_authenticated_user:
+            try:
+                target_author = Author.get_author(kwargs['author_id'])
+            except:
+                return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+            #local -> local
+            if target_author.is_local():
+                try:
+                    post = Post.objects.get(official_id=kwargs['post_id'])
+                    serializer = PostSerializer(post)
+                    return Response(serializer.data)
+                except Exception as e:
+                    logger.info(e)
+                    return HttpResponseNotFound()
+
+            # local -> remote
+            else:
+                node_config = base.REMOTE_CONFIG.get(target_author.host)
+                response = node_config.get_post_by_post_id(request.path)
+                if response.status_code < 200 or response.status_code > 200:
+                    return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                return Response(json.loads(response.content), status = status.HTTP_200_OK)
+
+        
+        # remote -> local
+        if request.user.is_authenticated_node:
+            try:
+                post = Post.objects.get(official_id=kwargs['post_id'])
+                serializer = PostSerializer(post)
+                return Response(serializer.data)
+            except Exception as e:
+                print(e)
+                return HttpResponse(f'Failed to get post for post id: {kwargs["post_id"]}', status = status.HTTP_400_BAD_REQUEST)
+
     
     # DELETE /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     # Wolph, October 19, https://stackoverflow.com/questions/3805958/how-to-delete-a-record-in-django-models

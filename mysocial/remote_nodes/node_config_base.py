@@ -146,3 +146,7 @@ class NodeConfigBase:
         url = f'{target_author_url}/liked'
         print(url)
         return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_post_by_post_id(self, post_url):
+        url = f'{self.get_base_url()}/{post_url}'
+        return requests.get(url = url, auth = (self.username, self.password))
