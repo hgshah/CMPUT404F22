@@ -3,10 +3,12 @@ from mysocial.settings import base
 
 class BaseUtil:
     """
-    functions related to base.py but we don't want to put it in base.py
+    Methods and values that are foundational. Could be put in base.py but removed there to prevent clutter
 
-    prevents circular dependency
+    This file should NOT have many downstream dependencies aka tons of imports above.
+    This file has a LOT of upstream dependencies aka a lot of files will depend on this.
     """
+    connected_nodes = []
 
     @staticmethod
     def get_http_or_https() -> str:

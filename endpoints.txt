@@ -243,3 +243,15 @@ This returns:
 4.B. The follow request is now gone for User B if you look at the follow request endpoint
 ```GET /follows/outgoing/```
 Note: not really in the user story
+
+----------------------------------------------------
+FRONTEND GUIDE ON LOGGING IN
+====================================================
+
+1. Check out the login endpoint aka tokens_create: https://potato-oomfie.herokuapp.com/api/schema/redoc/#tag/tokens/operation/tokens_create
+- Grab the token field from this entry
+- Save the author entry here so you know which author the token belongs to
+    - You might want to use something like local storage to save it. Check out redux!
+
+2. When you make an auth request, add the Token in the header like:
+`Authorization: Token THE_TOKEN_YOU_GOT_HERE`

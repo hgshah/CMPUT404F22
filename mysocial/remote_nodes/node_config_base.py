@@ -4,6 +4,7 @@ import urllib.parse
 import requests
 from django.http import HttpResponseNotFound
 from rest_framework.response import Response
+from requests import ConnectionError
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
@@ -27,7 +28,7 @@ class NodeConfigBase:
     author_serializer = AuthorSerializer
 
     """Mapping: remote to local"""
-    remote_author_fields = {
+    remote_fields = {
         'id': 'official_id',
         'url': 'url',
         'host': 'host',
@@ -60,17 +61,37 @@ class NodeConfigBase:
     def get_base_url(self):
         return f'http://{self.__class__.domain}'
 
-    # endpoints
-    def get_all_authors_request(self, params: dict):
+    def get_all_author_jsons(self, params: dict):
+        """Returns a list of authors as json"""
         url = f'{self.get_base_url()}/authors/'
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
             url += '?' + query_param
-        response = requests.get(url, auth=(self.username, self.password))
+
+        try:
+            response = requests.get(url, auth=(self.username, self.password))
+        except ConnectionError:
+            return None
+        except Exception as e:
+            print(f"NodeConfigBase: Unknown err: {e}")
+            return None
+
         if response.status_code == 200:
-            # todo(turnip): map to our author?
-            return Response(json.loads(response.content))
-        return HttpResponseNotFound()
+            author_jsons = json.loads(response.content.decode('utf-8'))
+            return author_jsons['items']
+        return None
+
+    # endpoints
+    def get_all_authors_request(self, params: dict):
+        """Returns all authors as a valid HTTP Response"""
+        author_jsons = self.get_all_author_jsons(params)
+
+        if author_jsons is None:
+            return HttpResponseNotFound()
+        return Response({
+            "type": "authors",
+            "items": author_jsons
+        })
 
     def from_author_id_to_url(self, author_id: str) -> str:
         url = f'{self.get_base_url()}/authors/{author_id}/'
@@ -151,12 +172,35 @@ class NodeConfigBase:
             print(f'NodeConfigBase: get_follow_request: get failed: {response.status_code}')
             return None
 
-    ## will have to change the url depending on what team it is 
+    ## will have to change the url depending on what team it is
     # dictionary: [host + endpoint, formatted url]
     # will have to change the data for team 10
-    def share_to_remote_inbox(self, target_author_url: str, data):
+    def send_to_remote_inbox(self, data, target_author_url):
         if target_author_url is None:
             return 404
         url = f'{target_author_url}/inbox'
-        response = requests.post(url=url, data=data, auth=(self.username, self.password))
-        return response.status_code
+        return requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+
+    def get_authors_liked_on_post(self, object_id):
+        url = f'{self.get_base_url()}{object_id}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_liked_on_comment(self, object_id):
+        url = f'{self.get_base_url()}{object_id}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_likes(self, target_author_url):
+        url = f'{target_author_url}/liked'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_post_by_post_id(self, post_url):
+        url = f'{self.get_base_url()}{post_url}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_posts(self, author_posts_path):
+        url = f'{self.get_base_url()}{author_posts_path}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_comments_for_post(self, comments_path):
+        url = f'{self.get_base_url()}{comments_path}'
+        return requests.get(url = url, auth = (self.username, self.password))

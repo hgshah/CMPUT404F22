@@ -50,7 +50,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_id(model: Author) -> str:
         # the path after host may vary, e.g. authors/ vs authors/id
-        return model.official_id
+        return str(model.official_id)
 
     @staticmethod
     def get_host(model: Author) -> str:
