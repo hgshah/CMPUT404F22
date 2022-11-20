@@ -4,6 +4,7 @@ import urllib.parse
 import requests
 from django.http import HttpResponseNotFound
 from rest_framework.response import Response
+from requests import ConnectionError
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
@@ -56,7 +57,15 @@ class NodeConfigBase:
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
             url += '?' + query_param
-        response = requests.get(url, auth=(self.username, self.password))
+
+        try:
+            response = requests.get(url, auth=(self.username, self.password))
+        except ConnectionError:
+            return None
+        except Exception as e:
+            print(f"Author.get_author: Unknown err: {e}")
+            return None
+
         if response.status_code == 200:
             # todo(turnip): map to our author?
             return json.loads(response.content.decode('utf-8'))
