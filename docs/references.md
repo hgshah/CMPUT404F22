@@ -23,6 +23,7 @@ probably use to authenticate
   https://stackoverflow.com/questions/15128135/setting-debug-false-causes-500-error#:~:text=If%20you%20are%20having%20a,in%20any%20web%20error%20logs
   .
   https://stackoverflow.com/questions/16416172/how-can-i-modify-procfile-to-run-gunicorn-process-in-a-non-standard-folder-on-he
+  https://stackoverflow.com/questions/2201598/how-to-define-two-fields-unique-as-couple
 
 ### Allan
 

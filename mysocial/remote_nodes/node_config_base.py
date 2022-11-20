@@ -8,7 +8,6 @@ from requests import ConnectionError
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
-from mysocial.settings import base
 
 
 class NodeConfigBase:
@@ -149,9 +148,32 @@ class NodeConfigBase:
     ## will have to change the url depending on what team it is 
     # dictionary: [host + endpoint, formatted url]
     # will have to change the data for team 10
-    def share_to_remote_inbox(self, target_author_url: str, data):
+    def send_to_remote_inbox(self, data, target_author_url):
         if target_author_url is None:
             return 404
         url = f'{target_author_url}/inbox'
-        response = requests.post(url=url, data=data, auth=(self.username, self.password))
-        return response.status_code
+        return requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+
+    def get_authors_liked_on_post(self, object_id):
+        url = f'{self.get_base_url()}{object_id}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_liked_on_comment(self, object_id):
+        url = f'{self.get_base_url()}{object_id}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_likes(self, target_author_url):
+        url = f'{target_author_url}/liked'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_post_by_post_id(self, post_url):
+        url = f'{self.get_base_url()}{post_url}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_posts(self, author_posts_path):
+        url = f'{self.get_base_url()}{author_posts_path}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_comments_for_post(self, comments_path):
+        url = f'{self.get_base_url()}{comments_path}'
+        return requests.get(url = url, auth = (self.username, self.password))
