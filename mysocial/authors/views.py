@@ -5,8 +5,10 @@ from drf_spectacular.utils import OpenApiExample, extend_schema, inline_serializ
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from authors.models.author import Author
@@ -109,6 +111,23 @@ class AuthorView(GenericViewSet):
         if node_config is None:
             return HttpResponseNotFound()
         return node_config.get_author_request(author_id)
+
+
+class AuthorSelfView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializers = AuthorSerializer
+
+    def get_queryset(self):
+        return None
+
+    @staticmethod
+    @extend_schema(
+        parameters=PaginationHelper.OPEN_API_PARAMETERS,
+        summary="Get current author logged in details"
+    )
+    def get(request: Request) -> HttpResponse:
+        """Get details about the current author"""
+        return Response(AuthorSerializer(request.user).data)
 
 
 class RemoteNodeView(GenericAPIView):

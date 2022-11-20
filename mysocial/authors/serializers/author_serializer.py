@@ -5,6 +5,7 @@ from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_sc
 from rest_framework import serializers
 
 from authors.models.author import Author
+from common.base_util import BaseUtil
 from mysocial.settings import base
 
 AUTHOR_SERIALIZER_EXAMPLE = {
@@ -85,7 +86,7 @@ class AuthorSerializer(serializers.ModelSerializer):
                 if node_config is None:
                     print(f"AuthorSerializer: Host not found: {host}")
                     return serializers.ValidationError(f"AuthorSerializer: Host not found: {host}")
-                remote_fields: dict = node_config.remote_fields
+                remote_fields: dict = node_config.remote_author_fields
 
                 for remote_field, local_field in remote_fields.items():
                     if remote_field not in data:
@@ -96,16 +97,14 @@ class AuthorSerializer(serializers.ModelSerializer):
                         for start in ('http://', 'https://'):
                             if sanitized.startswith(start):
                                 sanitized = sanitized[len(start):]
-                        prefix = 'https://'
-                        if '127.0.0.1' in base.CURRENT_DOMAIN:
-                            prefix = 'http://'
+                        prefix = BaseUtil.get_http_or_https()
                         setattr(author, local_field, f'{prefix}{sanitized}')
                     else:
                         setattr(author, local_field, data[remote_field])
                 author.host = host  # force a set even if field was not given
         except Exception as e:
-            print(f"AuthorSerializer: failed serializing {e}")
-            raise serializers.ValidationError(f"AuthorSerializer: failed serializing {e}")
+            print(f"AuthorSerializer: failed serializing: {e}")
+            raise serializers.ValidationError(f"AuthorSerializer: failed serializing: {e}")
 
         return author
 

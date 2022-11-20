@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from requests import ConnectionError
 
+from common.base_util import BaseUtil
 from mysocial.settings import base
 from .author_manager import AuthorManager
 from .remote_node import NodeStatus, RemoteNode
@@ -78,9 +79,7 @@ class Author(AbstractUser):
             return self.url
 
         # local authors
-        prefix = 'https://'
-        if '127.0.0.1' in base.CURRENT_DOMAIN:
-            prefix = 'http://'
+        prefix = BaseUtil.get_http_or_https()
         return f"{prefix}{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
 
     def get_id(self) -> str:

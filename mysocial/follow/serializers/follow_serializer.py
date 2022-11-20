@@ -5,9 +5,11 @@ from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_sc
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from authors.util import AuthorUtil
 from follow.models import Follow
+from mysocial.settings import base
 
 
 @extend_schema_serializer(
@@ -79,12 +81,69 @@ class FollowRequestSerializer(serializers.ModelSerializer):
     def get_remote_url(self, model: Follow):
         return model.remote_url
 
-    def to_internal_value(self, data):
-        if 'id' not in data:
-            raise serializers.ValidationError('Missing id')
-        follow = Follow.objects.get(id=data['id'])
-        if follow is None:
-            raise serializers.ValidationError(f'Follow (id={data[id]}) does not exist')
+    def to_internal_value(self, data: dict):
+        target_serializer = AuthorSerializer(data=data['object'])
+        if not target_serializer.is_valid():
+            raise serializers.ValidationError('FollowRequestSerializer: to_internal_value: invalid json')
+        target: Author = target_serializer.validated_data
+
+        if target.is_local():
+            try:
+                # case 1: local target/object
+                follow = Follow.objects.get(id=data['id'])
+            except Follow.DoesNotExist:
+                raise serializers.ValidationError('FollowRequestSerializer: to_internal_value: follow does not exist')
+            except Exception as e:
+                raise serializers.ValidationError(f'FollowRequestSerializer: to_internal_value: unknown error: {e}')
+        else:
+            # get configuration
+            node_config = base.REMOTE_CONFIG.get(target.host)
+            if node_config is None:
+                raise serializers.ValidationError(
+                    f'FollowRequestSerializer: to_internal_value: host not found: {target.host}')
+            remote_fields: dict = node_config.remote_follow_fields
+
+            # transform data to be consistent based on target host
+            for remote_field, local_field in remote_fields.items():
+                if remote_field not in data:
+                    continue
+                else:
+                    data[local_field] = data[remote_field]
+
+            # get author
+            actor_serializer = AuthorSerializer(data=data['actor'])
+            if not actor_serializer.is_valid():
+                raise serializers.ValidationError('FollowRequestSerializer: to_internal_value: invalid json')
+            actor: Author = target_serializer.validated_data
+
+            try:
+                # case 2: remote target/object that already exists
+                follow = Follow.objects.get(actor=actor.get_url(), target=target.get_url())
+
+                for remote_field, local_field in remote_fields.items():
+                    if remote_field not in data:
+                        continue
+                    else:
+                        setattr(follow, local_field, data[remote_field])
+                follow.save()
+
+            except Follow.DoesNotExist:
+                # case 3: this is a new follow request we've made. make a local copy
+                # I know... I'm putting too much faith in other servers
+                # todo: add security later? lol
+                follow = Follow.objects.create(
+                    actor=actor.get_url(),
+                    target=target.get_url(),
+                    actor_id=actor.get_id(),
+                    target_id=target.get_id(),
+                    has_accepted=data['has_accepted'],
+                    remote_url=data['local_url'],  # switcharoo
+                    remote_id=data['proxy_id']
+                )
+
+            except Exception as e:
+                raise serializers.ValidationError(f'FollowRequestSerializer: to_internal_value: unknown error: {e}')
+
         return follow
 
     class Meta:

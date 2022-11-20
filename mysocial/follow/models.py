@@ -1,10 +1,12 @@
 import uuid
 
 from django.db import models
+from django.db.models import Q
 
+from authors.models.author import Author
 from authors.util import AuthorUtil
+from common.base_util import BaseUtil
 from mysocial.settings import base
-from remote_nodes.remote_util import RemoteUtil
 
 
 class Follow(models.Model):
@@ -22,7 +24,9 @@ class Follow(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
+    actor_id = models.UUIDField(default=uuid.uuid4, editable=False)
     target = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
+    target_id = models.UUIDField(default=uuid.uuid4, editable=False)
     has_accepted = models.BooleanField(default=False)
 
     """
@@ -31,6 +35,10 @@ class Follow(models.Model):
     If this is empty, this is the source of truth and you may disregard the other object
     """
     remote_url = models.URLField(blank=True, max_length=1000)
+    """
+    remote_id is the id of the authoritative Follow object in the other server
+    """
+    remote_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
     class Meta:
         unique_together = (('actor', 'target'),)
@@ -40,7 +48,7 @@ class Follow(models.Model):
         """
         Returns the url to get this Follow object
         """
-        return f"{RemoteUtil.get_http_or_https()}{base.CURRENT_DOMAIN}/follows/{self.id}"
+        return f"{self.target}/followers/{self.actor_id}"
 
     def get_url(self):
         if bool(self.remote_url):

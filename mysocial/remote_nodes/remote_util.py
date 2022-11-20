@@ -85,10 +85,32 @@ class RemoteUtil:
                 node.node_detail.save()
 
         # todo: setup superuser???
+
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            # prefill some users for testing
+            for user in [
+                {
+                    "username": "super",
+                    "password": "super",
+                    "is_staff": True,
+                    "is_superuser": True
+                },
+                {
+                    "username": "actor",
+                    "password": "actor"
+                },
+                {
+                    "username": "target",
+                    "password": "target"
+                }
+            ]:
+                username = user['username']
+                other_args: dict = user
+                other_args.pop('username')
+                TestHelper.overwrite_author(username, other_args)
+
         if 'PREFILLED_USERS' in os.environ:
             prefilled_users = json.loads(os.environ['PREFILLED_USERS'])
-            # prefilled_users: dict = {
-            #     'items': [{'username': 'super', 'password': 'super', 'is_staff': True, 'email': "super@gmail.com"}]}
             for user in prefilled_users['items']:
                 username = user['username']
                 other_args: dict = user
@@ -125,10 +147,3 @@ class RemoteUtil:
         if node_param not in base.REMOTE_CONFIG:
             return None
         return base.REMOTE_CONFIG[node_param]
-
-    @staticmethod
-    def get_http_or_https() -> str:
-        if '127.0.0.1' in base.CURRENT_DOMAIN:
-            return 'http://'
-        else:
-            return 'https://'

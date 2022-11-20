@@ -7,7 +7,8 @@ from rest_framework.response import Response
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
-from mysocial.settings import base
+from follow.models import Follow
+from follow.serializers.follow_serializer import FollowRequestSerializer
 
 
 class NodeConfigBase:
@@ -24,14 +25,23 @@ class NodeConfigBase:
     domain = 'domain.herokuapp.com'
     username = 'domain'
     author_serializer = AuthorSerializer
+
     """Mapping: remote to local"""
-    remote_fields = {
+    remote_author_fields = {
         'id': 'official_id',
         'url': 'url',
         'host': 'host',
         'displayName': 'display_name',
         'github': 'github',
         'profileImage': 'profile_image'
+    }
+    remote_follow_fields = {
+        'id': 'proxy_id',  # fake; for serializer
+        'hasAccepted': 'has_accepted',
+        'object': 'target',
+        'actor': 'actor',
+        'localUrl': 'local_url',  # fake; for serializer
+        'remoteUrl': 'proxy_url'  # fake; for serializer
     }
 
     def __init__(self):
@@ -121,6 +131,26 @@ class NodeConfigBase:
             print(f"post_local_follow_remote: remote server response: {response.status_code}")
         return response.status_code
 
+    def get_remote_follow(self, target: Author, follower: Author) -> Follow:
+        """
+        Make call to remote node to get a follow object or request
+
+        Returns a Follow object if there is one;
+        Returns None if cannot be found
+        """
+        url = f'{target.get_url()}/followers/{follower.get_id()}'
+        response = requests.get(url, auth=(self.username, self.password))
+        if 200 <= response.status_code < 300:
+            follow_json = json.loads(response.content)
+            follow_serializer = FollowRequestSerializer(data=follow_json)
+            if not follow_serializer.is_valid():
+                print(f'NodeCongiBase: get_remote_follow: serialization error: {follow_serializer.errors}')
+                return None
+            return follow_serializer.validated_data
+        else:
+            print(f'NodeConfigBase: get_follow_request: get failed: {response.status_code}')
+            return None
+
     ## will have to change the url depending on what team it is 
     # dictionary: [host + endpoint, formatted url]
     # will have to change the data for team 10
@@ -128,5 +158,5 @@ class NodeConfigBase:
         if target_author_url is None:
             return 404
         url = f'{target_author_url}/inbox'
-        response = requests.post(url = url, data = data, auth = (self.username, self.password))
+        response = requests.post(url=url, data=data, auth=(self.username, self.password))
         return response.status_code
