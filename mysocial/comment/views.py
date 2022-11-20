@@ -30,19 +30,6 @@ class CommentView(GenericAPIView):
         return Comment.objects.all()
 
     @extend_schema(
-        summary = "comment_get_comments_for_post",
-        responses = inline_serializer(
-            name='CommentList',
-            fields={
-                'type': serializers.CharField(),
-                'items': CommentSerializer(many=True)
-            }
-        ),
-        tags=['comment']
-    )
-    @action(detail=True, methods=['get'], url_name='comment_get')
-
-    @extend_schema(
         responses=CommentSerializerList,
         summary="comment_get_comments_on_post",
         tags=["comment", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
