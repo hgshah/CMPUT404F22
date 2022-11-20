@@ -27,6 +27,9 @@
 } */
 
 .Inbox {
+  position: absolute;
+  top: 0px;
+  left: 25%;
   width: 50%;
   flex: 0.4;
   border-right: 1px solid;
@@ -99,7 +102,7 @@ ul.choose li:hover {
 }
 
 ul.choose li.current {
-  background: #04bcefc3;
+  background: rgb(159, 185, 31);
 }
 
 .Tabs {
