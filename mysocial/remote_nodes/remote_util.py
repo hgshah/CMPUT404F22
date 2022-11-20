@@ -6,6 +6,8 @@ from rest_framework.request import Request
 
 from authors.models.author import Author
 from authors.models.remote_node import NodeStatus
+from authors.serializers.author_serializer import AuthorSerializer
+from common.base_util import BaseUtil
 from common.pagination_helper import PaginationHelper
 from common.test_helper import TestHelper
 from mysocial.settings import base
@@ -103,7 +105,7 @@ class RemoteUtil:
         # add all connected nodes but self to prevent infinite recursion
         for _, value in base.REMOTE_CONFIG.items():
             if value.domain != base.CURRENT_DOMAIN:
-                Author.connected_nodes.append(value)
+                BaseUtil.connected_nodes.append(value)
 
     @staticmethod
     def extract_node_target(request: Request):

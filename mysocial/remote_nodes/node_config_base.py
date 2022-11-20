@@ -4,6 +4,7 @@ import urllib.parse
 import requests
 from django.http import HttpResponseNotFound
 from rest_framework.response import Response
+from requests import ConnectionError
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
@@ -49,17 +50,37 @@ class NodeConfigBase:
     def get_base_url(self):
         return f'http://{self.__class__.domain}'
 
-    # endpoints
-    def get_all_authors_request(self, params: dict):
+    def get_all_author_jsons(self, params: dict):
+        """Returns a list of authors as json"""
         url = f'{self.get_base_url()}/authors/'
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
             url += '?' + query_param
-        response = requests.get(url, auth=(self.username, self.password))
+
+        try:
+            response = requests.get(url, auth=(self.username, self.password))
+        except ConnectionError:
+            return None
+        except Exception as e:
+            print(f"NodeConfigBase: Unknown err: {e}")
+            return None
+
         if response.status_code == 200:
-            # todo(turnip): map to our author?
-            return Response(json.loads(response.content))
-        return HttpResponseNotFound()
+            author_jsons = json.loads(response.content.decode('utf-8'))
+            return author_jsons['items']
+        return None
+
+    # endpoints
+    def get_all_authors_request(self, params: dict):
+        """Returns all authors as a valid HTTP Response"""
+        author_jsons = self.get_all_author_jsons(params)
+
+        if author_jsons is None:
+            return HttpResponseNotFound()
+        return Response({
+            "type": "authors",
+            "items": author_jsons
+        })
 
     def from_author_id_to_url(self, author_id: str) -> str:
         url = f'{self.get_base_url()}/authors/{author_id}/'
@@ -132,7 +153,7 @@ class NodeConfigBase:
             return 404
         url = f'{target_author_url}/inbox'
         return requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
-    
+
     def get_authors_liked_on_post(self, object_id):
         url = f'{self.get_base_url()}{object_id}'
         return requests.get(url = url, auth = (self.username, self.password))

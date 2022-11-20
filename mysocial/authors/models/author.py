@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from requests import ConnectionError
 
+from common.base_util import BaseUtil
 from mysocial.settings import base
 from .author_manager import AuthorManager
 from .remote_node import NodeStatus, RemoteNode
@@ -30,7 +31,6 @@ class Author(AbstractUser):
     # placed over here to prevent circular dependency
     SERIALIZER = None
     connected_node_classes = ()
-    connected_nodes = []
 
     # Remove this unnecessary fields
     first_name = None
@@ -130,9 +130,11 @@ class Author(AbstractUser):
         return "author"
 
     @classmethod
-    def get_author(cls, official_id: str):
+    def get_author(cls, official_id: str, should_do_recursively=True):
         """
-        Gets a local author ONLY. Nodes are ignored.
+        Get a local author. If not found locally, tries to find the author on other nodes by default.
+        Turn off the recursive find by setting should_do_recursively=False.
+
         :param official_id:
         :return: A local_author
         :throws: Author.DoesNotExist if the Author does not exist
@@ -143,7 +145,10 @@ class Author(AbstractUser):
                 node_detail__isnull=True
             )
         except cls.DoesNotExist:
-            for node in cls.connected_nodes:
+            if not should_do_recursively:
+                raise cls.DoesNotExist()
+
+            for node in BaseUtil.connected_nodes:
                 try:
                     author = node.from_author_id_to_author(official_id)
                 except ConnectionError:
@@ -154,7 +159,7 @@ class Author(AbstractUser):
 
                 if author is not None:
                     return author  # <- GODD RESULT HERE
-            raise Author.DoesNotExist()
+            raise cls.DoesNotExist()
         except Exception as e:
             print(f"Cannot find author {official_id}: {e}")
             return None
