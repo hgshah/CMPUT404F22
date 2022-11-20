@@ -63,7 +63,7 @@ class AuthorView(GenericViewSet):
 
         # look at everyone else
         # do not recursively find an author if this is a node
-        should_do_recursively = not (request.user.is_authenticated and request.is_authenticated_node)
+        should_do_recursively = not (request.user.is_authenticated and request.user.is_authenticated_node)
         if should_do_recursively:
             for node in BaseUtil.connected_nodes:
                 author_jsons = node.get_all_author_jsons(request.query_params)
@@ -117,7 +117,7 @@ class AuthorView(GenericViewSet):
 
         try:
             # do not recursively find an author if this is a node
-            should_do_recursively = not (request.user.is_authenticated and request.is_authenticated_node)
+            should_do_recursively = not (request.user.is_authenticated and request.user.is_authenticated_node)
             author = Author.get_author(official_id=author_id, should_do_recursively=should_do_recursively)
         except Author.DoesNotExist:
             return HttpResponseNotFound()
