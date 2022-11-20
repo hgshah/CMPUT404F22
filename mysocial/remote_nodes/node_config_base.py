@@ -50,8 +50,8 @@ class NodeConfigBase:
     def get_base_url(self):
         return f'http://{self.__class__.domain}'
 
-    # endpoints
-    def get_all_authors_request(self, params: dict):
+    def get_all_author_jsons(self, params: dict):
+        """Returns a list of authors as json"""
         url = f'{self.get_base_url()}/authors/'
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
@@ -59,8 +59,17 @@ class NodeConfigBase:
         response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
             # todo(turnip): map to our author?
-            return Response(json.loads(response.content))
-        return HttpResponseNotFound()
+            return json.loads(response.content.decode('utf-8'))
+        return None
+
+    # endpoints
+    def get_all_authors_request(self, params: dict):
+        """Returns all authors as a valid HTTP Response"""
+        author_jsons = self.get_all_author_jsons(params)
+
+        if author_jsons is None:
+            return HttpResponseNotFound()
+        return Response(author_jsons)
 
     def from_author_id_to_url(self, author_id: str) -> str:
         url = f'{self.get_base_url()}/authors/{author_id}/'
