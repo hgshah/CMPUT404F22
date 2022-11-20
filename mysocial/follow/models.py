@@ -24,9 +24,9 @@ class Follow(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
-    actor_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    actor_id = models.UUIDField(default=uuid.uuid4, blank=True)  # for convenience
     target = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
-    target_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    target_id = models.UUIDField(default=uuid.uuid4, blank=True)  # for convenience
     has_accepted = models.BooleanField(default=False)
 
     """
