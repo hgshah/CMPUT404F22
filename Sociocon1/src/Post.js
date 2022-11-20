@@ -20,9 +20,24 @@ import axios from 'axios'
 
 function Post({displayName, title, description, text, image, avatar, visibility}) {
     const[value, setValue] = useState(""); 
+    const [comment, setPostComment] = useState('');
+    const [ContentType, setPostContentType] = useState('');
     //const[p_post, setPost] = useState([]); 
     function handle() {
         alert(value)
+    }
+    const AddComment = async () => {
+        let formField = new FormData()
+        formField.append("comments", comment)
+        formField.append("contentType", ContentType)
+        await axios({
+            method: 'post',
+            url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/85c7c95e-dd41-44d2-ae0e-f0cb143fc908/comments',
+            data: formField
+        }).then((response) =>{
+            console.log(response.data)
+            navigate.push('/')
+        })
     }
     // useEffect(() => {
     //     async function getAllPosts(){
@@ -44,7 +59,7 @@ function Post({displayName, title, description, text, image, avatar, visibility}
         const nid = String(id).slice(-36)
         await axios({
                 method:'DELETE',
-                url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/' + nid + '/',
+                url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/' + nid + '/',
             
         }).then((response) =>{
             console.log(response.data)
@@ -91,7 +106,7 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                     </form>
 
                 <div className='post_footer'>
-
+                
 
                 {/* /* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
@@ -102,11 +117,30 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                      <div className='post_comments'>
                         <Comment/>
                         <form>
-
-                            <TextField label = "add comment" size = "small" variant='outlined' className='post_input' placeholder='add comment' />
-                            <Button variant='contained' size = "small" endIcon= {<SendIcon/>} type = "submit" >   </Button> 
-
+                            <input 
+                                onChange={e => setPostComment(e.target.value)} 
+                                value={comment} 
+                                placeholder='Enter comment' 
+                                type = 'text'
+                                className='post_input'
+                                variant = 'outlined'
+                                label = "add comment"
+                                size = "small"
+                            />
+                            <label for="set-contenttype"></label>
+                                {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
+                                    author: https://developer.mozilla.org/en-US/
+                                    License: https://creativecommons.org/licenses/by-sa/4.0/*/}
+                                <select name="contenttype" id="contenttype">
+                                    <option value="">choose an option--</option>
+                                    <option value={comment}>CommonMark</option>
+                                    <option value={comment}>PlainText</option>
+                                </select>
+                            {/* <TextField label = "add comment"  size = "small" variant='outlined' className='post_input' placeholder='add comment' /> */}
+                            <Button onClick = {AddComment} variant='contained' size = "small" endIcon= {<SendIcon/>} type = "submit" >   </Button> 
+                            
                         </form> 
+                        <Button onclick = {DeletePostInfo} variant = 'contained' endIcon = {<DeleteIcon/>} className = "postdel_button"></Button>
                     </div> 
  
                        

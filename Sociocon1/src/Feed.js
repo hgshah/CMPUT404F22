@@ -36,18 +36,18 @@ function Feed() {
     // link: https://www.youtube.com/watch?v=aRYkCe6JcGM
     // author: https://www.youtube.com/c/GreatAdib
     // license: https://creativecommons.org/
-    const DeletePostInfo = async (id) => {
-        String(id)
-        const nid = String(id).slice(-36)
-        await axios({
-                method:'DELETE',
-                url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/' + nid + '/',
+    // const DeletePostInfo = async (id) => {
+    //     String(id)
+    //     const nid = String(id).slice(-36)
+    //     await axios({
+    //             method:'DELETE',
+    //             url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/' + nid + '/',
             
-        }).then((response) =>{
-            console.log(response.data)
-            navigate.push('/')
-        })
-    }
+    //     }).then((response) =>{
+    //         console.log(response.data)
+    //         navigate.push('/')
+    //     })
+    // }
   //const navigate = useNavigate()
   return (
     <div className='feed'>
@@ -64,7 +64,7 @@ function Feed() {
                                    <Post title = {posts.title} description = {posts.description} displayName = "Harsh Shah"  image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = "public"/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
-                                    <Button onClick = {() =>DeletePostInfo(posts.id)}  className = "postdel_button">Delete</Button>
+                                    {/* <Button onClick = {() =>DeletePostInfo(posts.id)}  className = "postdel_button">Delete</Button> */}
                                 </h2>
                             )
                         })
