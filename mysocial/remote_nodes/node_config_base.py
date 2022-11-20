@@ -154,3 +154,7 @@ class NodeConfigBase:
     def get_authors_posts(self, author_posts_path):
         url = f'{self.get_base_url()}/{author_posts_path}'
         return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_comments_for_post(self, comments_path):
+        url = f'{self.get_base_url()}/{comments_path}'
+        return requests.get(url = url, auth = (self.username, self.password))
