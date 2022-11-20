@@ -14,6 +14,7 @@ from common.pagination_helper import PaginationHelper
 from follow.follow_util import FollowUtil
 from inbox.models import Inbox
 from mysocial.settings import base
+from remote_nodes.remote_util import RemoteUtil
 import json
 
 logger = logging.getLogger("mylogger")
@@ -40,7 +41,7 @@ class PostView(GenericAPIView):
     @extend_schema(
         summary = "get_post_by_id",
         responses = PostSerializer,
-        tags=['post']
+        tags=['post', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
     @action(detail=True, methods=['get'], url_name='get_post_by_id')
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
@@ -76,7 +77,6 @@ class PostView(GenericAPIView):
                 
                 return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
-        
         # remote -> local
         if request.user.is_authenticated_node:
             try:
