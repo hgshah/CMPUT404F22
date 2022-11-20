@@ -141,3 +141,8 @@ class NodeConfigBase:
     def get_authors_liked_on_comment(self, object_id):
         url = f'{self.get_base_url()}/{object_id}'
         return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_likes(self, target_author_url):
+        url = f'{target_author_url}/liked'
+        print(url)
+        return requests.get(url = url, auth = (self.username, self.password))
