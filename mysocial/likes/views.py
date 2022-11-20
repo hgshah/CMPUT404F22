@@ -111,7 +111,7 @@ class LikeView(GenericViewSet):
         summary="like_get_author_likes",
         tags=["likes", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
-    @action(detail=True, methods=['get'], url_name='retrieve_all')
+    @action(detail=True, methods=['get'], url_name='get_authors_likes')
     def get_author_liked(self, request, *args, **kwargs) -> HttpResponse:
         node: Author = request.user
         if not node.is_authenticated:
