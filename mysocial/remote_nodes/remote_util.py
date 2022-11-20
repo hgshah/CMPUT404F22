@@ -72,9 +72,14 @@ class RemoteUtil:
 
         # setup remote config node type authors
         for host, credentials in base.REMOTE_NODE_CREDENTIALS.items():
-            node: Author = TestHelper.overwrite_node(credentials['username'], credentials['password'],
-                                                     credentials['remote_username'], credentials['remote_password'],
-                                                     host)
+            try:
+                node: Author = TestHelper.overwrite_node(credentials['username'], credentials['password'],
+                                                         credentials['remote_username'], credentials['remote_password'],
+                                                         host)
+            except Exception as e:
+                print(f'RemoteUtil: setup: unknown error: {e}')
+                continue
+
             is_active = credentials.get('is_active')
             if is_active is None and not isinstance(is_active, bool):
                 continue
@@ -85,16 +90,16 @@ class RemoteUtil:
                 node.node_detail.status = NodeStatus.INACTIVE
                 node.node_detail.save()
 
-        # todo: setup superuser???
         if 'PREFILLED_USERS' in os.environ:
-            prefilled_users = json.loads(os.environ['PREFILLED_USERS'])
-            # prefilled_users: dict = {
-            #     'items': [{'username': 'super', 'password': 'super', 'is_staff': True, 'email': "super@gmail.com"}]}
-            for user in prefilled_users['items']:
-                username = user['username']
-                other_args: dict = user
-                other_args.pop('username')
-                TestHelper.overwrite_author(username, other_args)
+            try:
+                prefilled_users = json.loads(os.environ['PREFILLED_USERS'])
+                for user in prefilled_users['items']:
+                    username = user['username']
+                    other_args: dict = user
+                    other_args.pop('username')
+                    TestHelper.overwrite_author(username, other_args)
+            except Exception as e:
+                print(f'RemoteUtil: setup: unknown error: {e}')
 
         # This is where the endpoints and configs are added!
         # When it's local (contains 127.0.0.1), we add 127.0.0.1:8000 and 127.0.0.1:8080
