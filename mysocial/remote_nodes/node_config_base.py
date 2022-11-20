@@ -63,12 +63,12 @@ class NodeConfigBase:
         except ConnectionError:
             return None
         except Exception as e:
-            print(f"Author.get_author: Unknown err: {e}")
+            print(f"NodeConfigBase: Unknown err: {e}")
             return None
 
         if response.status_code == 200:
-            # todo(turnip): map to our author?
-            return json.loads(response.content.decode('utf-8'))
+            author_jsons = json.loads(response.content.decode('utf-8'))
+            return author_jsons['items']
         return None
 
     # endpoints
@@ -78,7 +78,10 @@ class NodeConfigBase:
 
         if author_jsons is None:
             return HttpResponseNotFound()
-        return Response(author_jsons)
+        return Response({
+            "type": "authors",
+            "items": author_jsons
+        })
 
     def from_author_id_to_url(self, author_id: str) -> str:
         url = f'{self.get_base_url()}/authors/{author_id}/'
@@ -150,5 +153,5 @@ class NodeConfigBase:
         if target_author_url is None:
             return 404
         url = f'{target_author_url}/inbox'
-        response = requests.post(url = url, data = data, auth = (self.username, self.password))
+        response = requests.post(url=url, data=data, auth=(self.username, self.password))
         return response.status_code
