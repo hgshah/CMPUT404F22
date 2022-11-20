@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from authors.serializers.author_serializer import AuthorSerializer 
-from .models import Post
+from .models import Post, ContentType
 from comment.models import Comment
 from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_schema_serializer
 
@@ -57,7 +57,7 @@ class PostSerializer(serializers.ModelSerializer):
         return obj.get_url()
 
     def get_comments(self, obj):
-        return f"{self.get_id(obj)}/comments"
+        return f"{self.get_url(obj)}/comments"
     
     def get_count(self, obj):
         return Comment.objects.filter(post=obj).count()
@@ -111,3 +111,26 @@ class PostSerializerList(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('type', 'items')
+
+# Created to make fields required when someone tries to add a post to inbox
+class InboxPostSerializer(serializers.ModelSerializer):
+    type = serializers.CharField()
+    title = serializers.CharField()
+    id = serializers.CharField()
+    source = serializers.CharField(default = "www.default.com")
+    origin = serializers.CharField(default = "www.default.com")
+    description = serializers.CharField()
+    contentType = serializers.ChoiceField(ContentType)
+    author = serializers.JSONField()
+    categories = serializers.ListField(default = [])
+    count = serializers.IntegerField()
+    comments = serializers.CharField()
+    published = serializers.CharField()
+    visibility = serializers.CharField()
+    unlisted = serializers.BooleanField(default = False)
+    url = serializers.CharField()
+
+    class Meta:
+        model = Post
+        fields = ('type', 'title', 'id', 'source', 'origin', 'description', 'contentType',  'author', 'categories', 'count', 'comments', 'published', 'visibility', 'unlisted', 'url')
+    
