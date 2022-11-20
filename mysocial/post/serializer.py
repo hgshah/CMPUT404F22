@@ -1,15 +1,42 @@
 from rest_framework import serializers
 from authors.serializers.author_serializer import AuthorSerializer 
-from .models import Post, ContentType, Visibility
+from .models import Post
 from comment.models import Comment
-from drf_spectacular.utils import extend_schema_field
-import logging 
+from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_schema_serializer
 
-import logging, json
-from urllib.request import urlopen
-
-logger = logging.getLogger("mylogger")
-
+POST_SERIALIZER_EXAMPLE = {
+    "type": "post",
+    "title": "mytitle",
+    "id": "aa292f41-90b2-4b0f-af4e-fc4cdfaabcc4",
+    "source": "",
+    "origin": "",
+    "description": "mydesc",
+    "contentType": "text/plain",
+    "author": {
+        "type": "author",
+        "id": "44248451-2deb-421c-b5f6-db0c214b68ea",
+        "url": "http://127.0.0.1:8000/authors/44248451-2deb-421c-b5f6-db0c214b68ea",
+        "host": "127.0.0.1:8000",
+        "displayName": "amanda",
+        "github": "",
+        "profileImage": ""
+    },
+    "categories": [],
+    "count": 1,
+    "comments": "aa292f41-90b2-4b0f-af4e-fc4cdfaabcc4/comments",
+    "published": "2022-11-17T21:07:41.803434Z",
+    "visibility": "public",
+    "unlisted": False,
+    "url": "http://127.0.0.1:8000/authors/44248451-2deb-421c-b5f6-db0c214b68ea/posts/aa292f41-90b2-4b0f-af4e-fc4cdfaabcc4"
+}
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            'Socioecon POST Object',
+            value=POST_SERIALIZER_EXAMPLE,
+        ),
+    ]
+)
 class PostSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
@@ -60,3 +87,27 @@ class SharePostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ()
+
+
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            'Socioecon Posts list',
+            value={
+                'type': 'post',
+                'items': [POST_SERIALIZER_EXAMPLE],
+            },
+        ),
+    ]
+)
+class PostSerializerList(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField('get_type')
+    items = PostSerializer(many=True, read_only=True)
+
+    @staticmethod
+    def get_type(model: Post) -> str:
+        return model.get_serializer_field_name()
+
+    class Meta:
+        model = Post
+        fields = ('type', 'items')

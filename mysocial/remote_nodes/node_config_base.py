@@ -135,9 +135,25 @@ class NodeConfigBase:
         return response.status_code
     
     def get_authors_liked_on_post(self, object_id):
-        url = f'{self.get_base_url()}/{object_id}'
+        url = f'{self.get_base_url()}{object_id}'
         return requests.get(url = url, auth = (self.username, self.password))
 
     def get_authors_liked_on_comment(self, object_id):
-        url = f'{self.get_base_url()}/{object_id}'
+        url = f'{self.get_base_url()}{object_id}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_likes(self, target_author_url):
+        url = f'{target_author_url}/liked'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_post_by_post_id(self, post_url):
+        url = f'{self.get_base_url()}{post_url}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_authors_posts(self, author_posts_path):
+        url = f'{self.get_base_url()}{author_posts_path}'
+        return requests.get(url = url, auth = (self.username, self.password))
+
+    def get_comments_for_post(self, comments_path):
+        url = f'{self.get_base_url()}{comments_path}'
         return requests.get(url = url, auth = (self.username, self.password))
