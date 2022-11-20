@@ -14,12 +14,13 @@ from likes.models import Like
 from django.http.response import HttpResponse, HttpResponseNotFound
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework.decorators import action
+from django.core import serializers
 
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework.request import Request
 from authors.models.author import Author
-from authors.serializers.author_serializer import AuthorSerializerList
+from authors.serializers.author_serializer import AuthorSerializer
 from remote_nodes.remote_util import RemoteUtil
 from likes.models import Like, LikeType
 from mysocial.settings import base
@@ -27,19 +28,11 @@ import json
 # Create your views here.
 class LikeView(GenericViewSet):
     '''
-        The code structure is identical!
-        1. Check if local user wants to find list of authors that liked a local post
-        2. Check if local user wants to find list of authors that liked a remote post
-        3. Check if remote user wants to find list of authors that liked a local post
-
-        4. Get the object id
-        5. Get the list of like objects that contains that object id and return the list of authors
-            a) For remote, we make a GET to their corresponding url to get list of authors
-        6. Return response object with the list of authors
+        Response will be a list of authors!! 
     '''
 
     @extend_schema(
-        responses=AuthorSerializerList,
+        responses=AuthorSerializer,
         summary="likes_retrieve_authors_for_post",
         tags=["likes", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
@@ -58,10 +51,7 @@ class LikeView(GenericViewSet):
             #local -> local
             if target_author.is_local():
                 authors = self.get_authors_for_local_like(request, LikeType.POST) 
-                return Response({
-                    'type': 'authors',
-                    'items': authors
-                }, status = status.HTTP_200_OK)
+                return Response(authors, status = status.HTTP_200_OK)
 
             # local -> remote
             else:
@@ -71,25 +61,19 @@ class LikeView(GenericViewSet):
                 if response.status_code < 200 or response.status_code > 200:
                     return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
-                return Response({
-                    'type': 'authors',
-                    'items': json.loads(response.content)
-                    }, status = status.HTTP_200_OK)
+                return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
         # remote -> local
         if request.user.is_authenticated_node:
             authors = self.get_authors_for_local_like(request, LikeType.POST) 
-            return Response({
-                        'type': 'authors',
-                        'items': authors
-                    }, status = status.HTTP_200_OK)
+            return Response(authors, status = status.HTTP_200_OK)
     
     @extend_schema(
-        responses=AuthorSerializerList,
+        responses=AuthorSerializer(),
         summary="likes_retrieve_authors_liked_on_comment",
         tags=["likes", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
-    @action(detail=True, methods=['get'], url_name='get_authors_liked_on_comment')
+    @action(detail=False, pagination_class = None, methods=['get'], url_name='get_authors_liked_on_comment')
     def get_authors_liked_on_comment(self, request: Request, *args, **kwargs) -> HttpResponse:
         node: Author = request.user
         if not node.is_authenticated:
@@ -104,10 +88,7 @@ class LikeView(GenericViewSet):
             #local -> local
             if target_author.is_local(): 
                 authors = self.get_authors_for_local_like(request, LikeType.COMMENT) 
-                return Response({
-                            'type': 'authors',
-                            'items': authors
-                        }, status = status.HTTP_200_OK)
+                return Response(authors, status = status.HTTP_200_OK)
 
             # local -> remote
             else:
@@ -117,18 +98,12 @@ class LikeView(GenericViewSet):
                 if response.status_code < 200 or response.status_code > 200:
                     return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
-                return Response({
-                    'type': 'authors',
-                    'items': json.loads(response.content)
-                }, status = status.HTTP_200_OK)
+                return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
         # remote -> local
         if request.user.is_authenticated_node:
             authors = self.get_authors_for_local_like(request, LikeType.COMMENT) 
-            return Response({
-                        'type': 'authors',
-                        'items': authors
-                    }, status = status.HTTP_200_OK)
+            return Response(authors, status = status.HTTP_200_OK)
     
     def get_authors_for_local_like(self, request, object_type):
         object_id = request.path.split('/likes')[0]
