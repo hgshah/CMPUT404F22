@@ -9,6 +9,7 @@ from common.simple_auth import SimpleAuth
 from remote_nodes.remote_util import RemoteUtil
 from mysocial.settings import base
 from authors.util import AuthorUtil
+import json
 
 # models
 from .models import Inbox
@@ -18,8 +19,8 @@ from likes.models import Like, LikeType
 
 # serializing
 from inbox.serializers import InboxSerializer, AllInboxSerializer
-from post.serializer import PostSerializer
-from comment.serializers import CommentSerializer
+from post.serializer import InboxPostSerializer
+from comment.serializers import InboxCommentSerializer
 from follow.serializers.follow_serializer import FollowRequestSerializer
 from authors.serializers.author_serializer import AuthorSerializer
 from likes.serializers import LikeSerializer
@@ -31,6 +32,37 @@ class InboxView(GenericAPIView):
 
     def get_queryset(self):
         return Inbox.objects.all()
+
+    ## GET /authors/{AUTHOR_ID}/inbox
+    def get(self, request: Request, *args, **kwargs) -> HttpResponse:
+        try:
+            if SimpleAuth.authorize_user(kwargs['author_id'], request) == False:
+                return HttpResponse(status=status.HTTP_403_FORBIDDEN)
+
+            author = Author.get_author(kwargs["author_id"])
+            inbox = Inbox.objects.get(author = author)
+            serializer = InboxSerializer(inbox)
+            return Response(serializer.data, status = status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return HttpResponseNotFound()
+    
+    # DELETE /authors/{AUTHOR_ID}/inbox
+    def delete(self, request: Request, *args, **kwargs) -> HttpResponse:
+        try:
+            if SimpleAuth.authorize_user(kwargs['author_id'], request) == False:
+                return HttpResponse(status=status.HTTP_403_FORBIDDEN)
+
+            author = Author.get_author(kwargs["author_id"])
+            inbox = Inbox.objects.get(author = author)
+            inbox.items = []
+            inbox.save()
+            return Response(status = status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            print(e)
+            return HttpResponseNotFound()
+
 
     def post(self, request: Request, *args, **kwargs) -> HttpResponse: 
         """
@@ -54,11 +86,111 @@ class InboxView(GenericAPIView):
 
             if type == ItemType.LIKE:
                 return self.handle_likes(request, node, **kwargs)
+            elif type == ItemType.POST:
+                return self.handle_post(request, node, **kwargs)
+            elif type == ItemType.COMMENT:
+                return self.handle_comment(request, node, **kwargs)
+            elif type == ItemType.FOLLOW:
+                pass
+            else:
+                return Response("Could not find item type", status = status.HTTP_400_BAD_REQUEST)
                 
         except Exception as e:
             print(e)
             return HttpResponseNotFound()
     
+    def handle_post(self, request, node, **kwargs):
+        '''
+        Find what scenario we are dealing with:
+        1. Local -> local
+        2. Local -> remote
+        3. Remote -> local
+
+        General steps for local/remote -> local
+        1. Get inbox for target author
+        2. Add item in inbox 
+        '''
+        try:
+            target_author = Author.get_author(kwargs['author_id'])
+        except:
+            return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+        if node.is_authenticated_user:
+            # local -> local
+            if target_author.is_local():
+                return self.send_post_or_comment_to_local_inbox(
+                            request = request, 
+                            serializer = InboxPostSerializer, 
+                            target_author = target_author
+                        )
+
+            # local -> remote
+            else:
+                return self.send_post_or_comment_to_remote_inbox(
+                    request = request,
+                    target_author = target_author
+                )
+
+        # remote -> local
+        if request.user.is_authenticated_node:
+            return self.send_post_or_comment_to_local_inbox(
+                request = request, 
+                serializer = InboxPostSerializer, 
+                target_author = target_author
+            )
+
+    def handle_comment(self, request, node, **kwargs):
+        try:
+            target_author = Author.get_author(kwargs['author_id'])
+        except:
+            return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+        if node.is_authenticated_user:
+            # local -> local
+            if target_author.is_local():
+                return self.send_post_or_comment_to_local_inbox(
+                            request = request, 
+                            serializer = InboxCommentSerializer, 
+                            target_author = target_author
+                        )
+
+            # local -> remote
+            else:
+                return self.send_post_or_comment_to_remote_inbox(
+                    request = request,
+                    target_author = target_author
+                )
+
+        # remote -> local
+        if request.user.is_authenticated_node:
+            return self.send_post_or_comment_to_local_inbox(
+                request = request, 
+                serializer = InboxCommentSerializer, 
+                target_author = target_author
+            )
+
+    def send_post_or_comment_to_local_inbox(self, request, serializer, target_author):
+        try:
+            inbox = Inbox.objects.get(author = target_author)
+        except:
+            return Response(f'Could not get inbox for local author: {target_author}', status.HTTP_400_BAD_REQUEST)
+
+        serializer = serializer(data = request.data)
+        if serializer.is_valid() == False:
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+        inbox.add_to_inbox(serializer.data)
+        return Response(f"Successfully added {request.data['type']} to {target_author}", status.HTTP_200_OK)
+    
+    def send_post_or_comment_to_remote_inbox(self, request, target_author):
+        node_config = base.REMOTE_CONFIG.get(target_author.host)
+        response = node_config.send_to_remote_inbox(data = request.data, target_author_url = target_author.get_url())
+
+        if response.status_code < 200 or response.status_code > 200:
+            return Response(json.loads(response.content), status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(f"Successfully added {request.data['type']} to {target_author}", status = status.HTTP_200_OK)
+
     def handle_likes(self, request, node, **kwargs):
         if node.is_authenticated_user:
             try:
@@ -78,7 +210,6 @@ class InboxView(GenericAPIView):
         if request.user.is_authenticated_node:
             return self.remote_likes_local(request, **kwargs)
 
-    
     def local_likes_remote(self, request, target_author):
         '''
         A local author wants to send something to a remote author
@@ -178,7 +309,6 @@ class InboxView(GenericAPIView):
             
         return Response(f"Successfully added 'LIKE' to author {target_author.display_name} inbox", status = status.HTTP_200_OK)
 
-    
     def create_like(self, request, json_author, requesting_author_id):
         object_id = request.data.get('object')
 
@@ -194,46 +324,6 @@ class InboxView(GenericAPIView):
         except Exception as e:
             print(e)
             return None
-
-    ## GET /authors/{AUTHOR_ID}/inbox
-    def get(self, request: Request, *args, **kwargs) -> HttpResponse:
-        try:
-            if SimpleAuth.authorize_user(kwargs['author_id'], request) == False:
-                return HttpResponse(status=status.HTTP_403_FORBIDDEN)
-
-            author = Author.get_author(kwargs["author_id"])
-            inbox = Inbox.objects.get(author = author)
-            serializer = InboxSerializer(inbox)
-            return Response(serializer.data, status = status.HTTP_200_OK)
-
-        except Exception as e:
-            print(e)
-            return HttpResponseNotFound()
-    
-    # DELETE /authors/{AUTHOR_ID}/inbox
-    def delete(self, request: Request, *args, **kwargs) -> HttpResponse:
-        try:
-            if SimpleAuth.authorize_user(kwargs['author_id'], request) == False:
-                return HttpResponse(status=status.HTTP_403_FORBIDDEN)
-
-            author = Author.get_author(kwargs["author_id"])
-            inbox = Inbox.objects.get(author = author)
-            inbox.items = []
-            inbox.save()
-            return Response(status = status.HTTP_204_NO_CONTENT)
-        except Exception as e:
-            print(e)
-            return HttpResponseNotFound()
-
-    def validate_request_data(self, request):
-        type = request.data['type'].lower()
-
-        if (type == ItemType.POST):
-            PostSerializer(request.data)
-        elif (type == ItemType.COMMENT):
-            CommentSerializer(request.data)
-        elif (type == ItemType.FOLLOW):
-            FollowRequestSerializer(request.data)
 
 class AllInboxView(GenericAPIView):
     serializer_class = AllInboxSerializer

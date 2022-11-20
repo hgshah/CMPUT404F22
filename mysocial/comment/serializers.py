@@ -86,3 +86,18 @@ class CommentSerializerList(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('type', 'items')
+
+
+class InboxCommentSerializer(serializers.ModelSerializer):
+    type = serializers.CharField()
+    author = serializers.JSONField()
+    comment = serializers.CharField()
+    published = serializers.CharField()
+    contentType = serializers.ChoiceField(ContentType)
+    id = serializers.CharField()
+    url = serializers.CharField()
+
+    class Meta:
+        model = Comment
+        fields = ('type', 'author', 'comment', 'contentType', 'published', 'id', 'url')
+    
