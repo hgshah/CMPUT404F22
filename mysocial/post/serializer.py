@@ -87,3 +87,27 @@ class SharePostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ()
+
+
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            'Socioecon Posts list',
+            value={
+                'type': 'post',
+                'items': [POST_SERIALIZER_EXAMPLE],
+            },
+        ),
+    ]
+)
+class PostSerializerList(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField('get_type')
+    items = PostSerializer(many=True, read_only=True)
+
+    @staticmethod
+    def get_type(model: Post) -> str:
+        return model.get_serializer_field_name()
+
+    class Meta:
+        model = Post
+        fields = ('type', 'items')

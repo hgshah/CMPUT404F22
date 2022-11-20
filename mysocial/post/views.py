@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
-from .serializer import PostSerializer, CreatePostSerializer, SharePostSerializer
+from .serializer import PostSerializer, CreatePostSerializer, SharePostSerializer, PostSerializerList
 from rest_framework import serializers
 from authors.models.author import Author
 from .models import Post, Visibility
@@ -39,11 +39,11 @@ class PostView(GenericAPIView):
     # GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     #Peter, October 19, https://stackoverflow.com/questions/1496346/passing-a-list-of-
     @extend_schema(
-        summary = "get_post_by_id",
+        summary = "post_get_post_by_id",
         responses = PostSerializer,
         tags=['post', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
-    @action(detail=True, methods=['get'], url_name='get_post_by_id')
+    @action(detail=True, methods=['get'], url_name='post_get_post_by_id')
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
         """
         Get specific post by post id
@@ -244,15 +244,9 @@ class CreationPostView(GenericAPIView):
         return Post.objects.all()
     
     @extend_schema(
-    summary = "post_get_all_posts_by_author",
-    responses = inline_serializer(
-            name='PostList',
-            fields={
-                'type': serializers.CharField(),
-                'items': PostSerializer(many=True)
-            }
-        ),
-    tags=['post']
+        responses=PostSerializerList,
+        summary="post_get_authors_posts",
+        tags=["post", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
     @action(detail=True, methods=['get'], url_name='post_get_author_posts')
     def get(self, request, *args, **kwargs):
@@ -263,16 +257,51 @@ class CreationPostView(GenericAPIView):
 
         User story: As an author, I want to be able to use my web-browser to manage/author my posts
         """
-        author = Author.objects.get(official_id = kwargs['author_id'])
-        posts = Post.objects.filter(author = author).order_by('-published')
-        serializer = PostSerializer(posts, many = True)
-        data = serializer.data
-        data, err = PaginationHelper.paginate_serialized_data(request, data)
-
-        if err is not None:
+        node: Author = request.user
+        if not node.is_authenticated:
             return HttpResponseNotFound()
-        else:
-            return Response({'type': 'posts', 'items': data})
+
+        if node.is_authenticated_user:
+            try:
+                target_author = Author.get_author(kwargs['author_id'])
+            except:
+                return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+            #local -> local
+            if target_author.is_local():
+                author = Author.get_author(kwargs['author_id'])
+                posts = Post.objects.filter(author = author).order_by('-published')
+                serializer = PostSerializer(posts, many = True)
+                data = serializer.data
+                data, err = PaginationHelper.paginate_serialized_data(request, data)
+
+                if err is not None:
+                    return Response(f'{err}', status = status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({'type': 'posts', 'items': data})
+
+            # local -> remote
+            else:
+                node_config = base.REMOTE_CONFIG.get(target_author.host)
+                response = node_config.get_authors_posts(request.path)
+                if response.status_code < 200 or response.status_code > 200:
+                    return Response("Failed to get author's post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                return Response(json.loads(response.content), status = status.HTTP_200_OK)
+
+        # remote -> local
+        if request.user.is_authenticated_node:
+            author = Author.objects.get(official_id = kwargs['author_id'])
+            posts = Post.objects.filter(author = author).order_by('-published')
+            serializer = PostSerializer(posts, many = True)
+            data = serializer.data
+            data, err = PaginationHelper.paginate_serialized_data(request, data)
+
+            if err is not None:
+                return HttpResponseNotFound()
+            else:
+                return Response({'type': 'posts', 'items': data})
+
 
     # Édouard Lopez, October 19, https://stackoverflow.com/questions/5255913/kwargs-in-django
     @extend_schema(
