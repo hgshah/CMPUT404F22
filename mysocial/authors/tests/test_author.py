@@ -8,6 +8,8 @@ from common.test_helper import TestHelper
 
 class TestAuthor(TestCase):
     def setUp(self) -> None:
+        for author in Author.objects.all():
+            author.delete()
         self.local_author = TestHelper.create_author('local_author')
         self.active_node = TestHelper.create_node('active_node', 'active_node', 'active_node',
                                                   'active_node', 'active_node')

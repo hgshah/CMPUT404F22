@@ -28,7 +28,7 @@ class NodeConfigBase:
     author_serializer = AuthorSerializer
 
     """Mapping: remote to local"""
-    remote_fields = {
+    remote_author_fields = {
         'id': 'official_id',
         'url': 'url',
         'host': 'host',

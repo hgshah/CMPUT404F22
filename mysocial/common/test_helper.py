@@ -52,7 +52,7 @@ class TestHelper:
         return node_author
 
     @staticmethod
-    def overwrite_author(username: str, other_args: dict = None):
+    def overwrite_author(username: str, other_args: dict = {}):
         try:
             author = Author.objects.get(username=username)
             for k, v in other_args.items():
