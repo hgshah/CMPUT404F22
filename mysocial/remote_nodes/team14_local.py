@@ -39,12 +39,18 @@ class Team14Local(LocalDefault):
 
         try:
             response = requests.get(url, auth=(self.username, self.password))
-        except ConnectionError:
+        except ConnectionError as e:
+            print(f"{self.__class__.username}: url ({url}) Connection error: {e}")
             return None
         except Exception as e:
-            print(f"Team14Local: Unknown err: {e}")
+            print(f"{self.__class__.username}: Unknown err: {e}")
             return None
 
         if response.status_code == 200:
             return json.loads(response.content.decode('utf-8'))
+        else:
+            print(f'Invalid response code: {response.status_code}')
+            message = response.content.decode('utf-8')
+            print(f'Invalid response code: {message}')
+
         return None

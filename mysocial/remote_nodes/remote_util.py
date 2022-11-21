@@ -15,6 +15,7 @@ from remote_nodes.local_default import LocalDefault
 from remote_nodes.local_mirror import LocalMirror
 from remote_nodes.macewan import MacEwan
 from remote_nodes.potato_oomfie import PotatoOomfie
+from remote_nodes.socioecon import Socioecon
 from remote_nodes.team14_local import Team14Local
 from remote_nodes.team14_main import Team14Main
 from remote_nodes.turnip_oomfie import TurnipOomfie
@@ -56,9 +57,9 @@ class RemoteUtil:
         Setup all remote node configs and logic
         """
         if '127.0.0.1' in base.CURRENT_DOMAIN:
-            Author.connected_node_classes = (LocalDefault, LocalMirror, Team14Local)
+            Author.connected_node_classes = [LocalDefault, LocalMirror, Team14Local]
         else:
-            Author.connected_node_classes = (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main)
+            Author.connected_node_classes = [TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main, Socioecon]
 
         # special remote node configs if you're running locally
         # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
@@ -105,6 +106,7 @@ class RemoteUtil:
         # When it's local (contains 127.0.0.1), we add 127.0.0.1:8000 and 127.0.0.1:8080
         # Then, we add the endpoints, like turnip-oomfie-1.herokuapp.com (TurnipOomfie)
         for config in Author.connected_node_classes:
+            print(f"Adding: {config}")
             base.REMOTE_CONFIG.update(config.create_dictionary_entry())
 
         # add all connected nodes but self to prevent infinite recursion

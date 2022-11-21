@@ -35,17 +35,26 @@ class NodeConfigBase:
     }
 
     def __init__(self):
+        self.is_valid = False
         try:
-            self.node_author = Author.objects.get(username=self.__class__.username)
+            self.node_author = Author.objects.get(username=self.username)
             self.node_detail = self.node_author.node_detail
             self.username = self.node_detail.remote_username
             self.password = self.node_detail.remote_password
+            self.is_valid = True
         except Exception as e:
-            print('Author does not exist yet...')
+            print(f'Node author does not exist yet...: Finding username {self.username} {self.__class__}): {e}')
 
     @classmethod
     def create_dictionary_entry(cls):
-        return {cls.domain: cls()}
+        result = cls()
+        if result.is_valid:
+            print(f"Adding node: {result.username}")
+            return {cls.domain: result}
+        else:
+            # prevent adding invalid classes
+            print(f"Removing node: {result.username}")
+            return {}
 
     def get_base_url(self):
         return f'http://{self.__class__.domain}'
