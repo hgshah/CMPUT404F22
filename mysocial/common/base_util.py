@@ -1,3 +1,6 @@
+from mysocial.settings import base
+
+
 class BaseUtil:
     """
     Methods and values that are foundational. Could be put in base.py but removed there to prevent clutter
