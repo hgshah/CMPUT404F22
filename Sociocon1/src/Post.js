@@ -23,7 +23,21 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const[value, setValue] = useState(""); 
     const [comment, setPostComment] = useState('');
     const [ContentType, setPostContentType] = useState('');
+    const [like, setPostLike] = useState(20);
+    const [likeactive, setPostLikeactive] = useState(false);
     //const[p_post, setPost] = useState([]); 
+    // link : https://www.youtube.com/watch?v=a8KruvMkEtY
+    function postlike(){
+        if (likeactive){
+            
+            setPostLikeactive(false)
+            setPostLike(like -1 )
+        }
+        else{
+            setPostLikeactive(true)
+            setPostLike( like +1 )
+        }
+    }
     function handle() {
         alert(value)
     }
@@ -61,9 +75,12 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const DeletePostInfo = async (id) => {
         String(id)
         const nid = String(id).slice(-36)
+
         await axios({
-                method:'DELETE',
-                url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/' + nid + '/',
+                method:'delete',
+                withCredentials: true ,
+                headers: { "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
             
         }).then((response) =>{
             console.log(response.data)
@@ -97,13 +114,14 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                     {/* <p>{text}</p> */}
                     {title} <br></br>
                     {description}
+                    
 
                 </div>
                 
                  <img className='post_content' src = {image} alt = " "/> 
                  <form>
                     <span>
-                        <Button variant='contained' size = "small" endIcon= {<LikeIcon/>} type = "submit" >   </Button>  &nbsp;&nbsp;&nbsp;
+                        <Button onClick={postlike} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {like}  </Button>  &nbsp;&nbsp;&nbsp;
                         <Button variant='contained' size = "small" endIcon= {<ShareIcon/>} type = "submit" >   </Button>
                     </span>
 
