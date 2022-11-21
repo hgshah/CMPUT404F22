@@ -4,6 +4,7 @@
 import React from 'react'
 import {useState, useEffect} from 'react';
 import "./Post.css";
+import List from '@mui/material/List';
 import Comment from './Comment';
 import {useNavigate, useParams} from 'react-router-dom'
 import { Avatar, Button, TextField} from '@mui/material';
@@ -18,7 +19,7 @@ import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
 import axios from 'axios'
 
-function Post({displayName, title, description, text, image, avatar, visibility}) {
+function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype}) {
     const[value, setValue] = useState(""); 
     const [comment, setPostComment] = useState('');
     const [ContentType, setPostContentType] = useState('');
@@ -109,7 +110,7 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                     </form>
 
                 <div className='post_footer'>
-                
+                 
 
                 {/* /* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
@@ -118,7 +119,8 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                         {/* <LikeIcon fontSize = "small" />
                         <ShareIcon fontSize = "small" /> */}
                      <div className='post_comments'>
-                        <Comment/>
+                        {/* <Comment/> */}
+                        {comments}
                         <form>
                             <input 
                                 onChange={e => setPostComment(e.target.value)} 
@@ -146,6 +148,11 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                         </form> 
                         <Button onclick = {DeletePostInfo} variant = 'contained' endIcon = {<DeleteIcon/>} className = "postdel_button"></Button>
                     </div> 
+                    {/* <div className='getcomments'>
+                    <h4>
+                         {comments} 
+                    </h4>
+                </div> */}
  
                        
                    
