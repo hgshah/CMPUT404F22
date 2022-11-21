@@ -8,6 +8,7 @@ from requests import ConnectionError
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
+from common.base_util import BaseUtil
 
 
 class NodeConfigBase:
@@ -57,7 +58,7 @@ class NodeConfigBase:
             return {}
 
     def get_base_url(self):
-        return f'http://{self.__class__.domain}'
+        return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}'
 
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""

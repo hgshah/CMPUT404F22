@@ -2,6 +2,7 @@ import json
 
 import requests
 
+from common.base_util import BaseUtil
 from remote_nodes.local_default import LocalDefault
 
 
@@ -17,7 +18,7 @@ class Team14Local(LocalDefault):
     }
 
     def get_base_url(self):
-        return f'http://{self.__class__.domain}/api'
+        return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}/api'
 
     @classmethod
     def create_node_credentials(cls):

@@ -18,6 +18,24 @@ You can have another database using settings=mysocial.settings.local_mirror, but
 
 ### To create a node
 
+### Method 0: The default ones in local testing
+
+To make local testing easier, if your team is listed in this documentation, you might not need to set up the things below.
+
+#### Team 14
+
+You call our server using:
+username: team14_local
+password: team14_local
+
+We call your server using:
+remote_username: local_default
+remote_password: local_default
+
+This assumes that your server is running at http://127.0.0.1:8014
+
+Contact us on discord if this is not feasible.
+
 ### Method 1: python manage.py shell
 
 So... Nodes are just Authors. We sadly don't have any endpoint for that just yet!
@@ -30,7 +48,7 @@ python manage.py shell
 
 ```python 
 from common.test_helper import TestHelper
-node = TestHelper.create_node(username='team14_local', password='team14_local', remote_username='local_default', remote_password='local_default', host='127.0.0.1:8080')
+node = TestHelper.create_node(username='team14_local', password='team14_local', remote_username='local_default', remote_password='local_default', host='127.0.0.1:8014')
 node.save()
 ```
 

@@ -189,6 +189,14 @@ structure looks like this:
 **team14_local.py**
 
 ```python
+import json
+
+import requests
+
+from common.base_util import BaseUtil
+from remote_nodes.local_default import LocalDefault
+
+
 class Team14Local(LocalDefault):
     domain = '127.0.0.1:8014'  # domain/host of their url extracted using `from urllib.parse import urlparse`
     username = 'team14'  # username they will use to call us
@@ -201,7 +209,7 @@ class Team14Local(LocalDefault):
         Use self.__class__.domain so we also get changes from child classes and not this one.
         Look at Team14Main which inherites Team14Local
         """
-        return f'http://{self.__class__.domain}/api'
+        return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}/api'
 
     @classmethod
     def create_node_credentials(cls):
@@ -221,24 +229,60 @@ class Team14Local(LocalDefault):
 **team14_main.py**
 
 ```python
+from remote_nodes.team14_local import Team14Local
+
+
 class Team14Main(LocalDefault):
     domain = 'team14.herokuapp.com'  # domain/host of their url extracted using `from urllib.parse import urlparse`
     username = 'team14'  # username they will use to call us
 
     # you can override the field mappings, look at remote_fields
 
-    def get_base_url(self):
-        """
-        You can override the base url like this!
-        Use self.__class__.domain so we also get changes from child classes and not this one.
-        Look at Team14Main which inherites Team14Local
-        """
-        # remember to change to https for production!
-        return f'https://{self.__class__.domain}/api'
-
     # feel free to override other methods!
 ```
 
 ### Part 2: RemoteUtil
 
-Add the classes above to RemoteUtil's connected_node_classes
+Add the classes above to RemoteUtil's
+connected_node_classes [in these lines](https://github.com/hgshah/cmput404-project/blob/03111274817d6978d0b81e41b61a98839e92c5b7/mysocial/remote_nodes/remote_util.py#L59-L62)
+
+```python
+from remote_nodes.team14_local import Team14Local
+from remote_nodes.team14_main import Team14Main
+
+# ...
+
+if '127.0.0.1' in base.CURRENT_DOMAIN:
+    connected_node_classes = [LocalDefault, LocalMirror, Team14Local]
+else:
+    connected_node_classes = [TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main, Socioecon]
+```
+
+### Part 3: ConfigVars
+
+In socioecon's ConfigVars (or staging), add this with key REMOTE_NODE_CREDENTIALS:
+
+*This ConfigVars assumes that it's in socioecon*
+
+```json
+{
+  "potato-oomfie.herokuapp.com": {
+    "username": "potato",
+    "password": "potato's password when calling socioecon",
+    "remote_username": "socioecon",
+    "remote_password": "socioecon's password when calling potato"
+  },
+  "team14.herokuapp.com": {
+    "username": "team14",
+    "password": "team14's password when calling socioecon",
+    "remote_username": "team10",
+    "remote_password": "socioecon's password when calling team14"
+  }
+}
+```
+
+### Part 4: Double deploy... (Some funky issues I haven't solved)
+
+We have a weird bug where you might need to deploy twice due to some ordering with node creation and node config
+creation. Might not solve this bug but we could just deploy twice once we add a new REMOTE_NODE_CREDENTIALS. You may do
+this by adding a comment anywhere, then pushing it again.
