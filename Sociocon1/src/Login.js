@@ -5,14 +5,15 @@ import {useNavigate, useParams} from 'react-router-dom'
 import axios from 'axios'
 import "./Login.css"
 import { Avatar, Button, TextField} from '@mui/material';
-import Home from './Home'
+
 // link: https://contactmentor.com/login-form-react-js-code/
+//link :https://bobbyhadz.com/blog/react-onclick-redirect
 function Login() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const navigateHome = () => {
     // 👇️ navigate to /
-    navigate('/');
+    navigate('/home');
   };
   const navigate = useNavigate();
   // User Login info
