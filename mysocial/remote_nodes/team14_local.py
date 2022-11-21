@@ -21,6 +21,7 @@ class Team14Local(LocalDefault):
 
     @classmethod
     def create_node_credentials(cls):
+        """This is for local testing"""
         return {
             cls.domain: {
                 'username': 'team14_local',

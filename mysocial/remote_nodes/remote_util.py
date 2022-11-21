@@ -57,16 +57,16 @@ class RemoteUtil:
         Setup all remote node configs and logic
         """
         if '127.0.0.1' in base.CURRENT_DOMAIN:
-            Author.connected_node_classes = [LocalDefault, LocalMirror, Team14Local]
+            connected_node_classes = [LocalDefault, LocalMirror, Team14Local]
         else:
-            Author.connected_node_classes = [TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main, Socioecon]
+            connected_node_classes = [TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main, Socioecon]
 
         # special remote node configs if you're running locally
         # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
         if '127.0.0.1' in base.CURRENT_DOMAIN:
             # tricky technique to make the user's config var override ours; useful for other teams!
             local_credentials: dict = {}
-            for node in Author.connected_node_classes:
+            for node in connected_node_classes:
                 local_credentials.update(node.create_node_credentials())
             # then set it back to our app's remote credentials
             base.REMOTE_NODE_CREDENTIALS = local_credentials
@@ -105,8 +105,8 @@ class RemoteUtil:
         # This is where the endpoints and configs are added!
         # When it's local (contains 127.0.0.1), we add 127.0.0.1:8000 and 127.0.0.1:8080
         # Then, we add the endpoints, like turnip-oomfie-1.herokuapp.com (TurnipOomfie)
-        for config in Author.connected_node_classes:
-            print(f"Adding: {config}")
+        for config in connected_node_classes:
+            print(f"Adding node information for: {config}")
             base.REMOTE_CONFIG.update(config.create_dictionary_entry())
 
         # add all connected nodes but self to prevent infinite recursion

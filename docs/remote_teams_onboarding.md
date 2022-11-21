@@ -64,4 +64,4 @@ Call our endpoints via basic auth, and use the username and password you used to
 
 We call your endpoint using the remote_username and remote_password fields! :D
 
-(Yeah, I know, we don't have the POST set up yet for remote-nodes T.T)
+(Yeah, I know, we don't have the POST set up yet for remote-nodes so you'll have to give us your password... T.T)

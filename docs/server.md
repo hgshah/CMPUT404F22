@@ -176,3 +176,69 @@ class RemoteUtil:
       repository and do a pull request that merges to main.
     - If you're manually deploying, like the instruction in the setup, go to your app's Deploy tab and manually deploy.
     - I can use the same branch to push to our main repo like `git push origin current-branch`.
+
+## Adding another team to our server
+
+As a case study, we're gonna pretend that we're adding Team14 to our server.
+
+#### Part 1: Create NodeConfigBase override for them!
+
+We created `remote_nodes/team14_local.py` for local testing, and `remote_nodes/team14_main.py` for production. The
+structure looks like this:
+
+**team14_local.py**
+
+```python
+class Team14Local(LocalDefault):
+    domain = '127.0.0.1:8014'  # domain/host of their url extracted using `from urllib.parse import urlparse`
+    username = 'team14'  # username they will use to call us
+
+    # you can override the field mappings, look at remote_fields
+
+    def get_base_url(self):
+        """
+        You can override the base url like this!
+        Use self.__class__.domain so we also get changes from child classes and not this one.
+        Look at Team14Main which inherites Team14Local
+        """
+        return f'http://{self.__class__.domain}/api'
+
+    @classmethod
+    def create_node_credentials(cls):
+        """This is for local testing"""
+        return {
+            cls.domain: {
+                'username': 'team14_local',
+                'password': 'team14_local',
+                'remote_username': 'local_default',
+                'remote_password': 'local_default',
+            }
+        }
+
+    # feel free to override other methods!
+```
+
+**team14_main.py**
+
+```python
+class Team14Main(LocalDefault):
+    domain = 'team14.herokuapp.com'  # domain/host of their url extracted using `from urllib.parse import urlparse`
+    username = 'team14'  # username they will use to call us
+
+    # you can override the field mappings, look at remote_fields
+
+    def get_base_url(self):
+        """
+        You can override the base url like this!
+        Use self.__class__.domain so we also get changes from child classes and not this one.
+        Look at Team14Main which inherites Team14Local
+        """
+        # remember to change to https for production!
+        return f'https://{self.__class__.domain}/api'
+
+    # feel free to override other methods!
+```
+
+### Part 2: RemoteUtil
+
+Add the classes above to RemoteUtil's connected_node_classes
