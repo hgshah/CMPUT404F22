@@ -457,7 +457,7 @@ class FollowersIndividualView(GenericAPIView):
 
     @staticmethod
     @extend_schema(
-        summary="check_if_follower",
+        summary="get follower or check if follower",
         tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
     def get(request: Request, target_id: str, follower_id: str) -> HttpResponse:

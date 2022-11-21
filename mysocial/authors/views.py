@@ -36,7 +36,7 @@ class AuthorView(GenericViewSet):
     @extend_schema(
         parameters=PaginationHelper.OPEN_API_PARAMETERS + RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializerList,
-        summary="authors_retrieve_all",
+        summary="Authors retrieve all",
         tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
     @action(detail=True, methods=['get'], url_name='retrieve_all')
@@ -101,7 +101,7 @@ class AuthorView(GenericViewSet):
     @extend_schema(
         parameters=RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializer,
-        summary="authors_retrieve",
+        summary="Retrieve an author",
         tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
     def retrieve(request: Request, author_id: str) -> HttpResponse:
