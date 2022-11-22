@@ -1,0 +1,14 @@
+.username {
+    display: flex;
+    justify-content: center;
+}
+
+.password {
+    display: flex;
+    justify-content: center;
+}
+
+.login_btn {
+    display: flex;
+    justify-content: center;
+}

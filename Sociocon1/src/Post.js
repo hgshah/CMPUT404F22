@@ -20,6 +20,9 @@ import axios from 'axios'
 
 function Post({displayName, title, description, text, image, avatar, visibility}) {
     const[value, setValue] = useState(""); 
+    // const [userName, setUserName] = useState('');
+    const[buttonText, newButtonText] = useState("Follow");
+    const[following, setFollowing] = useState(false);
     //const[p_post, setPost] = useState([]); 
     function handle() {
         alert(value)
@@ -51,6 +54,21 @@ function Post({displayName, title, description, text, image, avatar, visibility}
             navigate.push('/')
         })
     }
+
+    function follow_clicked() {
+        if (buttonText == "Follow") {
+            newButtonText("Following");
+        } else {
+            newButtonText("Follow")
+        }
+
+        //show the friend request is sent
+        setFollowing(!following);
+        if (following == false) {
+            alert("Friend request sent")
+        }
+    }
+
   return (
     <div className='post'>
         <div className = "post_avatar">
@@ -61,10 +79,23 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                 <div className='header_text'>
                     <h3>
                         {displayName} {" "} <span></span>
-                        
                         <EditIcon fontSize='small' /> 
-                        
-                        
+                        <span className='follow_span'> 
+                            <Button 
+                            className='follow_btn' 
+                            onClick={follow_clicked}
+                            style={{backgroundColor: following ? "rgb(159, 185, 31)" : "aqua"}} >
+                                {buttonText}
+                            </Button>
+                            {/* hardcode */}
+                            {/* <input 
+                            onChange={e => setUserName(e.target.value)}
+                            value={userName} 
+                            placeholder='Enter post body' 
+                            type = "text"
+                            name = "description"
+                            /> */}
+                        </span>
                     </h3>
                     
                 </div>

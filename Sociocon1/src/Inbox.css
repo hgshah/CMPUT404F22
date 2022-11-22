@@ -109,3 +109,7 @@ ul.choose li.current {
   font-size: 2rem;
   text-align: left;
 }
+
+.choose {
+  font-weight: bold;
+}
