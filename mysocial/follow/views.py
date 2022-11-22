@@ -354,7 +354,7 @@ class FollowersView(GenericAPIView):
         except Exception as e:
             logger.error(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data, status=201)
+        return Response(data=data)
 
     @staticmethod
     def post_local_follow_remote(request: Request, author_target_url: str, node_target: str) -> HttpResponse:
@@ -383,7 +383,7 @@ class FollowersView(GenericAPIView):
         except Exception as e:
             logger.error(f'FollowersView: post_local_follow_remote: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data, status=201)
+        return Response(data=data)
 
     @staticmethod
     def post_remote_follow_local(request: Request, author_id: str = None) -> HttpResponse:
@@ -413,7 +413,7 @@ class FollowersView(GenericAPIView):
         except Exception as e:
             print(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data, status=201)
+        return Response(data=data)
 
 
 # todo(turnip): add test
