@@ -26,8 +26,8 @@ class TestFollowersViewPost(TestCase):
 
         follow: Follow = serializer.validated_data
         self.assertEqual(follow.has_accepted, False)
-        self.assertEqual(self.actor.get_id(), follow.actor)
-        self.assertEqual(self.target.get_id(), follow.target)
+        self.assertEqual(self.actor.get_url(), follow.actor)
+        self.assertEqual(self.target.get_url(), follow.target)
 
     def test_post_unauthenticated(self):
         response = self.client.post(
@@ -60,8 +60,8 @@ class TestFollowersViewPost(TestCase):
 
         for test_value in (True, False):
             with transaction.atomic():  # need because we're intentionally causing an error here
-                f = Follow.objects.create(actor=self.actor.get_id(),
-                                          target=self.target.get_id(),
+                f = Follow.objects.create(actor=self.actor.get_url(),
+                                          target=self.target.get_url(),
                                           has_accepted=test_value)
                 response = self.client.post(
                     f'/authors/{self.target.official_id}/followers/',

@@ -4,13 +4,18 @@ from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
-from .serializer import PostSerializer, CreatePostSerializer
+from .serializer import PostSerializer, CreatePostSerializer, SharePostSerializer, PostSerializerList
 from rest_framework import serializers
 from authors.models.author import Author
 from .models import Post, Visibility
 from rest_framework import status
 import logging
 from common.pagination_helper import PaginationHelper
+from follow.follow_util import FollowUtil
+from inbox.models import Inbox
+from mysocial.settings import base
+from remote_nodes.remote_util import RemoteUtil
+import json
 
 logger = logging.getLogger("mylogger")
 
@@ -34,22 +39,54 @@ class PostView(GenericAPIView):
     # GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     #Peter, October 19, https://stackoverflow.com/questions/1496346/passing-a-list-of-
     @extend_schema(
-        summary = "get_post_by_id",
+        summary = "post_get_post_by_id",
         responses = PostSerializer,
-        tags=['post']
+        tags=['post', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
-    @action(detail=True, methods=['get'], url_name='get_post_by_id')
+    @action(detail=True, methods=['get'], url_name='post_get_post_by_id')
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
         """
         Get specific post by post id
         """
-        try:
-            post = Post.objects.get(official_id=kwargs['post_id'])
-            serializer = PostSerializer(post)
-            return Response(serializer.data)
-        except Exception as e:
-            logger.info(e)
+        node: Author = request.user
+        if not node.is_authenticated:
             return HttpResponseNotFound()
+
+        if node.is_authenticated_user:
+            try:
+                target_author = Author.get_author(kwargs['author_id'])
+            except:
+                return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+            #local -> local
+            if target_author.is_local():
+                try:
+                    post = Post.objects.get(official_id=kwargs['post_id'])
+                    serializer = PostSerializer(post)
+                    return Response(serializer.data)
+                except Exception as e:
+                    logger.info(e)
+                    return HttpResponseNotFound()
+
+            # local -> remote
+            else:
+                node_config = base.REMOTE_CONFIG.get(target_author.host)
+                response = node_config.get_post_by_post_id(request.path)
+                if response.status_code < 200 or response.status_code > 200:
+                    return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                return Response(json.loads(response.content), status = status.HTTP_200_OK)
+
+        # remote -> local
+        if request.user.is_authenticated_node:
+            try:
+                post = Post.objects.get(official_id=kwargs['post_id'])
+                serializer = PostSerializer(post)
+                return Response(serializer.data)
+            except Exception as e:
+                print(e)
+                return HttpResponse(f'Failed to get post for post id: {kwargs["post_id"]}', status = status.HTTP_400_BAD_REQUEST)
+
     
     # DELETE /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     # Wolph, October 19, https://stackoverflow.com/questions/3805958/how-to-delete-a-record-in-django-models
@@ -207,15 +244,9 @@ class CreationPostView(GenericAPIView):
         return Post.objects.all()
     
     @extend_schema(
-    summary = "post_get_all_posts_by_author",
-    responses = inline_serializer(
-            name='PostList',
-            fields={
-                'type': serializers.CharField(),
-                'items': PostSerializer(many=True)
-            }
-        ),
-    tags=['post']
+        responses=PostSerializerList,
+        summary="post_get_authors_posts",
+        tags=["post", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
     @action(detail=True, methods=['get'], url_name='post_get_author_posts')
     def get(self, request, *args, **kwargs):
@@ -226,16 +257,51 @@ class CreationPostView(GenericAPIView):
 
         User story: As an author, I want to be able to use my web-browser to manage/author my posts
         """
-        author = Author.objects.get(official_id = kwargs['author_id'])
-        posts = Post.objects.filter(author = author).order_by('-published')
-        serializer = PostSerializer(posts, many = True)
-        data = serializer.data
-        data, err = PaginationHelper.paginate_serialized_data(request, data)
-
-        if err is not None:
+        node: Author = request.user
+        if not node.is_authenticated:
             return HttpResponseNotFound()
-        else:
-            return Response({'type': 'posts', 'items': data})
+
+        if node.is_authenticated_user:
+            try:
+                target_author = Author.get_author(kwargs['author_id'])
+            except:
+                return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+            #local -> local
+            if target_author.is_local():
+                author = Author.get_author(kwargs['author_id'])
+                posts = Post.objects.filter(author = author).order_by('-published')
+                serializer = PostSerializer(posts, many = True)
+                data = serializer.data
+                data, err = PaginationHelper.paginate_serialized_data(request, data)
+
+                if err is not None:
+                    return Response(f'{err}', status = status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({'type': 'posts', 'items': data})
+
+            # local -> remote
+            else:
+                node_config = base.REMOTE_CONFIG.get(target_author.host)
+                response = node_config.get_authors_posts(request.path)
+                if response.status_code < 200 or response.status_code > 200:
+                    return Response("Failed to get author's post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                return Response(json.loads(response.content), status = status.HTTP_200_OK)
+
+        # remote -> local
+        if request.user.is_authenticated_node:
+            author = Author.objects.get(official_id = kwargs['author_id'])
+            posts = Post.objects.filter(author = author).order_by('-published')
+            serializer = PostSerializer(posts, many = True)
+            data = serializer.data
+            data, err = PaginationHelper.paginate_serialized_data(request, data)
+
+            if err is not None:
+                return HttpResponseNotFound()
+            else:
+                return Response({'type': 'posts', 'items': data})
+
 
     # Édouard Lopez, October 19, https://stackoverflow.com/questions/5255913/kwargs-in-django
     @extend_schema(
@@ -265,4 +331,38 @@ class CreationPostView(GenericAPIView):
         except Exception as e:
             logger.info(e)
             return HttpResponseNotFound()
+
+class SharePostView(GenericAPIView):
+    serializer_class = SharePostSerializer
+    @extend_schema(
+        summary = "post_share_post",
+        tags=['post']
+    )
+    @action(detail=True, methods=['put'], url_name='post_share_post')
+    def put(self, request: Request, *args, **kwargs) -> HttpResponse:
+        try:
+            post = PostSerializer(Post.objects.get(official_id = kwargs['post_id'])).data
+            requesting_author = Author.objects.get(official_id = self.request.user.official_id)
+            followers = FollowUtil.get_followers(requesting_author)
+
+            if len(followers) == 0:
+                return Response("You currently have no followers", status = status.HTTP_202_ACCEPTED)
+         
+            for follower in followers: 
+                if follower.is_local():
+                    inbox = Inbox.objects.get(author = follower)
+                    inbox.add_to_inbox(post)
+                else:
+                    node_config = base.REMOTE_CONFIG.get(follower.host)
+                    response_status_code = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = post)
+                    if response_status_code < 200 or response_status_code > 200:
+                        return Response("Failed to send data to remote inbox", status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            return Response("Successfully added to all followers inbox", status = status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return HttpResponseNotFound()
+
+
 

@@ -1,6 +1,11 @@
+import json
+
 from django.db import models
 import uuid
 from django.contrib.postgres.fields import ArrayField
+
+from common.uuid_encoder import UUIDEncoder
+
 
 # Create your models here.
 class ItemType(models.TextChoices):
@@ -16,5 +21,5 @@ class Inbox(models.Model):
     items = ArrayField(models.JSONField(), blank = True, default = list)
 
     def add_to_inbox(self, data):
-        self.items.append(data)
+        self.items.append(json.dumps(data, cls=UUIDEncoder))
         self.save()

@@ -1,4 +1,5 @@
 # models
+from common.uuid_encoder import UUIDEncoder
 from .models import Inbox
 from authors.models.author import Author
 from post.models import Post
@@ -19,8 +20,10 @@ class InboxSerializer(serializers.ModelSerializer):
     
     def get_items(self, obj):
         item_list = []
-
         for item in obj.items:
+            if isinstance(item, str):
+                item = json.loads(item)
+
             if item.get('type') == 'post':
                 item_list.append(item)
         
@@ -43,6 +46,9 @@ class AllInboxSerializer(serializers.ModelSerializer):
         item_list = []
     
         for item in obj.items:
+            if isinstance(item, str):
+                item = json.loads(item)
+
             item_list.append(item)
 
         item_list.reverse()
