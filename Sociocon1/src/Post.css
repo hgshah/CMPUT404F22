@@ -51,3 +51,19 @@
     border-radius: 30px !important;
     margin-left: auto !important;
 }
+
+.follow_span {
+    float: right;
+}
+
+.follow_span .follow_btn {
+    /* background-color: rgba(72, 195, 222, 0.834); */
+    color: black;
+    text-transform: capitalize;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.follow_span .follow_btn:hover {
+    background-color: rgba(72, 195, 222, 0.342);
+}
