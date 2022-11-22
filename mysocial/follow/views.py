@@ -1,5 +1,6 @@
 import logging
 
+import requests
 from django.db import IntegrityError
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from drf_spectacular.utils import extend_schema, inline_serializer

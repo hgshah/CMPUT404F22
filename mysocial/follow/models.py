@@ -7,7 +7,6 @@ from authors.models.author import Author
 from authors.util import AuthorUtil
 from common.base_util import BaseUtil
 from mysocial.settings import base
-from remote_nodes.remote_util import RemoteUtil
 
 
 class Follow(models.Model):

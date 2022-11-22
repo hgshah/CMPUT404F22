@@ -32,7 +32,6 @@ class AuthorSerializer(serializers.ModelSerializer):
     Author object
     """
     type = serializers.SerializerMethodField('get_type')
-    """Test"""
     id = serializers.SerializerMethodField('get_id')
     displayName = serializers.CharField(source='display_name')
     profileImage = serializers.CharField(source='profile_image')
@@ -50,7 +49,6 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_id(model: Author) -> str:
-        """Tests"""
         # the path after host may vary, e.g. authors/ vs authors/id
         return str(model.official_id)
 
