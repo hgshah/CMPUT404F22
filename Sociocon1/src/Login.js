@@ -1,10 +1,13 @@
 import React from 'react'
 import Sidebar from './Sidebar'
 import {useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom'
+import axios from 'axios'
+import "./Login.css"
+import { Avatar, Button, TextField} from '@mui/material';
 
 // link: https://contactmentor.com/login-form-react-js-code/
 //link :https://bobbyhadz.com/blog/react-onclick-redirect
-
 function Login() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -82,6 +85,11 @@ function Login() {
   );
 
   return (
+    <div className="app">
+      <div className="login-form">
+        <div className="title">Sign In</div>
+        {isSubmitted ? <div></div> : renderForm}
+      </div>
     </div>
   );
 }
