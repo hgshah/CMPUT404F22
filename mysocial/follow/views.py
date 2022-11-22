@@ -3,7 +3,7 @@ import logging
 import requests
 from django.db import IntegrityError
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -17,6 +17,7 @@ from authors.util import AuthorUtil
 from common.pagination_helper import PaginationHelper
 from follow.follow_util import FollowUtil
 from follow.models import Follow
+from follow.serializers.follow_accept_serializer import FollowAcceptSerializer
 from follow.serializers.follow_serializer import FollowRequestListSerializer, FollowRequestSerializer
 from mysocial.settings import base
 from remote_nodes.node_config_base import NodeConfigBase
@@ -189,6 +190,9 @@ class IndividualRequestView(APIView):
     @staticmethod
     @extend_schema(
         tags=['possibly-deprecating'],
+        responses={
+            200: OpenApiResponse(response=FollowRequestSerializer)
+        }
     )
     def delete(request: Request, follow_id: str = None) -> HttpResponse:
         """
@@ -285,7 +289,7 @@ class FollowersView(APIView):
     @staticmethod
     @extend_schema(
         parameters=RemoteUtil.REMOTE_NODE_MULTIL_PARAMS,
-        summary='post_followers',
+        summary='create follow request (post followers)',
         tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
         request=inline_serializer(
             name='FollowRequestRequest',
@@ -301,16 +305,15 @@ class FollowersView(APIView):
 
         There three are cases:
         1. A local author makes a follow request to a local author
-            - Do an auth call with a user credential
-            - author_id is the local author
+            - Do an **auth** call with a user credential
+            - **author_id** is the local author
         2. A remote node tells us that one of its users wants to follow us
-            - Do an auth call with a node/server credential
+            - Do an **auth** call with a node/server credential
             - Add an `actor` in the json payload in the request body
-            - author_id is the local author they want to follow
+            - **author_id** is the local author they want to follow
         3. A local author makes a follow request to a remote author
-            - Do an auth with a user credential
-            - Add a node-target query param that should be equal to the remote server's domain
-            - author_id is the remote author
+            - Do an **auth** with a user credential
+            - **author_id** is the remote author
 
         For more details, check out: https://github.com/hgshah/cmput404-project/pull/89
 
@@ -512,8 +515,10 @@ class FollowersIndividualView(GenericAPIView):
         """
         Check if follower_id is a follower of author_id.
 
-        You may only access this if you are the following:
-        - A remote node/server
+        This is for public consumption ONLY if it's true that the follower follows the author.
+
+        Otherwise, you may only access this if you are the following:
+        - A remote node/server (please, we trust you lol)
         - The follower which is a local author
         - The object/actor which is a local author
 
@@ -549,10 +554,14 @@ class FollowersIndividualView(GenericAPIView):
     @staticmethod
     @extend_schema(
         summary="Accept follow request",
-        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=['follows'],
+        request=FollowAcceptSerializer()
     )
     def put(request: Request, target_id: str, follower_id: str):
         """
+        To accept a follow request, an author must explicitly indicate that they are accepting it by adding a payload
+        with the boolean hasAccepted = true. Checkout the payload example below
+
         https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#followers
         PUT [local]: Add FOREIGN_AUTHOR_ID as a follower of AUTHOR_ID (must be authenticated)
 
@@ -589,10 +598,18 @@ class FollowersIndividualView(GenericAPIView):
     @staticmethod
     @extend_schema(
         summary="Decline or delete follow request",
-        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
+        responses={
+            200: OpenApiResponse(response=FollowRequestSerializer)
+        }
     )
     def delete(request: Request, target_id: str, follower_id: str):
         """
+        The following can remove the follower in the follow list of an author:
+        - The follower (actor)
+        - The author being followed (object/target)
+        - A remote server/node but only if one of tthe actor or object belongs to theirs
+
         https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#followers
         DELETE [local]: remove FOREIGN_AUTHOR_ID as a follower of AUTHOR_ID
         """
