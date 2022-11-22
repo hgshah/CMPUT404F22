@@ -146,7 +146,7 @@ class NodeConfigBase:
 
     def get_all_followers_request(self, author: Author, params: dict):
         followers = self.get_all_followers(author=author, params=params)
-        if followers is None:
+        if followers is not None:
             return Response({
                 "type": "followers",
                 "items": followers

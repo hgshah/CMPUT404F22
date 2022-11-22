@@ -277,10 +277,10 @@ class FollowersView(APIView):
 
     @staticmethod
     def get_remote(request: Request, author: Author, params: dict):
-        node_config = base.REMOTE_CONFIG.get(author.host)
+        node_config: NodeConfigBase = base.REMOTE_CONFIG.get(author.host)
         if node_config is None:
             return HttpResponseNotFound()
-        return node_config.get_all_followers_request(authors=author, params=params)
+        return node_config.get_all_followers_request(author=author, params=params)
 
     @staticmethod
     @extend_schema(
@@ -548,13 +548,15 @@ class FollowersIndividualView(GenericAPIView):
 
     @staticmethod
     @extend_schema(
-        summary="accept_follow_request",
-        tags=['follows', RemoteUtil.REMOTE_WIP_TAG]
+        summary="Accept follow request",
+        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
     def put(request: Request, target_id: str, follower_id: str):
         """
         https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#followers
         PUT [local]: Add FOREIGN_AUTHOR_ID as a follower of AUTHOR_ID (must be authenticated)
+
+        Behavior: if already accepted follow request, and you call this indicating accepting follow request, just return 200 again.
         """
         if not request.user.is_authenticated:
             return Response(401)
@@ -576,9 +578,6 @@ class FollowersIndividualView(GenericAPIView):
             return HttpResponseBadRequest("Cannot downgrade a follow request or follow status. Use DELETE. If wanted "
                                           "to accept, set hasAccepted = true.")
 
-        if follow.has_accepted:
-            return HttpResponseBadRequest("You already accepted this follow request")
-
         # accept!
         follow.has_accepted = True
         follow.save()
@@ -589,8 +588,8 @@ class FollowersIndividualView(GenericAPIView):
 
     @staticmethod
     @extend_schema(
-        summary="delete_follow_request",
-        tags=['follows', RemoteUtil.REMOTE_WIP_TAG]
+        summary="Decline or delete follow request",
+        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
     )
     def delete(request: Request, target_id: str, follower_id: str):
         """
@@ -604,15 +603,20 @@ class FollowersIndividualView(GenericAPIView):
         if follow is None:
             return error_response
         follow: Follow = follow  # type hint
+        target = follow.get_author_target()
+        actor = follow.get_author_actor()
 
-        if follow.get_author_target() != request.user and not request.user.is_authenticated_node:
+        if target != request.user and actor != request.user and not request.user.is_authenticated_node:
             # you're not allowed!
             return HttpResponseForbidden()
 
-        # todo: protection against bad servers?
+        # protection against bad server
+        if request.user.is_authenticated_node:
+            host = request.user.host
+            if host != target.host and host != actor.host:
+                return HttpResponseForbidden()
 
         # we gotta make sure, remote server isn't sending us inbox anymore!
-        target = follow.get_author_target()
         if not target.is_local():
             node_config: NodeConfigBase = base.REMOTE_CONFIG.get(target.host)
             if node_config is None:
