@@ -12,7 +12,9 @@ import profilepic from "./profilepic.jpeg"
 const Postbox = () => {
     const [title, setPostTitle] = useState('');
     const [description, setPostBody] = useState('');
+    const [visibility, setPostVisibility] = useState('');
     const [postImage, setPostImage] = useState('');
+    
     const navigate = useNavigate()
     // const handleClick = () => {
     //     //  "message" stores input field value
@@ -34,11 +36,16 @@ const Postbox = () => {
         let formField = new FormData()
         formField.append("title", title)
         formField.append("description", description)
+        formField.append("visibility", visibility)
         await axios({
             method: 'post',
+
             // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-            url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+            
+            url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+
             data: formField
         }).then((response) =>{
             console.log(response.data)
@@ -73,7 +80,7 @@ const Postbox = () => {
                        License: https://creativecommons.org/licenses/by-sa/4.0/*/}
                 <select name="visibility" id="visibility">
                     <option value="">choose an option--</option>
-                    <option value="Public">Public</option>
+                    <option value={visibility}>Public</option>
                     <option value="Friends">Friends</option>
                 </select>
                 

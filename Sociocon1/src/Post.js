@@ -4,6 +4,7 @@
 import React from 'react'
 import {useState, useEffect} from 'react';
 import "./Post.css";
+import List from '@mui/material/List';
 import Comment from './Comment';
 import {useNavigate, useParams} from 'react-router-dom'
 import { Avatar, Button, TextField} from '@mui/material';
@@ -18,14 +19,49 @@ import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
 import axios from 'axios'
 
-function Post({displayName, title, description, text, image, avatar, visibility}) {
+function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype}) {
     const[value, setValue] = useState(""); 
+
     // const [userName, setUserName] = useState('');
     const[buttonText, newButtonText] = useState("Follow");
     const[following, setFollowing] = useState(false);
+
+    const [comment, setPostComment] = useState('');
+    const [ContentType, setPostContentType] = useState('');
+    const [like, setPostLike] = useState(20);
+    const [likeactive, setPostLikeactive] = useState(false);
+
     //const[p_post, setPost] = useState([]); 
+    // link : https://www.youtube.com/watch?v=a8KruvMkEtY
+    function postlike(){
+        if (likeactive){
+            
+            setPostLikeactive(false)
+            setPostLike(like -1 )
+        }
+        else{
+            setPostLikeactive(true)
+            setPostLike( like +1 )
+        }
+    }
     function handle() {
         alert(value)
+    }
+    const AddComment = async () => {
+        let formField = new FormData()
+        formField.append("comment", comment)
+        formField.append("contentType", "text/plain")
+        console.log(formField)
+        await axios({
+            method: 'post',
+            withCredentials: true ,
+            headers: { 'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+            url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/de5b437f-5f88-4302-afaa-15182a4c643a/comments',
+            data: formField
+        }).then((response) =>{
+            console.log(response.data)
+            navigate.push('/')
+        })
     }
     // useEffect(() => {
     //     async function getAllPosts(){
@@ -45,9 +81,12 @@ function Post({displayName, title, description, text, image, avatar, visibility}
     const DeletePostInfo = async (id) => {
         String(id)
         const nid = String(id).slice(-36)
+
         await axios({
-                method:'DELETE',
-                url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/' + nid + '/',
+                method:'delete',
+                withCredentials: true ,
+                headers: { "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
             
         }).then((response) =>{
             console.log(response.data)
@@ -109,20 +148,21 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                     {/* <p>{text}</p> */}
                     {title} <br></br>
                     {description}
+                    
 
                 </div>
                 
                  <img className='post_content' src = {image} alt = " "/> 
                  <form>
                     <span>
-                        <Button variant='contained' size = "small" endIcon= {<LikeIcon/>} type = "submit" >   </Button>  &nbsp;&nbsp;&nbsp;
+                        <Button onClick={postlike} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {like}  </Button>  &nbsp;&nbsp;&nbsp;
                         <Button variant='contained' size = "small" endIcon= {<ShareIcon/>} type = "submit" >   </Button>
                     </span>
 
                     </form>
 
                 <div className='post_footer'>
-
+                 
 
                 {/* /* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
@@ -131,14 +171,40 @@ function Post({displayName, title, description, text, image, avatar, visibility}
                         {/* <LikeIcon fontSize = "small" />
                         <ShareIcon fontSize = "small" /> */}
                      <div className='post_comments'>
-                        <Comment/>
+                        {/* <Comment/> */}
+                        {comments}
                         <form>
+                            <input 
+                                onChange={e => setPostComment(e.target.value)} 
+                                value={comment} 
+                                placeholder='Enter comment' 
+                                type = 'text'
+                                className='post_input'
+                                variant = 'outlined'
+                                label = "add comment"
+                                size = "small"
+                            />
 
-                            <TextField label = "add comment" size = "small" variant='outlined' className='post_input' placeholder='add comment' />
-                            <Button variant='contained' size = "small" endIcon= {<SendIcon/>} type = "submit" >   </Button> 
-
+                            <label for="set-contenttype"></label>
+                                {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
+                                    author: https://developer.mozilla.org/en-US/
+                                    License: https://creativecommons.org/licenses/by-sa/4.0/*/}
+                                <select name="contenttype" id="contenttype">
+                                    <option value="">choose an option--</option>
+                                    <option onChange={e => setPostContentType(e.target.value)} value={ContentType}>text/markdown</option>
+                                    <option onChange={e => setPostContentType(e.target.value)} value={ContentType}>text/plain</option>
+                                </select>
+                            {/* <TextField label = "add comment"  size = "small" variant='outlined' className='post_input' placeholder='add comment' /> */}
+                            <Button onClick = {AddComment} variant='contained' size = "small" endIcon= {<SendIcon/>}  >   </Button> 
+                            
                         </form> 
+                        <Button onclick = {DeletePostInfo} variant = 'contained' endIcon = {<DeleteIcon/>} className = "postdel_button"></Button>
                     </div> 
+                    {/* <div className='getcomments'>
+                    <h4>
+                         {comments} 
+                    </h4>
+                </div> */}
  
                        
                    

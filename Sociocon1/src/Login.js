@@ -1,44 +1,88 @@
 import React from 'react'
 import Sidebar from './Sidebar'
 import {useState} from 'react';
-import {Button} from '@mui/material';
-import "./Login.css";
+
+// link: https://contactmentor.com/login-form-react-js-code/
+//link :https://bobbyhadz.com/blog/react-onclick-redirect
 
 function Login() {
-    const[value, setValue] = useState(""); 
-    function handle() {
-        alert("You are logged in")
+  const [errorMessages, setErrorMessages] = useState({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const navigateHome = () => {
+    // 👇️ navigate to /
+    navigate('/home');
+  };
+  const navigate = useNavigate();
+  // User Login info
+  const database = [
+    {
+      username: "hgshah",
+      password: "hgshah"
+    },
+    {
+      username: "user2",
+      password: "pass2"
     }
-  return (
-    <div className='login'>
+  ];
 
-        <div className='username'>
-            <form>
-                <input type="text" placeholder="Username" value={value} onChange={(e) => {setValue(e.target.value)}} />
-            </form>
-        </div>
+  const errors = {
+    uname: "invalid username",
+    pass: "invalid password"
+  };
 
-        <div className='password'>
-            <form>
-                <input type="text" placeholder="Password" value={value} onChange={(e) => {setValue(e.target.value)}} />
-            </form>
-        </div>
-        
-        <div className='login_btn'>
-            <Button onClick={handle}>Login</Button>
-        </div>
+  const handleSubmit = (event) => {
+    //Prevent page reload
+    event.preventDefault();
 
-            {/* <div className='username'>
-                <input className='username_input' type="text" placeholder="Enter user name" value={value} onChange={(e) => {setValue(e.target.value)}} />
-            </div>
-            <div className="password">
-                <input type="text" placeholder="Password" />
-            </div>
-                <div className="login_button">
-                    <Button onClick={handle}>Login</Button>
-            </div> */}
+    var { uname, pass } = document.forms[0];
+
+    // Find user login info
+    const userData = database.find((user) => user.username === uname.value);
+
+    // Compare user info
+    if (userData) {
+      if (userData.password !== pass.value) {
+        // Invalid password
+        setErrorMessages({ name: "pass", message: errors.pass });
+      } else {
+        setIsSubmitted(true);
+        navigateHome();
+      }
+    } else {
+      // Username not found
+      setErrorMessages({ name: "uname", message: errors.uname });
+    }
+  };
+
+  // Generate JSX code for error message
+  const renderErrorMessage = (name) =>
+    name === errorMessages.name && (
+      <div className="error">{errorMessages.message}</div>
+    );
+
+  // JSX code for login form
+  const renderForm = (
+    <div className="form">
+      <form onSubmit={handleSubmit}>
+        <div className="input-container">
+          <label>Username </label>
+          <input type="text" name="uname" required />
+          {renderErrorMessage("uname")}
+        </div>
+        <div className="input-container">
+          <label>Password </label>
+          <input type="password" name="pass" required />
+          {renderErrorMessage("pass")}
+        </div>
+        <div className="button-container">
+            <input type="submit" />
+        </div>
+      </form>
     </div>
-  )
-}
+  );
 
+  return (
+    </div>
+  );
+}
 export default Login

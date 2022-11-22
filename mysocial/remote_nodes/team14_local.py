@@ -1,5 +1,8 @@
+import json
+
+import requests
+
 from remote_nodes.local_default import LocalDefault
-from remote_nodes.node_config_base import NodeConfigBase
 
 
 class Team14Local(LocalDefault):
@@ -26,3 +29,22 @@ class Team14Local(LocalDefault):
                 'remote_password': 'local_default',
             }
         }
+
+    def get_all_author_jsons(self, params: dict):
+        """Returns a list of authors as json"""
+        url = f'{self.get_base_url()}/authors/'
+        if len(params) > 0:
+            query_param = urllib.parse.urlencode(params)
+            url += '?' + query_param
+
+        try:
+            response = requests.get(url, auth=(self.username, self.password))
+        except ConnectionError:
+            return None
+        except Exception as e:
+            print(f"Team14Local: Unknown err: {e}")
+            return None
+
+        if response.status_code == 200:
+            return json.loads(response.content.decode('utf-8'))
+        return None
