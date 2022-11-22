@@ -1,6 +1,6 @@
 import React, {useState} from "react"
-import Sidebar from './Sidebar'
-import News from './News'
+import Sidebar from '../Sidebar'
+import News from '../News'
 import {NavLink, Routes, Route, Outlet } from "react-router-dom"
 //import "./Style.css";
 import "./Inbox.css"
