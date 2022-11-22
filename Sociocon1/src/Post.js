@@ -45,7 +45,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         }
     }
     function handle() {
-        alert(value)
+        alert("cant share right now")
     }
     const AddComment = async () => {
         let formField = new FormData()
@@ -118,7 +118,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 <div className='header_text'>
                     <h3>
                         {displayName} {" "} <span></span>
-                        <EditIcon fontSize='small' /> 
+                        <Button  variant='contained' size = "small" endIcon= {<EditIcon/>} >Edit</Button> 
                         <span className='follow_span'> 
                             <Button 
                             className='follow_btn' 
@@ -156,7 +156,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                  <form>
                     <span>
                         <Button onClick={postlike} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {like}  </Button>  &nbsp;&nbsp;&nbsp;
-                        <Button variant='contained' size = "small" endIcon= {<ShareIcon/>} type = "submit" >   </Button>
+                        <Button onClick = {handle} variant='contained' size = "small" endIcon= {<ShareIcon/>} >   </Button>
                     </span>
 
                     </form>
