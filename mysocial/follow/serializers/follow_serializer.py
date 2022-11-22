@@ -112,7 +112,7 @@ class FollowRequestSerializer(serializers.ModelSerializer):
             actor_serializer = AuthorSerializer(data=data['actor'])
             if not actor_serializer.is_valid():
                 raise serializers.ValidationError('FollowRequestSerializer: to_internal_value: invalid json')
-            actor: Author = target_serializer.validated_data
+            actor: Author = actor_serializer.validated_data
 
             try:
                 # case 2: remote target/object that already exists
@@ -125,6 +125,9 @@ class FollowRequestSerializer(serializers.ModelSerializer):
                         continue
                     else:
                         setattr(follow, local_field, data[remote_field])
+                # extremely important ordering!!!
+                follow.actor = actor.get_url()
+                follow.target = target.get_url()
                 follow.save()
 
             except Follow.DoesNotExist:
@@ -140,6 +143,8 @@ class FollowRequestSerializer(serializers.ModelSerializer):
                 )
                 follow._author_target = target
                 follow._author_actor = actor
+                follow.actor = actor.get_url()
+                follow.target = target.get_url()
 
             except Exception as e:
                 raise serializers.ValidationError(f'FollowRequestSerializer: to_internal_value: unknown error: {e}')

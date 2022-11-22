@@ -19,6 +19,7 @@ from follow.follow_util import FollowUtil
 from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestListSerializer, FollowRequestSerializer
 from mysocial.settings import base
+from remote_nodes.node_config_base import NodeConfigBase
 from remote_nodes.remote_util import RemoteUtil
 
 logger = logging.getLogger(__name__)
@@ -367,7 +368,7 @@ class FollowersView(APIView):
         except Exception as e:
             print(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data, status=201)
+        return Response(data=data)
 
     @staticmethod
     def post_local_follow_remote(request: Request, author_target: Author) -> HttpResponse:
@@ -398,7 +399,7 @@ class FollowersView(APIView):
         except Exception as e:
             print(f'FollowersView: post_local_follow_remote: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data, status=201)
+        return Response(data=data)
 
     @staticmethod
     def post_remote_follow_local(request: Request, author_id: str = None) -> HttpResponse:
@@ -433,12 +434,13 @@ class FollowersView(APIView):
         except Author.DoesNotExist:
             print(f"Local author does not exist: {author_id}")
             return HttpResponseNotFound()
-        except IntegrityError:
+        except IntegrityError as e:
+            print(f'Integrity error: {e}')
             return HttpResponseBadRequest('You\'re either following this account or have already made a follow request')
         except Exception as e:
             print(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data, status=201)
+        return Response(data=data)
 
 
 class FollowersIndividualView(GenericAPIView):
@@ -479,7 +481,7 @@ class FollowersIndividualView(GenericAPIView):
             try:
                 follow = Follow.objects.get(target=target.get_url(), actor=follower.get_url())
 
-                if follow.target != request.user and not follow.has_accepted:
+                if follow.get_author_target() != request.user and not follow.has_accepted:
                     return None, HttpResponseNotFound("User does not follow the following author on our end")
 
                 return follow, None
@@ -554,6 +556,9 @@ class FollowersIndividualView(GenericAPIView):
         https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#followers
         PUT [local]: Add FOREIGN_AUTHOR_ID as a follower of AUTHOR_ID (must be authenticated)
         """
+        if not request.user.is_authenticated:
+            return Response(401)
+
         follow, error_response = FollowersIndividualView.get_follow(request, target_id, follower_id)
         if follow is None:
             return error_response
@@ -563,13 +568,16 @@ class FollowersIndividualView(GenericAPIView):
             # you're not allowed!
             return HttpResponseForbidden()
 
-        has_accepted = request.data.get('hasAccepted')
+        has_accepted = request.data.get('hasAccepted') in ['True', 'true']
         if has_accepted is None or not isinstance(has_accepted, bool):
-            return HttpResponseBadRequest("Missing boolean has_accepted payload")
+            return HttpResponseBadRequest("Missing boolean hasAccepted payload")
 
         if not has_accepted:
             return HttpResponseBadRequest("Cannot downgrade a follow request or follow status. Use DELETE. If wanted "
                                           "to accept, set hasAccepted = true.")
+
+        if follow.has_accepted:
+            return HttpResponseBadRequest("You already accepted this follow request")
 
         # accept!
         follow.has_accepted = True
@@ -589,14 +597,33 @@ class FollowersIndividualView(GenericAPIView):
         https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#followers
         DELETE [local]: remove FOREIGN_AUTHOR_ID as a follower of AUTHOR_ID
         """
+        if not request.user.is_authenticated:
+            return Response(401)
+
         follow, error_response = FollowersIndividualView.get_follow(request, target_id, follower_id)
         if follow is None:
             return error_response
         follow: Follow = follow  # type hint
 
-        if follow.get_author_target() != request.user:
+        if follow.get_author_target() != request.user and not request.user.is_authenticated_node:
             # you're not allowed!
             return HttpResponseForbidden()
+
+        # todo: protection against bad servers?
+
+        # we gotta make sure, remote server isn't sending us inbox anymore!
+        target = follow.get_author_target()
+        if not target.is_local():
+            node_config: NodeConfigBase = base.REMOTE_CONFIG.get(target.host)
+            if node_config is None:
+                print(f"FollowersIndividualView: delete: cannot find node_config: {target.host}")
+                return HttpResponseNotFound()
+            # todo
+            response = node_config.delete_local_follow_remote(author_target=follow.get_author_target(),
+                                                              author_actor=follow.get_author_actor())
+            if response is int:
+                print(f"Delete: unknown status code: {response}")
+                return HttpResponseBadRequest("Struggling to communicate with the other server T.T")
 
         follow_serializer = FollowRequestSerializer(follow)
         follow_json = follow_serializer.data

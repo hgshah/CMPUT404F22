@@ -168,6 +168,20 @@ class NodeConfigBase:
             print(f"post_local_follow_remote: remote server response: {response.status_code}")
         return response.status_code
 
+    def delete_local_follow_remote(self, author_target: Author, author_actor: Author) -> dict:
+        """Make call to remote node to delete follow; stop sending stuff in my inbox!!!"""
+        url = f'{author_target.get_url()}/followers/{author_actor.get_id()}'
+        response = requests.delete(url,
+                                   auth=(self.username, self.password))
+        if 200 <= response.status_code < 300:
+            try:
+                return json.loads(response.content.decode('utf-8'))
+            except Exception as e:
+                print(f"Failed to deserialize response: {response.content}")
+        else:
+            print(f"post_local_follow_remote: remote server response: {response.status_code}")
+        return response.status_code
+
     def get_remote_follow(self, target: Author, follower: Author) -> Follow:
         """
         Make call to remote node to get a follow object or request
@@ -181,7 +195,8 @@ class NodeConfigBase:
             follow_json = json.loads(response.content)
             follow_serializer = FollowRequestSerializer(data=follow_json)
             if not follow_serializer.is_valid():
-                print(f'NodeCongiBase: get_remote_follow: serialization error: {follow_serializer.errors}')
+                for err in follow_serializer.errors:
+                    print(f'NodeConfigBase: get_remote_follow: serialization error: {err}')
                 return None
             return follow_serializer.validated_data
         else:

@@ -32,7 +32,8 @@ class TestMirrorFollow(TestCase):
 
         # local actor follows remote target
         response = local.session.post(f'{local.base}/authors/{remote.author_id}/followers/')
-        self.assertEqual(response.status_code, 200)
+        content = response.content.decode('utf-8')
+        self.assertEqual(response.status_code, 200, content)
 
         # # target receives follow request
         response = remote.session.get(f'{remote.base}/follows/incoming')
@@ -53,15 +54,20 @@ class TestMirrorFollow(TestCase):
             f'{remote.base}/authors/{remote.author_id}/followers/{local.author_id}',
             data={'hasAccepted': True}
         )
-        self.assertEqual(response.status_code, 200)
+        content = response.content.decode('utf-8')
+        self.assertEqual(response.status_code, 200, content)
 
         # local checks if target has accepted their request (200)
         response = local.session.get(f'{local.base}/authors/{remote.author_id}/followers/{local.author_id}')
         self.assertEqual(response.status_code, 200)
 
-        # delete!
+        # double accept!
         response = remote.session.put(
             f'{remote.base}/authors/{remote.author_id}/followers/{local.author_id}',
             data={'hasAccepted': True}
         )
+        self.assertEqual(response.status_code, 400)
+
+        # just kidding! i wanna unfollow now >.>
+        response = local.session.delete(f'{local.base}/authors/{remote.author_id}/followers/{local.author_id}')
         self.assertEqual(response.status_code, 200)
