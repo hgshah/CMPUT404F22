@@ -1,7 +1,7 @@
 import React from 'react'
 import "./ActivityTab.css"
 import FriendRequestsTab from './FriendRequestsTab'
-import Comment from './Comment'
+import Comment from '../Homepage/Comment'
 
 export default function ActivityTab() {
   return (

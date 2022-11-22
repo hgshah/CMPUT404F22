@@ -7,12 +7,12 @@ import "./Feed.css"
 import Postbox from './Postbox'
 import { Avatar, Button, TextField} from '@mui/material';
 import Post from './Post'
-import profilepic from "./profilepic.jpeg";
-import Inbox from "./Inbox";
+import profilepic from "../profilepic.jpeg";
+import Inbox from "../Inbox/Inbox";
 import axios from 'axios'
 import Comment from './Comment'
-import Test from './Test';
-import Profile from "./Profile";
+import Test from '../Test';
+import Profile from "../Profile";
 import {useNavigate, useParams} from 'react-router-dom'
 function Feed() {
     //const [posts, setPosts] = useState([]);
