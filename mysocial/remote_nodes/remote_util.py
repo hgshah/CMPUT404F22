@@ -148,3 +148,10 @@ class RemoteUtil:
         if node_param not in base.REMOTE_CONFIG:
             return None
         return base.REMOTE_CONFIG[node_param]
+
+    @staticmethod
+    def get_http_or_https() -> str:
+        if '127.0.0.1' in base.CURRENT_DOMAIN:
+            return 'http://'
+        else:
+            return 'https://'
