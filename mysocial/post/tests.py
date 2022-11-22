@@ -111,9 +111,7 @@ class PostTestCase(APITestCase):
     def test_share_post_sends_local_followers(self):
         Follow.objects.create(
             actor=self.author2.get_url(),
-            actor_id=self.author2.get_id(),
             target=self.author1.get_url(),
-            target_id=self.author1.get_id(),
             has_accepted=True)
 
         self.client.force_login(self.author1)

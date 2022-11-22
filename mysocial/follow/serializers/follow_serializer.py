@@ -90,7 +90,8 @@ class FollowRequestSerializer(serializers.ModelSerializer):
         if target.is_local():
             try:
                 # case 1: local target/object
-                follow = Follow.objects.get(id=data['id'])
+                follow: Follow = Follow.objects.get(id=data['id'])
+                follow._author_target = target
             except Follow.DoesNotExist:
                 raise serializers.ValidationError('FollowRequestSerializer: to_internal_value: follow does not exist')
             except Exception as e:
@@ -119,6 +120,8 @@ class FollowRequestSerializer(serializers.ModelSerializer):
             try:
                 # case 2: remote target/object that already exists
                 follow = Follow.objects.get(actor=actor.get_url(), target=target.get_url())
+                follow._author_target = target
+                follow._author_actor = actor
 
                 for remote_field, local_field in remote_fields.items():
                     if remote_field not in data:
@@ -134,12 +137,12 @@ class FollowRequestSerializer(serializers.ModelSerializer):
                 follow = Follow.objects.create(
                     actor=actor.get_url(),
                     target=target.get_url(),
-                    actor_id=actor.get_id(),
-                    target_id=target.get_id(),
                     has_accepted=data['has_accepted'],
                     remote_url=data['local_url'],  # switcharoo
                     remote_id=data['proxy_id']
                 )
+                follow._author_target = target
+                follow._author_actor = actor
 
             except Exception as e:
                 raise serializers.ValidationError(f'FollowRequestSerializer: to_internal_value: unknown error: {e}')

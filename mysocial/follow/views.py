@@ -358,9 +358,7 @@ class FollowersView(APIView):
 
             follow = Follow.objects.create(
                 actor=author_actor.get_url(),
-                actor_id=author_actor.get_id(),
                 target=author_target.get_url(),
-                target_id=author_target.get_id(),
                 has_accepted=False)
             serializers = FollowRequestSerializer(follow)
             data = serializers.data
@@ -429,9 +427,7 @@ class FollowersView(APIView):
             target = Author.get_author(official_id=author_id)
             follow = Follow.objects.create(
                 actor=actor.get_url(),
-                actor_id=actor.get_id(),
                 target=target.get_url(),
-                target_id=target.get_id(),
                 has_accepted=False)
             serializers = FollowRequestSerializer(follow)
             data = serializers.data
