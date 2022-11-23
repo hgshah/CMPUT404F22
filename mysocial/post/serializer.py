@@ -1,8 +1,13 @@
 from rest_framework import serializers
 from authors.serializers.author_serializer import AuthorSerializer 
-from .models import Post, ContentType
+from .models import Post, ContentType, Visibility
 from comment.models import Comment
+from authors.models.author import Author
 from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_schema_serializer
+from urllib.parse import urlparse
+from mysocial.settings import base
+import pathlib
+
 
 POST_SERIALIZER_EXAMPLE = {
     "type": "post",
@@ -72,6 +77,48 @@ class PostSerializer(serializers.ModelSerializer):
             category_list.append(category)
 
         return category_list
+    
+    def to_internal_value(self, data: dict) -> Post:
+        """
+        Does not work with remote Author
+        :param data:
+        :return: Access serializers.validated_data for deserialized version of the json converted to Author
+        """
+        url = data['url']
+        # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
+        _, host, path, _, _, _ = urlparse(url)
+
+        try:
+            if host == base.CURRENT_DOMAIN:
+                local_id = pathlib.PurePath(path).name
+                # deserialize a local post
+                post = Post.objects.get(official_id=local_id)
+            else:
+                # deserialize a remote author; take not it's missing some stuff so check with is_local()
+                post = Post()
+                node_config = base.REMOTE_CONFIG.get(host)
+                if node_config is None:
+                    print(f"PostSerializer: Host not found: {host}")
+                    return serializers.ValidationError(f"PostSerializer: Host not found: {host}")
+                post_remote_fields: dict = node_config.post_remote_fields
+   
+                for remote_field, local_field in post_remote_fields.items():
+                    if remote_field not in data:
+                        continue
+                    elif remote_field == 'author':
+                        author = Author.get_author(official_id=data['author']['id'], should_do_recursively=True)
+                        setattr(post, local_field, author)
+                    elif remote_field == 'source' or remote_field == 'origin':
+                        if not data[remote_field]:
+                            continue
+                    else:
+                        setattr(post, local_field, data[remote_field])
+
+        except Exception as e:
+            print(f"PostSerializer: failed serializing {e}")
+            raise serializers.ValidationError(f"PostSerializer: failed serializing {e}")
+
+        return post
 
     class Meta:
         model = Post
@@ -135,4 +182,3 @@ class InboxPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('type', 'title', 'id', 'source', 'origin', 'description', 'contentType',  'author', 'categories', 'count', 'comments', 'published', 'visibility', 'unlisted', 'url')
-    
