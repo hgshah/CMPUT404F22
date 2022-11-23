@@ -4,13 +4,16 @@ import FriendRequestsTab from './FriendRequestsTab'
 import Comment from '../Homepage/Comment'
 
 export default function ActivityTab() {
-  return (
-    let friendsList;
-    
+    let fetchURL = "http://127.0.0.1:8000/authors"
 
+    fetch(fetchURL)
+      .then((response) => console.log(response))
+      .then((data) => console.log(data))
 
-    <div className='ActivityTab'>
-      {/* <p>Your inbox is empty. </p> */}
-    </div>
-  )
+    return (
+        <div className='ActivityTab'>
+        {/* <p>Your inbox is empty. </p> */}
+        
+        </div>
+    )
 }
