@@ -10,6 +10,8 @@ from remote_nodes.local_default import LocalDefault
 class Team14Local(LocalDefault):
     domain = '127.0.0.1:8014'
     username = 'team14_local'
+
+    """team14 fields <-> our fields"""
     remote_author_fields = {
         'id': 'official_id',
         'url': 'url',
