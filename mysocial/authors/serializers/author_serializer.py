@@ -91,16 +91,25 @@ class AuthorSerializer(serializers.ModelSerializer):
                 for remote_field, local_field in remote_fields.items():
                     if remote_field not in data:
                         continue
-                    elif remote_field == 'url':
+
+                    entry = data[remote_field]
+
+                    # post-processing
+                    if local_field == 'github':
+                        # team14 case
+                        if 'https://github.com/' not in entry:
+                            entry = f'https://github.com/{entry}/'
+                    elif local_field == 'url':
                         # special case
                         sanitized: str = data[remote_field]
                         for start in ('http://', 'https://'):
                             if sanitized.startswith(start):
                                 sanitized = sanitized[len(start):]
                         prefix = BaseUtil.get_http_or_https()
-                        setattr(author, local_field, f'{prefix}{sanitized}')
-                    else:
-                        setattr(author, local_field, data[remote_field])
+                        entry = f'{prefix}{sanitized}'
+
+                    setattr(author, local_field, entry)
+                    # end loop for processing and setting entries
                 author.host = host  # force a set even if field was not given
         except Exception as e:
             print(f"AuthorSerializer: failed serializing: {e}")
