@@ -5,6 +5,7 @@ import requests
 from django.http import HttpResponseNotFound
 from rest_framework.response import Response
 from requests import ConnectionError
+from rest_framework import status
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
@@ -155,9 +156,6 @@ class NodeConfigBase:
             print(f"post_local_follow_remote: remote server response: {response.status_code}")
         return response.status_code
 
-    ## will have to change the url depending on what team it is 
-    # dictionary: [host + endpoint, formatted url]
-    # will have to change the data for team 10
     def send_to_remote_inbox(self, data, target_author_url):
         if target_author_url is None:
             return 404
@@ -180,9 +178,10 @@ class NodeConfigBase:
         url = f'{self.get_base_url()}{post_url}'
         return requests.get(url = url, auth = (self.username, self.password))
 
-    def get_authors_posts(self, author_posts_path):
+    def get_authors_posts(self, request, author_posts_path):
         url = f'{self.get_base_url()}{author_posts_path}'
-        return requests.get(url = url, auth = (self.username, self.password))
+        response = requests.get(url = url, auth = (self.username, self.password))
+        return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
     def get_comments_for_post(self, comments_path):
         url = f'{self.get_base_url()}{comments_path}'

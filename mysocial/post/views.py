@@ -70,11 +70,11 @@ class PostView(GenericAPIView):
 
             # local -> remote
             else:
-                node_config = base.REMOTE_CONFIG.get(target_author.host)
+                node_config = base.REMOTE_CONFIG.get(target_author.host) 
                 response = node_config.get_post_by_post_id(request.path)
                 if response.status_code < 200 or response.status_code > 200:
                     return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
+
                 return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
         # remote -> local
@@ -251,7 +251,7 @@ class CreationPostView(GenericAPIView):
     @action(detail=True, methods=['get'], url_name='post_get_author_posts')
     def get(self, request, *args, **kwargs):
         """
-        get posts by the author
+        Get authors posts
 
         User story: As an author I want to make public posts.
 
@@ -283,11 +283,7 @@ class CreationPostView(GenericAPIView):
             # local -> remote
             else:
                 node_config = base.REMOTE_CONFIG.get(target_author.host)
-                response = node_config.get_authors_posts(request.path)
-                if response.status_code < 200 or response.status_code > 200:
-                    return Response("Failed to get author's post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-                return Response(json.loads(response.content), status = status.HTTP_200_OK)
+                return node_config.get_authors_posts(request, request.path)
 
         # remote -> local
         if request.user.is_authenticated_node:
