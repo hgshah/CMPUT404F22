@@ -15,6 +15,7 @@ from remote_nodes.local_default import LocalDefault
 from remote_nodes.local_mirror import LocalMirror
 from remote_nodes.macewan import MacEwan
 from remote_nodes.potato_oomfie import PotatoOomfie
+from remote_nodes.socioecon import Socioecon
 from remote_nodes.team14_local import Team14Local
 from remote_nodes.team14_main import Team14Main
 from remote_nodes.turnip_oomfie import TurnipOomfie
@@ -56,25 +57,30 @@ class RemoteUtil:
         Setup all remote node configs and logic
         """
         if '127.0.0.1' in base.CURRENT_DOMAIN:
-            Author.connected_node_classes = (LocalDefault, LocalMirror, Team14Local)
+            connected_node_classes = [LocalDefault, LocalMirror, Team14Local]
         else:
-            Author.connected_node_classes = (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main)
+            connected_node_classes = [TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main, Socioecon]
 
         # special remote node configs if you're running locally
         # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
         if '127.0.0.1' in base.CURRENT_DOMAIN:
             # tricky technique to make the user's config var override ours; useful for other teams!
             local_credentials: dict = {}
-            for node in Author.connected_node_classes:
+            for node in connected_node_classes:
                 local_credentials.update(node.create_node_credentials())
             # then set it back to our app's remote credentials
             base.REMOTE_NODE_CREDENTIALS = local_credentials
 
         # setup remote config node type authors
         for host, credentials in base.REMOTE_NODE_CREDENTIALS.items():
-            node: Author = TestHelper.overwrite_node(credentials['username'], credentials['password'],
-                                                     credentials['remote_username'], credentials['remote_password'],
-                                                     host)
+            try:
+                node: Author = TestHelper.overwrite_node(credentials['username'], credentials['password'],
+                                                         credentials['remote_username'], credentials['remote_password'],
+                                                         host)
+            except Exception as e:
+                print(f'RemoteUtil: setup: unknown error: {e}')
+                continue
+
             is_active = credentials.get('is_active')
             if is_active is None and not isinstance(is_active, bool):
                 continue
@@ -85,21 +91,22 @@ class RemoteUtil:
                 node.node_detail.status = NodeStatus.INACTIVE
                 node.node_detail.save()
 
-        # todo: setup superuser???
         if 'PREFILLED_USERS' in os.environ:
-            prefilled_users = json.loads(os.environ['PREFILLED_USERS'])
-            # prefilled_users: dict = {
-            #     'items': [{'username': 'super', 'password': 'super', 'is_staff': True, 'email': "super@gmail.com"}]}
-            for user in prefilled_users['items']:
-                username = user['username']
-                other_args: dict = user
-                other_args.pop('username')
-                TestHelper.overwrite_author(username, other_args)
+            try:
+                prefilled_users = json.loads(os.environ['PREFILLED_USERS'])
+                for user in prefilled_users['items']:
+                    username = user['username']
+                    other_args: dict = user
+                    other_args.pop('username')
+                    TestHelper.overwrite_author(username, other_args)
+            except Exception as e:
+                print(f'RemoteUtil: setup: unknown error: {e}')
 
         # This is where the endpoints and configs are added!
         # When it's local (contains 127.0.0.1), we add 127.0.0.1:8000 and 127.0.0.1:8080
         # Then, we add the endpoints, like turnip-oomfie-1.herokuapp.com (TurnipOomfie)
-        for config in Author.connected_node_classes:
+        for config in connected_node_classes:
+            print(f"Adding node information for: {config}")
             base.REMOTE_CONFIG.update(config.create_dictionary_entry())
 
         # add all connected nodes but self to prevent infinite recursion
