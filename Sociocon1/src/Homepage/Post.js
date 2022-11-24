@@ -59,7 +59,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             method: 'post',
             withCredentials: true ,
             headers: { 'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
-            url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/de5b437f-5f88-4302-afaa-15182a4c643a/comments',
+            url: purl + '/comments' ,
             data: formField
         }).then((response) =>{
             console.log(response.data)
@@ -79,7 +79,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             
-            url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/373e0d37-bfbc-437f-b424-b8095b1ca6c8/',
+            url: purl + '/',
 
             data: formField
         }).then((response) =>{
