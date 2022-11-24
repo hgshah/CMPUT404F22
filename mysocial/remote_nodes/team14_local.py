@@ -3,6 +3,7 @@ import urllib.parse
 
 import requests
 
+from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from remote_nodes.local_default import LocalDefault
 
@@ -33,6 +34,36 @@ class Team14Local(LocalDefault):
                 'remote_password': 'local_default',
             }
         }
+
+    def post_local_follow_remote(self, author_actor: Author, author_target: Author) -> dict:
+        url = f'{author_target.get_url()}/inbox/'
+        response = requests.post(url,
+                                 auth=(self.username, self.password),
+                                 json={
+                                     'type': 'follow',
+                                     'sender': {
+                                         'url': author_actor.get_url(),
+                                         'id': author_actor.get_id()
+                                     },
+                                     'receiver': {
+                                         'url': author_target.get_url(),
+                                         'id': author_target.get_id(),
+                                     }
+                                 })
+        if 200 <= response.status_code < 300:
+            response_json = json.loads(response.content.decode('utf-8'))
+            message = response_json.get('message')
+            if response_json is None:
+                return {
+                    'type': 'follow',
+                    'actor': author_actor.get_url(),
+                    'object': author_target.get_url(),
+                    'localUrl': f'{author_actor.get_url()}/followers/{author_target.get_id()}/',
+                    'id': None
+                }  # <- GOOD
+            else:
+                print(f'{self}: post_local_follow_remote: {message}')
+        return response.status_code
 
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""

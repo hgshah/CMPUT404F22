@@ -75,7 +75,7 @@ class Author(AbstractUser):
         # this is a trick in the serializer for remote authors, look at AuthorSerializer.to_internal_value
         # we are forcing a new field exclusive to remote authors called url, found in Meta.internal_field_equivalents
         if hasattr(self, 'url'):
-            return self.url
+            return self.url.rstrip('/')
 
         # local authors
         prefix = BaseUtil.get_http_or_https()
