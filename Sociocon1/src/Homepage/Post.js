@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import EditPost from './EditPost';
-function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype}) {
+function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype, purl}) {
     const[value, setValue] = useState(""); 
 
     // const [userName, setUserName] = useState('');
@@ -79,7 +79,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             
-            url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/fdda88a1-7c65-43df-9748-d8aa0d095862/',
+            url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/373e0d37-bfbc-437f-b424-b8095b1ca6c8/',
 
             data: formField
         }).then((response) =>{
@@ -103,18 +103,20 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     // }, [])
     const navigate = useNavigate()
     
-    const DeletePostInfo = async (id) => {
-        String(id)
-        const nid = String(id).slice(-36)
-
+    const DeletePostInfo = async () => {
+        // String(id)
+        // const nid = String(id).slice(-36)
+        
         await axios({
                 method:'delete',
                 withCredentials: true ,
                 headers: { "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
-                url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
+                // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
+                url: purl
             
         }).then((response) =>{
             console.log(response.data)
+            console.log(purl)
             navigate.push('/')
         })
     }
@@ -145,6 +147,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         </div>
         <div className='post_body'>
             <div className='post_header'>
+               
             <React.Fragment>
                     {
                         showForm ? (
@@ -248,7 +251,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                         <ShareIcon fontSize = "small" /> */}
                      <div className='post_comments'>
                         {/* <Comment/> */}
-                        {comments}
+                        
                         <form>
                             <input 
                                 onChange={e => setPostComment(e.target.value)} 
@@ -271,10 +274,11 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                                     <option onChange={e => setPostContentType(e.target.value)} value={ContentType}>text/plain</option>
                                 </select>
                             {/* <TextField label = "add comment"  size = "small" variant='outlined' className='post_input' placeholder='add comment' /> */}
+
                             <Button onClick = {AddComment} variant='contained' size = "small" endIcon= {<SendIcon/>}  >   </Button> 
                             
                         </form> 
-                        <Button onclick = {DeletePostInfo} variant = 'contained' endIcon = {<DeleteIcon/>} className = "postdel_button"></Button>
+                        <Button onClick = {DeletePostInfo} variant = 'contained' endIcon = {<DeleteIcon/>} className = "postdel_button" type = "submit"> Delete</Button>
                     </div> 
                     {/* <div className='getcomments'>
                     <h4>

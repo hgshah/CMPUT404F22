@@ -87,7 +87,7 @@ function Feed() {
                               
                                 <h2 >
                                   
-                                   <Post title = {posts.title} description = {posts.description} displayName = "Harsh Shah"  image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = "public"/>
+                                   <Post purl = {posts.url} title = {posts.title} description = {posts.description} displayName = "Harsh Shah"  image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = "public"/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     

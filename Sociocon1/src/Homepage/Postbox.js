@@ -89,7 +89,7 @@ const Postbox = () => {
             {/* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
                 // license:  https://creativecommons.org/licenses/by-sa/4.0/ */}
-            <Button onClick = {AddPostInfo}  className = "postbox_button">Post</Button>
+            <Button onClick = {AddPostInfo}  className = "postbox_button" type = "submit">Post</Button>
             
         </form>
       
