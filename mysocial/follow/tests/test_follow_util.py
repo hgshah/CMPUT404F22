@@ -9,8 +9,8 @@ from follow.models import Follow
 
 class TestFollowUtil(TestCase):
     def setUp(self):
-        self.target = TestHelper.create_author('target')
-        self.local_follower = TestHelper.create_author('actor')
+        self.target = TestHelper.overwrite_author('target')
+        self.local_follower = TestHelper.overwrite_author('actor')
 
         # this one is an actual remote author! might break if it disappears!
         # todo: fix later

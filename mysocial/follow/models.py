@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 
+from authors.models.author import Author
 from authors.util import AuthorUtil
 from common.base_util import BaseUtil
 from mysocial.settings import base
@@ -21,7 +22,9 @@ class Follow(models.Model):
     FIELD_NAME_HAS_ACCEPTED = 'hasAccepted'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    """url for the actor's author resource NOT the author id and NOT the Author object"""
     actor = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
+    """url for the target's author resource NOT the author id and NOT the Author object"""
     target = models.URLField(validators=[AuthorUtil.validate_author_url], max_length=1000)
     has_accepted = models.BooleanField(default=False)
 
@@ -31,10 +34,35 @@ class Follow(models.Model):
     If this is empty, this is the source of truth and you may disregard the other object
     """
     remote_url = models.URLField(blank=True, max_length=1000)
+    """
+    remote_id is the id of the authoritative Follow object in the other server
+    """
+    remote_id = models.UUIDField(default=uuid.uuid4, editable=False)
+
+    def __init__(self, *args, **kwargs):
+        self._author_actor: Author = None
+        self._author_target: Author = None
+        super().__init__(*args, **kwargs)
 
     class Meta:
         unique_together = (('actor', 'target'),)
         get_latest_by = 'id'
+
+    def get_author_actor(self) -> Author:
+        """Get the author object for the given actor in actor url"""
+        if self._author_actor is None:
+            self._author_actor, err = AuthorUtil.from_author_url_to_author(self.actor)
+            if err is not None:
+                raise err
+        return self._author_actor
+
+    def get_author_target(self) -> Author:
+        """Get the author object for the given target in target url"""
+        if self._author_target is None:
+            self._author_target, err = AuthorUtil.from_author_url_to_author(self.target)
+            if err is not None:
+                raise err
+        return self._author_target
 
     def get_local_url(self):
         """

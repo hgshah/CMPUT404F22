@@ -18,8 +18,8 @@ class CommentTestCase(APITestCase):
     def setUp(self):
         self.author1 =  TestHelper.create_author(username = "author1", other_args = {"host": "127.0.0.1:8000"})
         self.author2 = TestHelper.create_author(username = "author2", other_args = {"host": "127.0.0.1:8000"})
-        self.author1_post = TestHelper.create_post(author = self.author1) 
-        self.author2_post = TestHelper.create_post(author = self.author2) 
+        self.author1_post = TestHelper.create_post(author = self.author1)
+        self.author2_post = TestHelper.create_post(author = self.author2)
 
     # create a comment on your own post
     def test_create_comment_on_post(self):

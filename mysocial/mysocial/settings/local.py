@@ -16,3 +16,6 @@ DATABASES = {
 
 if base.CURRENT_DOMAIN is None:
     base.CURRENT_DOMAIN = f'127.0.0.1:{base.CURRENT_PORT}'
+
+# for debugging purposes: figure out which setting you're on
+LOCAL_STATE = 'DEFAULT'

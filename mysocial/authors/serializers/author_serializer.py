@@ -5,6 +5,7 @@ from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_sc
 from rest_framework import serializers
 
 from authors.models.author import Author
+from common.base_util import BaseUtil
 from mysocial.settings import base
 
 AUTHOR_SERIALIZER_EXAMPLE = {
@@ -28,11 +29,9 @@ AUTHOR_SERIALIZER_EXAMPLE = {
 )
 class AuthorSerializer(serializers.ModelSerializer):
     """
-    based on https://stackoverflow.com/a/18426235/17836168
-    Note: We can generalize this btw to use in every serializer out there!
+    Author object
     """
     type = serializers.SerializerMethodField('get_type')
-    """Test"""
     id = serializers.SerializerMethodField('get_id')
     displayName = serializers.CharField(source='display_name')
     profileImage = serializers.CharField(source='profile_image')
@@ -50,7 +49,6 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_id(model: Author) -> str:
-        """Tests"""
         # the path after host may vary, e.g. authors/ vs authors/id
         return str(model.official_id)
 
@@ -82,13 +80,13 @@ class AuthorSerializer(serializers.ModelSerializer):
                 # deserialize a local author
                 author = Author.objects.get(official_id=local_id)
             else:
-                # deserialize a remote author; take not it's missing some stuff so check with is_local()
+                # deserialize a remote author; it's missing some stuff so check with is_local()
                 author = Author()
                 node_config = base.REMOTE_CONFIG.get(host)
                 if node_config is None:
                     print(f"AuthorSerializer: Host not found: {host}")
                     return serializers.ValidationError(f"AuthorSerializer: Host not found: {host}")
-                remote_fields: dict = node_config.remote_fields
+                remote_fields: dict = node_config.remote_author_fields
 
                 for remote_field, local_field in remote_fields.items():
                     if remote_field not in data:
@@ -99,16 +97,14 @@ class AuthorSerializer(serializers.ModelSerializer):
                         for start in ('http://', 'https://'):
                             if sanitized.startswith(start):
                                 sanitized = sanitized[len(start):]
-                        prefix = 'https://'
-                        if '127.0.0.1' in base.CURRENT_DOMAIN:
-                            prefix = 'http://'
+                        prefix = BaseUtil.get_http_or_https()
                         setattr(author, local_field, f'{prefix}{sanitized}')
                     else:
                         setattr(author, local_field, data[remote_field])
                 author.host = host  # force a set even if field was not given
         except Exception as e:
-            print(f"AuthorSerializer: failed serializing {e}")
-            raise serializers.ValidationError(f"AuthorSerializer: failed serializing {e}")
+            print(f"AuthorSerializer: failed serializing: {e}")
+            raise serializers.ValidationError(f"AuthorSerializer: failed serializing: {e}")
 
         return author
 

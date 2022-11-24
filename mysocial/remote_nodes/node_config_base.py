@@ -8,6 +8,8 @@ from requests import ConnectionError
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
+from follow.models import Follow
+from follow.serializers.follow_serializer import FollowRequestSerializer
 from common.base_util import BaseUtil
 
 
@@ -25,14 +27,23 @@ class NodeConfigBase:
     domain = 'domain.herokuapp.com'
     username = 'domain'
     author_serializer = AuthorSerializer
+
     """Mapping: remote to local"""
-    remote_fields = {
+    remote_author_fields = {
         'id': 'official_id',
         'url': 'url',
         'host': 'host',
         'displayName': 'display_name',
         'github': 'github',
         'profileImage': 'profile_image'
+    }
+    remote_follow_fields = {
+        'id': 'proxy_id',  # fake; for serializer
+        'hasAccepted': 'has_accepted',
+        'object': 'target',
+        'actor': 'actor',
+        'localUrl': 'local_url',  # fake; for serializer
+        'remoteUrl': 'proxy_url'  # fake; for serializer
     }
 
     def __init__(self):
@@ -126,23 +137,19 @@ class NodeConfigBase:
 
         return None
 
-    def get_all_followers_request(self, params: dict, author_id: str):
-        url = f'{self.get_base_url()}/authors/{author_id}/followers/'
+    def get_all_followers_request(self, params: dict, author: Author):
+        url = f'{author.get_url()}/followers/'
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
             url += '?' + query_param
         response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
-            # todo(turnip): map to our author?
             return Response(json.loads(response.content))
         return HttpResponseNotFound()
 
-    def post_local_follow_remote(self, actor_url: str, target_id: str) -> dict:
+    def post_local_follow_remote(self, actor_url: str, author_target: Author) -> dict:
         """Make call to remote node to follow"""
-        target_author_url = self.from_author_id_to_url(target_id)
-        if target_author_url is None:
-            return 404
-        url = f'{target_author_url}/followers/'
+        url = f'{author_target.get_url()}/followers/'
         response = requests.post(url,
                                  auth=(self.username, self.password),
                                  data={'actor': actor_url})
@@ -155,7 +162,27 @@ class NodeConfigBase:
             print(f"post_local_follow_remote: remote server response: {response.status_code}")
         return response.status_code
 
-    ## will have to change the url depending on what team it is 
+    def get_remote_follow(self, target: Author, follower: Author) -> Follow:
+        """
+        Make call to remote node to get a follow object or request
+
+        Returns a Follow object if there is one;
+        Returns None if cannot be found
+        """
+        url = f'{target.get_url()}/followers/{follower.get_id()}'
+        response = requests.get(url, auth=(self.username, self.password))
+        if 200 <= response.status_code < 300:
+            follow_json = json.loads(response.content)
+            follow_serializer = FollowRequestSerializer(data=follow_json)
+            if not follow_serializer.is_valid():
+                print(f'NodeCongiBase: get_remote_follow: serialization error: {follow_serializer.errors}')
+                return None
+            return follow_serializer.validated_data
+        else:
+            print(f'NodeConfigBase: get_follow_request: get failed: {response.status_code}')
+            return None
+
+    ## will have to change the url depending on what team it is
     # dictionary: [host + endpoint, formatted url]
     # will have to change the data for team 10
     def send_to_remote_inbox(self, data, target_author_url):
