@@ -101,7 +101,7 @@ class PostTestCase(APITestCase):
 
         response = self.client.put(request, self.CREATE_POST_PAYLOAD)
 
-        self.assertEqual(response.data["id"], new_uuid)
+        self.assertEqual(response.data["id"], str(new_uuid))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def get_expected_official_id(self, post_id):

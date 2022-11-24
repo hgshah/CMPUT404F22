@@ -1,7 +1,6 @@
 import uuid
 
 from django.db import models
-from django.db.models import Q
 
 from authors.models.author import Author
 from authors.util import AuthorUtil
@@ -69,7 +68,7 @@ class Follow(models.Model):
         """
         Returns the url to get this Follow object
         """
-        return f"{self.target}/followers/{self.get_author_actor().get_id()}"
+        return f"{BaseUtil.get_http_or_https()}{base.CURRENT_DOMAIN}/follows/{self.id}"
 
     def get_url(self):
         if bool(self.remote_url):

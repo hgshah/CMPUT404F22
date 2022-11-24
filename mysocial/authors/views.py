@@ -1,8 +1,7 @@
 import logging
 
 from django.http.response import HttpResponse, HttpResponseNotFound
-from drf_spectacular.utils import OpenApiExample, extend_schema, inline_serializer
-from rest_framework import serializers
+from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +12,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from authors.models.author import Author
 from authors.permissions import NodeIsAuthenticated
-from authors.serializers.author_serializer import AUTHOR_SERIALIZER_EXAMPLE, AuthorSerializer, AuthorSerializerList
+from authors.serializers.author_serializer import AuthorSerializer, AuthorSerializerList
 from common.base_util import BaseUtil
 from common.pagination_helper import PaginationHelper
 from mysocial.settings import base
