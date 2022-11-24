@@ -105,6 +105,19 @@ class Team14Local(LocalDefault):
             return Response(err, status = status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'type': 'posts', 'items': data}, status = status.HTTP_200_OK)
+    
+    def get_post_by_post_id(self, post_url: str):
+        url = f'{self.get_base_url()}{post_url}'
+
+        try:
+            response = requests.get(url, auth=(self.username, self.password))
+        except Exception as e:
+            return Response(f"Failed to get author's post from remote server, error: {e}", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        post_data = json.loads(response.content.decode('utf-8'))
+
+        post = self.convert_team14_post(url, post_data)
+        return Response(post, status = status.HTTP_200_OK)
 
     def convert_team14_post(self, url, post_data):
         post_data["url"] = url 

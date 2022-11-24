@@ -234,11 +234,20 @@ class NodeConfigBase:
 
     def get_post_by_post_id(self, post_url):
         url = f'{self.get_base_url()}{post_url}'
-        return requests.get(url = url, auth = (self.username, self.password))
+        response =  requests.get(url = url, auth = (self.username, self.password))
 
-    def get_authors_posts(self, request, author_posts_path):
+        if response.status_code < 200 or response.status_code > 200:
+            return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(json.loads(response.content), status = status.HTTP_200_OK)
+
+    def get_authors_posts(self, author_posts_path):
         url = f'{self.get_base_url()}{author_posts_path}'
         response = requests.get(url = url, auth = (self.username, self.password))
+        
+        if response.status_code < 200 or response.status_code > 200:
+            return Response("Failed to get author's post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
     def get_comments_for_post(self, comments_path):
