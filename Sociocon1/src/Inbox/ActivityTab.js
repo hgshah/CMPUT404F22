@@ -2,18 +2,44 @@ import React from 'react'
 import "./styles/ActivityTab.css"
 import FriendRequestsTab from './FriendRequestsTab'
 import Comment from '../Homepage/Comment'
+import { useState, useEffect } from 'react'
 
 export default function ActivityTab() {
-    let fetchURL = "http://127.0.0.1:8000/authors"
+    //eg. http://127.0.0.1:8000/authors/b636feb1-f85f-438c-b3a4-ce63f93d1b1d/inbox
 
-    fetch(fetchURL)
-      .then((response) => console.log(response))
-      .then((data) => console.log(data))
+    let host = '127.0.0.1:8000';
+    let authorUUID = 'b636feb1-f85f-438c-b3a4-ce63f93d1b1d';
+    let fetchLimit = '?_limit=20'
+    let fetchURL = "http://127.0.0.1:8000/authors";
 
+    let [data, setData] = useState(null);
+
+    let fetchData;
+    useEffect(() => {
+        fetch(fetchURL)
+            .then((response) => console.log(response))
+            .then((data) => {
+                console.log(data);
+                fetchData = data;
+                setData = data;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, []);
+    
     return (
         <div className='ActivityTab'>
-        {/* <p>Your inbox is empty. </p> */}
-        
+            <p>test</p>
+
+            <p>
+                {data &&
+                    data.map(({type, items}) => (
+                        <h1>{type}</h1>
+                        //<h2>{items}</h2>
+                    ))}
+            </p>
+
         </div>
     )
 }
