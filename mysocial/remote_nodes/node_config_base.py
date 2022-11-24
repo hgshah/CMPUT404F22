@@ -137,14 +137,30 @@ class NodeConfigBase:
 
         return None
 
-    def get_all_followers_request(self, params: dict, author: Author):
+    def get_all_followers(self, author: Author, params=None):
+        if params is None:
+            # python has a weird property that if the argument is mutable, like a dictionary
+            # if you pass the reference around, you can actually change the default values,
+            # like params here. doing this to prevent evil things
+            params = {}
+
         url = f'{author.get_url()}/followers/'
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
             url += '?' + query_param
         response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
-            return Response(json.loads(response.content))
+            follower_json: dict = json.loads(response.content)
+            return follower_json.get('items')
+        return None
+
+    def get_all_followers_request(self, author: Author, params: dict):
+        followers = self.get_all_followers(author=author, params=params)
+        if followers is not None:
+            return Response({
+                "type": "followers",
+                "items": followers
+            })
         return HttpResponseNotFound()
 
     def post_local_follow_remote(self, actor_url: str, author_target: Author) -> dict:
@@ -153,6 +169,20 @@ class NodeConfigBase:
         response = requests.post(url,
                                  auth=(self.username, self.password),
                                  data={'actor': actor_url})
+        if 200 <= response.status_code < 300:
+            try:
+                return json.loads(response.content.decode('utf-8'))
+            except Exception as e:
+                print(f"Failed to deserialize response: {response.content}")
+        else:
+            print(f"post_local_follow_remote: remote server response: {response.status_code}")
+        return response.status_code
+
+    def delete_local_follow_remote(self, author_target: Author, author_actor: Author) -> dict:
+        """Make call to remote node to delete follow; stop sending stuff in my inbox!!!"""
+        url = f'{author_target.get_url()}/followers/{author_actor.get_id()}'
+        response = requests.delete(url,
+                                   auth=(self.username, self.password))
         if 200 <= response.status_code < 300:
             try:
                 return json.loads(response.content.decode('utf-8'))
@@ -175,7 +205,8 @@ class NodeConfigBase:
             follow_json = json.loads(response.content)
             follow_serializer = FollowRequestSerializer(data=follow_json)
             if not follow_serializer.is_valid():
-                print(f'NodeCongiBase: get_remote_follow: serialization error: {follow_serializer.errors}')
+                for err in follow_serializer.errors:
+                    print(f'NodeConfigBase: get_remote_follow: serialization error: {err}')
                 return None
             return follow_serializer.validated_data
         else:

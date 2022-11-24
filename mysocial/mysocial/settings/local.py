@@ -11,6 +11,14 @@ DATABASES = {
         'PASSWORD': 'password',
         'HOST': 'localhost',
         'PORT': '5432',
+    },
+    'mirror': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mysocialdb_mirror',
+        'USER': 'mysocialuser',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

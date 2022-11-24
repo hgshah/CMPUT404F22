@@ -37,15 +37,7 @@ class RemoteUtil:
 
     REMOTE_NODE_SINGLE_PARAMS = [
         OpenApiParameter(name=NODE_TARGET_QUERY_PARAM, location=OpenApiParameter.QUERY,
-                         description='The domain name for the remote node we want to target. For example: '
-                                     '`?node-target=app.herokuapp.com`. We currently support the following nodes:\n'
-                                     '- Main endpoints\n'
-                                     '    - Our stable endpoint: [WIP]\n '
-                                     '- Other connected endpoints\n'
-                                     '    - [WIP]\n '
-                                     '- Staging endpoints (unstable)\n'
-                                     '    - potato-oomfie.herokuapp.com\n '
-                                     '    - turnip-oomfie-1.herokuapp.com\n',
+                         description='Optional explicit domain name you can use for debugging',
                          required=False, type=str),
     ]
 
