@@ -97,7 +97,7 @@ class AuthorSerializer(serializers.ModelSerializer):
                     # post-processing
                     if local_field == 'github':
                         # team14 case
-                        if 'https://github.com/' not in entry:
+                        if entry.strip() != '' and 'https://github.com/' not in entry:
                             entry = f'https://github.com/{entry}/'
                     elif local_field == 'url':
                         # special case
