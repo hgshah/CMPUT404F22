@@ -7,10 +7,10 @@ import { useState, useEffect } from 'react'
 export default function ActivityTab() {
     //eg. http://127.0.0.1:8000/authors/b636feb1-f85f-438c-b3a4-ce63f93d1b1d/inbox
 
-    let host = '127.0.0.1:8000';
-    let authorUUID = 'b636feb1-f85f-438c-b3a4-ce63f93d1b1d';
+    let host;
+    let authorUUID;
     let fetchLimit = '?_limit=20'
-    let fetchURL = "http://127.0.0.1:8000/authors";
+    let fetchURL = 'http://127.0.0.1:8000/authors/b636feb1-f85f-438c-b3a4-ce63f93d1b1d/inbox';
 
     let [data, setData] = useState(null);
 
@@ -28,6 +28,21 @@ export default function ActivityTab() {
             });
     }, []);
     
+    /*
+    {
+        "type": "inbox",
+        "author": {
+            "type": "author",
+            "id": "b636feb1-f85f-438c-b3a4-ce63f93d1b1d",
+            "url": "http://127.0.0.1:8000/authors/b636feb1-f85f-438c-b3a4-ce63f93d1b1d",
+            "host": "127.0.0.1:8000",
+            "displayName": "",
+            "github": "",
+            "profileImage": ""
+        },
+        "items": [...]
+    }
+    */
     return (
         <div className='ActivityTab'>
             <p>test</p>
