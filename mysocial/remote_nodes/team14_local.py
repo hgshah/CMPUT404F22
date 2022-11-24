@@ -3,6 +3,7 @@ import urllib.parse
 
 import requests
 
+from authors.serializers.author_serializer import AuthorSerializer
 from common.base_util import BaseUtil
 from remote_nodes.local_default import LocalDefault
 
@@ -14,7 +15,7 @@ class Team14Local(LocalDefault):
         'id': 'official_id',
         'url': 'url',
         'display_name': 'display_name',
-        'github': 'github',
+        'github_handle': 'github',
         'profile_image': 'profile_image'
     }
 
@@ -50,10 +51,15 @@ class Team14Local(LocalDefault):
             return None
 
         if response.status_code == 200:
-            return json.loads(response.content.decode('utf-8'))
-        else:
-            print(f'Invalid response code: {response.status_code}')
-            message = response.content.decode('utf-8')
-            print(f'Invalid response code: {message}')
-
+            author_json = json.loads(response.content.decode('utf-8'))
+            author_list = []
+            for raw_author in author_json:
+                author_deserializer = AuthorSerializer(data=raw_author)
+                if author_deserializer.is_valid():
+                    author = author_deserializer.validated_data
+                    author_list.append(AuthorSerializer(author).data)
+                else:
+                    for err in author_deserializer.errors:
+                        print(f'{self}: get_all_author_jsons: {err}')
+            return author_list
         return None

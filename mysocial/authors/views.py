@@ -36,7 +36,7 @@ class AuthorView(GenericViewSet):
         parameters=PaginationHelper.OPEN_API_PARAMETERS + RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializerList,
         summary="Authors retrieve all",
-        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM14_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='retrieve_all')
     def retrieve_all(request: Request):
@@ -67,6 +67,7 @@ class AuthorView(GenericViewSet):
         should_do_recursively = not (request.user.is_authenticated and request.user.is_authenticated_node)
         if should_do_recursively:
             for node in BaseUtil.connected_nodes:
+                # todo: for team 14
                 author_jsons = node.get_all_author_jsons(request.query_params)
                 if author_jsons is None:
                     print(f'AuthorsView: cannot connect: {node.domain}')
@@ -101,7 +102,7 @@ class AuthorView(GenericViewSet):
         parameters=RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializer,
         summary="Retrieve an author",
-        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM14_CONNECTED]
     )
     def retrieve(request: Request, author_id: str) -> HttpResponse:
         """
