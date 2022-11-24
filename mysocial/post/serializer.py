@@ -44,6 +44,8 @@ class PostSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
+    source = serializers.CharField(default = "www.default.com")
+    origin = serializers.CharField(default = "www.default.com")
 
     @extend_schema_field(AuthorSerializer)
     def get_author(self, obj):
@@ -51,7 +53,7 @@ class PostSerializer(serializers.ModelSerializer):
         return author
     
     def get_id(self, obj) -> str:
-        return obj.official_id
+        return str(obj.official_id)
 
     def get_url(self, obj: Post) -> str:
         return obj.get_url()
