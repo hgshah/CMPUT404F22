@@ -369,7 +369,7 @@ class FollowersView(APIView):
         except Exception as e:
             print(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data, status=201)
+        return Response(data=data)
 
     @staticmethod
     def post_local_follow_remote(request: Request, author_target: Author) -> HttpResponse:
@@ -400,7 +400,7 @@ class FollowersView(APIView):
         except Exception as e:
             print(f'FollowersView: post_local_follow_remote: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data, status=201)
+        return Response(data=data)
 
     @staticmethod
     def post_remote_follow_local(request: Request, author_id: str = None) -> HttpResponse:
@@ -439,7 +439,7 @@ class FollowersView(APIView):
         except Exception as e:
             print(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data, status=201)
+        return Response(data=data)
 
 
 class FollowersIndividualView(GenericAPIView):
