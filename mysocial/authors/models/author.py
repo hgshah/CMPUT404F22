@@ -30,7 +30,6 @@ class Author(AbstractUser):
 
     # placed over here to prevent circular dependency
     SERIALIZER = None
-    connected_node_classes = ()
 
     # Remove this unnecessary fields
     first_name = None
