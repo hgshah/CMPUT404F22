@@ -19,8 +19,8 @@ function Login() {
   // User Login info
   const database = [
     {
-      username: "hgshah",
-      password: "hgshah"
+      username: "malhi",
+      password: "pass"
     },
     {
       username: "user2",

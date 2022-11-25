@@ -91,7 +91,7 @@ function Feed() {
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     
-                                    {/* <Button onClick = {() =>DeletePostInfo(posts.id)}  className = "postdel_button">Delete</Button> */}
+                                    {/* <Buttson onClick = {() =>DeletePostInfo(posts.id)}  className = "postdel_button">Delete</Button> */}
                                 </h2>
                             )
                         })

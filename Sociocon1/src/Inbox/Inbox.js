@@ -59,6 +59,7 @@ export default function Inbox() {
                 onClick={handleRequestsTab}>Friend Requests</li>
                 <li className={currentTab === "messages" ? "current" : ""}
                 onClick={handleMessagesTab}>Messages</li> */}
+                
             </ul>
             <div className="outlet">
                 <Tabs id="activity" currentTab={currentTab}>

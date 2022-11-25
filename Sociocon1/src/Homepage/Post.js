@@ -23,7 +23,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const[value, setValue] = useState(""); 
 
     // const [userName, setUserName] = useState('');
-    const[buttonText, newButtonText] = useState("Follow");
+    const[followButtonText, newFollowButtonText] = useState("Follow");
     const[following, setFollowing] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [updatetitle, setPostTitle] = useState('')
@@ -58,7 +58,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method: 'post',
             withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+            headers: { 'Content-Type': 'application/json', "Authorization": "Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1"},
             url: purl + '/comments' ,
             data: formField
         }).then((response) =>{
@@ -74,7 +74,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method: 'post',
             withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+            headers: { 'Content-Type': 'application/json', "Authorization": "Token 4b2f6de222e42aca42d129851b9a4dedd7e08d41"},
             // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
@@ -98,7 +98,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'delete',
                 withCredentials: true ,
-                headers: { "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                headers: { "Authorization": "Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1"},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl
                 
@@ -117,9 +117,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'post',
                 withCredentials: true ,
-                headers: {'Content-Type': 'application/json' , "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                headers: {'Content-Type': 'application/json' , "Authorization": "Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1"},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/inbox',
+                url: 'http://127.0.0.1:8000/authors/22c4d5a1-06ae-42d1-9882-3dd5a9d5f5ab/inbox',
                 data: formField12
             
         }).then((response) =>{
@@ -128,25 +128,56 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             navigate.push('/')
         })
     }
-    
-   
-    function follow_clicked() {
-        if (buttonText == "Follow") {
-            newButtonText("Following");
+
+    const follow_clicked = async() => {
+        if (followButtonText == "Follow") {
+            newFollowButtonText("Following");
         } else {
-            newButtonText("Follow")
+            newFollowButtonText("Follow")
         }
 
         //show the friend request is sent
         setFollowing(!following);
-        if (following == false) {
-            alert("Friend request sent")
-        }
+        // if (following == false) {
+        //     alert("Friend request sent")
+        // }
+
+        // let formField_follow = new FormData();
+        // formField_follow.append("actor", "actor")
+        await axios({
+            method:'post',
+            withCredentials: true,
+            headers: {'Content-Type':'application/json', 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'},
+            url: 'http://127.0.0.1:8000/authors/22c4d5a1-06ae-42d1-9882-3dd5a9d5f5ab/followers/',
+            // data: formField_follow
+        }).then((response) => {
+            console.log(response.data)
+            navigate.push('/')
+        })
     }
     function edit () {
         
         alert("working?")
           
+    }
+
+    const Share_Post = async () => {
+        
+        let formField_share = new FormData()
+        formField_share.append("object",purl)
+        await axios({
+                method:'put',
+                withCredentials: true ,
+                headers: {'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
+                url: purl + '/share',
+                data: formField_share
+            
+        }).then((response) =>{
+            console.log(response.data)
+            console.log(purl)
+            navigate.push('/')
+        })
     }
 
   return (
@@ -212,7 +243,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             className='follow_btn' 
                             onClick={follow_clicked}
                             style={{backgroundColor: following ? "rgb(159, 185, 31)" : "aqua"}} >
-                                {buttonText}
+                                {followButtonText}
                             </Button>
                             {/* hardcode */}
                             {/* <input 
@@ -244,7 +275,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                  <form>
                     <span>
                         <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {like}  </Button>  &nbsp;&nbsp;&nbsp;
-                        <Button onClick = {handle} variant='contained' size = "small" endIcon= {<ShareIcon/>} >   </Button>
+                        <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button>
                     </span>
 
                     </form>
