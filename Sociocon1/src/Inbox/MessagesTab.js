@@ -1,5 +1,5 @@
 import React from 'react'
-import "./MessagesTab.css"
+import "./styles/MessagesTab.css"
 
 export default function MessagesTab() {
   return (

@@ -71,6 +71,7 @@ class TestRequestView(BaseTestFollowerView):
                 content_type='application/json')
             self.assertEqual(response.status_code, 400)
 
+    @skip
     def test_delete_successful(self):
         follow = Follow.objects.latest()
         path = f'/follows/{follow.id}/'
