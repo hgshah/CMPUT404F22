@@ -94,6 +94,41 @@ So, we haven't made an endpoint for making an author. The way we do it was by us
 
 ```python
 from common.test_helper import TestHelper
+
 node = TestHelper.create_author(username='chris')
 node.save()
+
+# new safer version that overwrites or creates a new one
+node = TestHelper.overwrite_author(username='chris')
+node.save()
 ```
+
+The default password is "1234567".
+
+To override properties, you can do:
+
+```python
+from common.test_helper import TestHelper
+
+node = TestHelper.create_author(username='chris', other_args={
+    'email': 'chris@gmail.com',
+    'password': '1234567',
+    'display_name': 'chris',
+    'github': 'https://github.com/chris/',
+    'is_staff': False,
+    'is_superuser': False,
+})
+node.save()
+
+# new safer version that overwrites or creates a new one
+node = TestHelper.create_author(username='chris', other_args={
+    'password': 'hunter2',
+    'github': 'https://github.com/hunter2/',
+    'is_staff': true,
+    'is_superuser': true,
+})
+node.save()
+```
+
+For `other_args`, you don't need to add all fields, like the example above.
+
