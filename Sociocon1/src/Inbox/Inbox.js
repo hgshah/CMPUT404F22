@@ -3,7 +3,7 @@ import Sidebar from '../Sidebar'
 import News from '../News'
 import {NavLink, Routes, Route, Outlet } from "react-router-dom"
 //import "./Style.css";
-import "./Inbox.css"
+import "./styles/Inbox.css"
 import ActivityTab from "./ActivityTab";
 import FriendRequestsTab from "./FriendRequestsTab";
 import MessagesTab from "./MessagesTab";
