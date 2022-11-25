@@ -96,20 +96,6 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     }
 
     const follow_clicked = async() => {
-        let formField = new FormData();
-        formField.append("actor", following)
-        await axios({
-            method:'post',
-            withCredentials: true,
-            headers: {'Content-Type':'application/json', 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'},
-            url: 'http://127.0.0.1:8000/authors/22c4d5a1-06ae-42d1-9882-3dd5a9d5f5ab/followers/'
-        }).then((response) => {
-            console.log(response.data)
-            navigate.push('/')
-        })
-
-        
-
         if (followButtonText == "Follow") {
             newFollowButtonText("Following");
         } else {
@@ -121,6 +107,19 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         if (following == false) {
             alert("Friend request sent")
         }
+
+        let formField_follow = new FormData();
+        formField_follow.append("actor", "actor")
+        await axios({
+            method:'post',
+            withCredentials: true,
+            headers: {'Content-Type':'application/json', 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'},
+            url: 'http://127.0.0.1:8000/authors/22c4d5a1-06ae-42d1-9882-3dd5a9d5f5ab/followers/',
+            data: formField_follow
+        }).then((response) => {
+            console.log(response.data)
+            navigate.push('/')
+        })
     }
     
 
