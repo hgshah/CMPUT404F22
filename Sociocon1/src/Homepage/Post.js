@@ -130,7 +130,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     }
     
    // 745e792f-2a17-4b1a-8db4-3940aba96b2e
-
+     
     function follow_clicked() {
         if (buttonText == "Follow") {
             newButtonText("Following");
@@ -264,7 +264,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                  <form>
                     <span>
                         <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {like}  </Button>  &nbsp;&nbsp;&nbsp;
-                        <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >   </Button>
+                        <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button>
                     </span>
 
                     </form>
