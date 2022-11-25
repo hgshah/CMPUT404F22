@@ -12,4 +12,5 @@ urlpatterns = [
     path(f'{app_name}/<uuid:follow_id>/', views.IndividualRequestView.as_view()),
     path(f'{authors_app_name}/<uuid:author_id>/followers/', views.FollowersView.as_view()),
     path(f'{authors_app_name}/<uuid:author_id>/real-friends/', views.RealFriendsView.as_view()),
+    path(f'{authors_app_name}/<uuid:target_id>/followers/<uuid:follower_id>', views.FollowersIndividualView.as_view()),
 ]

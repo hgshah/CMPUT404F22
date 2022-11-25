@@ -1,26 +1,30 @@
 import json
+import urllib.parse
 
 import requests
 
+from authors.serializers.author_serializer import AuthorSerializer
+from common.base_util import BaseUtil
 from remote_nodes.local_default import LocalDefault
 
 
 class Team14Local(LocalDefault):
     domain = '127.0.0.1:8014'
     username = 'team14_local'
-    remote_fields = {
+    remote_author_fields = {
         'id': 'official_id',
         'url': 'url',
         'display_name': 'display_name',
-        'github': 'github',
+        'github_handle': 'github',
         'profile_image': 'profile_image'
     }
 
     def get_base_url(self):
-        return f'http://{self.__class__.domain}/api'
+        return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}/api'
 
     @classmethod
     def create_node_credentials(cls):
+        """This is for local testing"""
         return {
             cls.domain: {
                 'username': 'team14_local',
@@ -39,12 +43,23 @@ class Team14Local(LocalDefault):
 
         try:
             response = requests.get(url, auth=(self.username, self.password))
-        except ConnectionError:
+        except ConnectionError as e:
+            print(f"{self.__class__.username}: url ({url}) Connection error: {e}")
             return None
         except Exception as e:
-            print(f"Team14Local: Unknown err: {e}")
+            print(f"{self.__class__.username}: Unknown err: {e}")
             return None
 
         if response.status_code == 200:
-            return json.loads(response.content.decode('utf-8'))
+            author_json = json.loads(response.content.decode('utf-8'))
+            author_list = []
+            for raw_author in author_json:
+                author_deserializer = AuthorSerializer(data=raw_author)
+                if author_deserializer.is_valid():
+                    author = author_deserializer.validated_data
+                    author_list.append(AuthorSerializer(author).data)
+                else:
+                    for err in author_deserializer.errors:
+                        print(f'{self}: get_all_author_jsons: {err}')
+            return author_list
         return None

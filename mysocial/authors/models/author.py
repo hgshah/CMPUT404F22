@@ -30,7 +30,6 @@ class Author(AbstractUser):
 
     # placed over here to prevent circular dependency
     SERIALIZER = None
-    connected_node_classes = ()
 
     # Remove this unnecessary fields
     first_name = None
@@ -78,9 +77,7 @@ class Author(AbstractUser):
             return self.url
 
         # local authors
-        prefix = 'https://'
-        if '127.0.0.1' in base.CURRENT_DOMAIN:
-            prefix = 'http://'
+        prefix = BaseUtil.get_http_or_https()
         return f"{prefix}{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
 
     def get_id(self) -> str:

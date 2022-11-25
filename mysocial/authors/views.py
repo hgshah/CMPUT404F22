@@ -1,17 +1,18 @@
 import logging
 
 from django.http.response import HttpResponse, HttpResponseNotFound
-from drf_spectacular.utils import OpenApiExample, extend_schema, inline_serializer
-from rest_framework import serializers
+from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from authors.models.author import Author
 from authors.permissions import NodeIsAuthenticated
-from authors.serializers.author_serializer import AUTHOR_SERIALIZER_EXAMPLE, AuthorSerializer, AuthorSerializerList
+from authors.serializers.author_serializer import AuthorSerializer, AuthorSerializerList
 from common.base_util import BaseUtil
 from common.pagination_helper import PaginationHelper
 from mysocial.settings import base
@@ -34,8 +35,8 @@ class AuthorView(GenericViewSet):
     @extend_schema(
         parameters=PaginationHelper.OPEN_API_PARAMETERS + RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializerList,
-        summary="authors_retrieve_all",
-        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        summary="Authors retrieve all",
+        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM14_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='retrieve_all')
     def retrieve_all(request: Request):
@@ -66,6 +67,7 @@ class AuthorView(GenericViewSet):
         should_do_recursively = not (request.user.is_authenticated and request.user.is_authenticated_node)
         if should_do_recursively:
             for node in BaseUtil.connected_nodes:
+                # todo: for team 14
                 author_jsons = node.get_all_author_jsons(request.query_params)
                 if author_jsons is None:
                     print(f'AuthorsView: cannot connect: {node.domain}')
@@ -99,8 +101,8 @@ class AuthorView(GenericViewSet):
     @extend_schema(
         parameters=RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializer,
-        summary="authors_retrieve",
-        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        summary="Retrieve an author",
+        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM14_CONNECTED]
     )
     def retrieve(request: Request, author_id: str) -> HttpResponse:
         """
@@ -135,6 +137,23 @@ class AuthorView(GenericViewSet):
         if node_config is None:
             return HttpResponseNotFound()
         return node_config.get_author_request(author_id)
+
+
+class AuthorSelfView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializers = AuthorSerializer
+
+    def get_queryset(self):
+        return None
+
+    @staticmethod
+    @extend_schema(
+        parameters=PaginationHelper.OPEN_API_PARAMETERS,
+        summary="Get current author logged in details"
+    )
+    def get(request: Request) -> HttpResponse:
+        """Get details about the current author"""
+        return Response(AuthorSerializer(request.user).data)
 
 
 class RemoteNodeView(GenericAPIView):

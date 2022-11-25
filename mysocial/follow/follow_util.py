@@ -5,6 +5,8 @@ from rest_framework.exceptions import ValidationError
 from authors.models.author import Author
 from authors.util import AuthorUtil
 from follow.models import Follow
+from mysocial.settings import base
+from remote_nodes.node_config_base import NodeConfigBase
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +23,20 @@ class FollowUtil:
 
         Remember to catch errors!
         """
-        follower_url_list = Follow.objects.values_list('actor', flat=True).filter(target=target.get_url(),
-                                                                                  has_accepted=True)
+        # todo: support remote authors!
+        if target.is_local():
+            follower_url_list = Follow.objects.values_list('actor', flat=True).filter(target=target.get_url(),
+                                                                                      has_accepted=True)
+        else:
+            node_config: NodeConfigBase = base.REMOTE_CONFIG.get(target.host)
+            if node_config is None:
+                print(f"FollowUtil: get_followers: missing NodeConfig: {target.host}")
+                return []
+            follower_list = node_config.get_all_followers(target)
+            follower_url_list = []
+            for follow_object in follower_list:
+                follow_object: Follow = follow_object # type hinting for IDE
+                follower_url_list.append(follow_object.actor)
 
         # todo: we could optimize this (later) by saving a list of local urls and doing a single database query for
         #  local authors; this implementation gets the local authors one-by-one; alternative will need another list
