@@ -23,7 +23,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const[value, setValue] = useState(""); 
 
     // const [userName, setUserName] = useState('');
-    const[buttonText, newButtonText] = useState("Follow");
+    const[followButtonText, newFollowButtonText] = useState("Follow");
     const[following, setFollowing] = useState(false);
 
     const [comment, setPostComment] = useState('');
@@ -55,8 +55,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method: 'post',
             withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
-            url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/de5b437f-5f88-4302-afaa-15182a4c643a/comments',
+            headers: { 'Content-Type': 'application/json', "Authorization": "Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1"},
+            // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/de5b437f-5f88-4302-afaa-15182a4c643a/comments',
+            url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6/posts/f63f7b8e-cc7e-4f86-8efb-488d84a969a3/comments',
             data: formField
         }).then((response) =>{
             console.log(response.data)
@@ -76,7 +77,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     //     }
     //     getAllPosts()
     // }, [])
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     
     const DeletePostInfo = async (id) => {
         String(id)
@@ -94,11 +95,25 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         })
     }
 
-    function follow_clicked() {
-        if (buttonText == "Follow") {
-            newButtonText("Following");
+    const follow_clicked = async() => {
+        let formField = new FormData();
+        formField.append("actor", following)
+        await axios({
+            method:'post',
+            withCredentials: true,
+            headers: {'Content-Type':'application/json', 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'},
+            url: 'http://127.0.0.1:8000/authors/22c4d5a1-06ae-42d1-9882-3dd5a9d5f5ab/followers/'
+        }).then((response) => {
+            console.log(response.data)
+            navigate.push('/')
+        })
+
+        
+
+        if (followButtonText == "Follow") {
+            newFollowButtonText("Following");
         } else {
-            newButtonText("Follow")
+            newFollowButtonText("Follow")
         }
 
         //show the friend request is sent
@@ -107,6 +122,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             alert("Friend request sent")
         }
     }
+    
 
   return (
     <div className='post'>
@@ -124,7 +140,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             className='follow_btn' 
                             onClick={follow_clicked}
                             style={{backgroundColor: following ? "rgb(159, 185, 31)" : "aqua"}} >
-                                {buttonText}
+                                {followButtonText}
                             </Button>
                             {/* hardcode */}
                             {/* <input 

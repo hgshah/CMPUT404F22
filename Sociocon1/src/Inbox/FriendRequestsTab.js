@@ -18,9 +18,9 @@ export default function FriendRequestsTab() {
   // const handleFollowRequests = async() => {
   //   response = await axios.get(process.env.REACT_APP_HOST + 'authors/{uuid}/followers/')
   //   console.log(response)
-  //   const followersIds = [];
+  //   const idFollower = [];
   //   for (let follower of response.data.items) {
-  //     followersIds.push()
+  //     idFollower.push()
   //   }
   // }
 
