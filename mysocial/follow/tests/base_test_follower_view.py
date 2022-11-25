@@ -6,14 +6,14 @@ from follow.models import Follow
 
 class BaseTestFollowerView(TestCase):
     def setUp(self) -> None:
-        self.target = TestHelper.create_author('target')
-        self.other = TestHelper.create_author('other')
+        self.target = TestHelper.overwrite_author('target')
+        self.other = TestHelper.overwrite_author('other')
         self.followers = []
         self.non_followers = [self.other]
         self.pending = []
 
         for index in range(10):
-            oomfie = TestHelper.create_author(f'user{index}')
+            oomfie = TestHelper.overwrite_author(f'user{index}')
 
             # okay, maybe one of them was not accepted yet
             if index == 5:

@@ -1,12 +1,17 @@
 from django.test import TestCase
 
 from authors.models.author import Author
+from common.base_util import BaseUtil
 from common.test_helper import TestHelper
 from mysocial.settings import base
 
 
 class TestAuthorView(TestCase):
     def setUp(self) -> None:
+        for author in Author.objects.all():
+            author.delete()
+        BaseUtil.connected_nodes = ()  # remove all nodes
+
         self.users = []
         for index in range(10):
             self.users.append(TestHelper.create_author(f'user{index}'))
@@ -19,7 +24,7 @@ class TestAuthorView(TestCase):
         )
         output_data = {
             "type": "author",
-            "id": user.official_id,
+            "id": user.get_id(),
             "url": f"http://{base.CURRENT_DOMAIN}/authors/{user.official_id}",
             "host": user.host,
             "displayName": user.display_name,

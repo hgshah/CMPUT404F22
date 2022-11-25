@@ -26,6 +26,7 @@ class PostTestCase(APITestCase):
         self.existing_post = TestHelper.create_post(author = self.author1)
         self.private_post = TestHelper.create_post(author = self.author1, other_args = {"visibility": Visibility.FRIENDS}) 
         self.author2_post = TestHelper.create_post(author = self.author2)
+        self.client.force_login(self.author1)
 
     # GET posts/public
     def test_get_all_public_posts(self):
@@ -39,7 +40,7 @@ class PostTestCase(APITestCase):
     # GET /authors/{AUTHOR_UUID}/posts?page={INT}&size={INT}
     def test_get_posts_by_author(self):
         # author 1 should have 2 created posts
-        request = f"/authors/{self.author1.official_id}/posts/?page={1}&size={2}"
+        request = f"/authors/{self.author1.get_id()}/posts/?page={1}&size={2}"
 
         response = self.client.get(request)
 
@@ -61,7 +62,7 @@ class PostTestCase(APITestCase):
 
         response = self.client.post(request, self.CREATE_POST_PAYLOAD)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.author1.official_id, response.data["author"]["id"])
+        self.assertEqual(self.author1.get_id(), response.data["author"]["id"])
 
     # GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     def test_get_specific_post(self):
@@ -100,7 +101,7 @@ class PostTestCase(APITestCase):
 
         response = self.client.put(request, self.CREATE_POST_PAYLOAD)
 
-        self.assertEqual(response.data["id"], new_uuid)
+        self.assertEqual(response.data["id"], str(new_uuid))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def get_expected_official_id(self, post_id):

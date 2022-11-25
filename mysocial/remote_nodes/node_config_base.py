@@ -8,6 +8,9 @@ from requests import ConnectionError
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
+from follow.models import Follow
+from follow.serializers.follow_serializer import FollowRequestSerializer
+from common.base_util import BaseUtil
 
 
 class NodeConfigBase:
@@ -24,8 +27,9 @@ class NodeConfigBase:
     domain = 'domain.herokuapp.com'
     username = 'domain'
     author_serializer = AuthorSerializer
+
     """Mapping: remote to local"""
-    remote_fields = {
+    remote_author_fields = {
         'id': 'official_id',
         'url': 'url',
         'host': 'host',
@@ -33,22 +37,39 @@ class NodeConfigBase:
         'github': 'github',
         'profileImage': 'profile_image'
     }
+    remote_follow_fields = {
+        'id': 'proxy_id',  # fake; for serializer
+        'hasAccepted': 'has_accepted',
+        'object': 'target',
+        'actor': 'actor',
+        'localUrl': 'local_url',  # fake; for serializer
+        'remoteUrl': 'proxy_url'  # fake; for serializer
+    }
 
     def __init__(self):
+        self.is_valid = False
         try:
-            self.node_author = Author.objects.get(username=self.__class__.username)
+            self.node_author = Author.objects.get(username=self.username)
             self.node_detail = self.node_author.node_detail
             self.username = self.node_detail.remote_username
             self.password = self.node_detail.remote_password
+            self.is_valid = True
         except Exception as e:
-            print('Author does not exist yet...')
+            print(f'Node author does not exist yet...: Finding username {self.username} {self.__class__}): {e}')
 
     @classmethod
     def create_dictionary_entry(cls):
-        return {cls.domain: cls()}
+        result = cls()
+        if result.is_valid:
+            print(f"Adding node: {result.username}")
+            return {cls.domain: result}
+        else:
+            # prevent adding invalid classes
+            print(f"Removing node: {result.username}")
+            return {}
 
     def get_base_url(self):
-        return f'http://{self.__class__.domain}'
+        return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}'
 
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""
@@ -116,23 +137,35 @@ class NodeConfigBase:
 
         return None
 
-    def get_all_followers_request(self, params: dict, author_id: str):
-        url = f'{self.get_base_url()}/authors/{author_id}/followers/'
+    def get_all_followers(self, author: Author, params=None):
+        if params is None:
+            # python has a weird property that if the argument is mutable, like a dictionary
+            # if you pass the reference around, you can actually change the default values,
+            # like params here. doing this to prevent evil things
+            params = {}
+
+        url = f'{author.get_url()}/followers/'
         if len(params) > 0:
             query_param = urllib.parse.urlencode(params)
             url += '?' + query_param
         response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
-            # todo(turnip): map to our author?
-            return Response(json.loads(response.content))
+            follower_json: dict = json.loads(response.content)
+            return follower_json.get('items')
+        return None
+
+    def get_all_followers_request(self, author: Author, params: dict):
+        followers = self.get_all_followers(author=author, params=params)
+        if followers is not None:
+            return Response({
+                "type": "followers",
+                "items": followers
+            })
         return HttpResponseNotFound()
 
-    def post_local_follow_remote(self, actor_url: str, target_id: str) -> dict:
+    def post_local_follow_remote(self, actor_url: str, author_target: Author) -> dict:
         """Make call to remote node to follow"""
-        target_author_url = self.from_author_id_to_url(target_id)
-        if target_author_url is None:
-            return 404
-        url = f'{target_author_url}/followers/'
+        url = f'{author_target.get_url()}/followers/'
         response = requests.post(url,
                                  auth=(self.username, self.password),
                                  data={'actor': actor_url})
@@ -145,7 +178,42 @@ class NodeConfigBase:
             print(f"post_local_follow_remote: remote server response: {response.status_code}")
         return response.status_code
 
-    ## will have to change the url depending on what team it is 
+    def delete_local_follow_remote(self, author_target: Author, author_actor: Author) -> dict:
+        """Make call to remote node to delete follow; stop sending stuff in my inbox!!!"""
+        url = f'{author_target.get_url()}/followers/{author_actor.get_id()}'
+        response = requests.delete(url,
+                                   auth=(self.username, self.password))
+        if 200 <= response.status_code < 300:
+            try:
+                return json.loads(response.content.decode('utf-8'))
+            except Exception as e:
+                print(f"Failed to deserialize response: {response.content}")
+        else:
+            print(f"post_local_follow_remote: remote server response: {response.status_code}")
+        return response.status_code
+
+    def get_remote_follow(self, target: Author, follower: Author) -> Follow:
+        """
+        Make call to remote node to get a follow object or request
+
+        Returns a Follow object if there is one;
+        Returns None if cannot be found
+        """
+        url = f'{target.get_url()}/followers/{follower.get_id()}'
+        response = requests.get(url, auth=(self.username, self.password))
+        if 200 <= response.status_code < 300:
+            follow_json = json.loads(response.content)
+            follow_serializer = FollowRequestSerializer(data=follow_json)
+            if not follow_serializer.is_valid():
+                for err in follow_serializer.errors:
+                    print(f'NodeConfigBase: get_remote_follow: serialization error: {err}')
+                return None
+            return follow_serializer.validated_data
+        else:
+            print(f'NodeConfigBase: get_follow_request: get failed: {response.status_code}')
+            return None
+
+    ## will have to change the url depending on what team it is
     # dictionary: [host + endpoint, formatted url]
     # will have to change the data for team 10
     def send_to_remote_inbox(self, data, target_author_url):

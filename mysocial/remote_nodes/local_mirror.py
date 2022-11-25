@@ -1,5 +1,4 @@
 from remote_nodes.local_default import LocalDefault
-from remote_nodes.node_config_base import NodeConfigBase
 
 
 class LocalMirror(LocalDefault):
