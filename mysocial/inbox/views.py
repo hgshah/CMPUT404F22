@@ -40,6 +40,7 @@ class InboxView(GenericAPIView):
                 return HttpResponse(status=status.HTTP_403_FORBIDDEN)
 
             author = Author.get_author(kwargs["author_id"])
+            print('hello')
             inbox = Inbox.objects.get(author = author)
             serializer = InboxSerializer(inbox)
             return Response(serializer.data, status = status.HTTP_200_OK)

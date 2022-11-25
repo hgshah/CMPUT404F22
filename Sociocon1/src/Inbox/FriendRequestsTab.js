@@ -1,5 +1,5 @@
 import React, { useState, Component, useEffect } from 'react'
-import "./FriendRequestsTab.css"
+import "./styles/FriendRequestsTab.css"
 import { appBarClasses, Avatar, Button, TextField} from '@mui/material';
 import ActivityTab from './ActivityTab';
 import axios from "axios";

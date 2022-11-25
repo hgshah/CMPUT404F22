@@ -44,8 +44,10 @@ class Post(models.Model):
 
     def get_url(self) -> str:
         # note: we might have to refactor this if some other team has a funky posts url
-        return f'{self.author.get_url()}/posts/{self.official_id}'
+        author_url = self.author.get_url().rstrip('/')
+        return f'{author_url}/posts/{self.official_id}'
 
     def get_comments_url(self) -> str:
         # note: we might have to refactor this if some other team has a funky comments url
-        return f'{self.author.get_url()}/posts/{self.official_id}/comments'
+        author_url = self.author.get_url().rstrip('/')
+        return f'{author_url}/posts/{self.official_id}/comments'

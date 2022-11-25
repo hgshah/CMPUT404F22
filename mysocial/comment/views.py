@@ -109,7 +109,7 @@ class CommentView(GenericAPIView):
         try:
             author = Author.get_author(self.request.user.get_id())
         except:
-            return Response(f'Failed to get author for author id: {self.request.user.get_id()}. Are you logged in? Did you pass auth information?', status = status.HTTP_400_BAD_REQUEST)
+            return Response(f'Failed to get author. Are you logged in? Did you pass auth information?', status = status.HTTP_400_BAD_REQUEST)
 
         try:
             post = Post.objects.get(official_id = kwargs['post_id'])
