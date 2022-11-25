@@ -79,7 +79,7 @@ export default function ActivityTab() {
             //setData(data.data);
             console.log(data.data.items)
             setData(data.data.items);
-            setData(testObj); //temp
+            setData(testObj); //temp, array is empty from inbox uri 
         })
     }, []);
     
