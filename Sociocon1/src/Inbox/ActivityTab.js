@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 
 export default function ActivityTab() {
     //https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+    //https://blog.logrocket.com/modern-api-data-fetching-methods-react/
     //eg. http://127.0.0.1:8000/authors/b636feb1-f85f-438c-b3a4-ce63f93d1b1d/inbox
 
     let host;
