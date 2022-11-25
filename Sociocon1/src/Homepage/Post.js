@@ -31,9 +31,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const [updatevisibility, setPostVisibility] = useState('')
     const [comment, setPostComment] = useState('');
     const [ContentType, setPostContentType] = useState('');
-    const [like, setPostLike] = useState(20);
+    const [like, setPostLike] = useState(1);
     const [likeactive, setPostLikeactive] = useState(false);
-
+    const[author_id, setAuthor_id] = useState('');
     //const[p_post, setPost] = useState([]); 
     // link : https://www.youtube.com/watch?v=a8KruvMkEtY
     function postlike(){
@@ -88,31 +88,39 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         })
     }
  
-    // useEffect(() => {
-    //     async function getAllPosts(){
-    //         try {
-    //                 const p_post = await axios.get("http://localhost:8000/posts/public/")
-    //                 console.log(p_post.data)
-    //                 setPost(p_post.data)
-    //         }
-    //         catch(error){
-    //             console.log(error)
-    //         }
-    //     }
-    //     getAllPosts()
-    // }, [])
+   
     const navigate = useNavigate()
     
     const DeletePostInfo = async () => {
         // String(id)
         // const nid = String(id).slice(-36)
-        
+       
         await axios({
                 method:'delete',
                 withCredentials: true ,
                 headers: { "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl
+                
+        }).then((response) =>{
+            console.log(response.data)
+            console.log(purl)
+            navigate.push('/')
+        })
+    }
+
+    const PostInfo_Likes = async () => {
+        
+        let formField12 = new FormData()
+        formField12.append("type","like")
+        formField12.append("object",purl)
+        await axios({
+                method:'post',
+                withCredentials: true ,
+                headers: {'Content-Type': 'application/json' , "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
+                url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/inbox',
+                data: formField12
             
         }).then((response) =>{
             console.log(response.data)
@@ -120,6 +128,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             navigate.push('/')
         })
     }
+    
    
     function follow_clicked() {
         if (buttonText == "Follow") {
@@ -234,7 +243,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                  <img className='post_content' src = {image} alt = " "/> 
                  <form>
                     <span>
-                        <Button onClick={postlike} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {like}  </Button>  &nbsp;&nbsp;&nbsp;
+                        <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {like}  </Button>  &nbsp;&nbsp;&nbsp;
                         <Button onClick = {handle} variant='contained' size = "small" endIcon= {<ShareIcon/>} >   </Button>
                     </span>
 

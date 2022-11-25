@@ -14,7 +14,7 @@ const Postbox = () => {
     const [description, setPostBody] = useState('');
     const [visibility, setPostVisibility] = useState('');
     const [postImage, setPostImage] = useState('');
-    
+    const [image, setImage] = useState('');
     const navigate = useNavigate()
     // const handleClick = () => {
     //     //  "message" stores input field value
@@ -47,8 +47,8 @@ const Postbox = () => {
             url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
 
             data: formField
-        }).then((response) =>{
-            console.log(response.data)
+        }).then((res) =>{
+            console.log(res.data)
             navigate.push('/')
         })
     }
@@ -86,6 +86,13 @@ const Postbox = () => {
                 
             </div>
             <input value={postImage} onchange = {e => setPostImage(e.target.value)} className="postbox_inputimage" placeholder='Enter a image url' type = "text" /> <br></br>
+            {/* // link: https://www.youtube.com/watch?v=xtQ74HKTOwY */}
+            <input 
+                onChange={e => setImage(e.target.files)}
+                src={image} 
+                type = "file"
+                name = "post image"
+                />
             {/* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
                 // license:  https://creativecommons.org/licenses/by-sa/4.0/ */}
