@@ -362,7 +362,7 @@ class SharePostView(GenericAPIView):
             else:
                 node_config = base.REMOTE_CONFIG.get(target_author.host)
                 response = node_config.get_post_by_post_id(request.path.split('/share')[0])
-                if response.status_code < 200 or response.status_code > 200:
+                if response.status_code < 200 or response.status_code > 300:
                     return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 post = json.loads(response.content)
@@ -380,7 +380,7 @@ class SharePostView(GenericAPIView):
                 else:
                     node_config = base.REMOTE_CONFIG.get(follower.host)
                     response = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = post)
-                    if response.status_code < 200 or response.status_code > 200:  
+                    if response.status_code < 200 or response.status_code > 300:  
                         return Response(json.loads(response.content), status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response("Successfully added to all followers inbox", status = status.HTTP_200_OK)

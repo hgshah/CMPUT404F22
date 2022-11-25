@@ -236,7 +236,7 @@ class NodeConfigBase:
         url = f'{self.get_base_url()}{post_url}'
         response =  requests.get(url = url, auth = (self.username, self.password))
 
-        if response.status_code < 200 or response.status_code > 200:
+        if response.status_code < 200 or response.status_code > 300:
             return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(json.loads(response.content), status = status.HTTP_200_OK)
@@ -245,7 +245,7 @@ class NodeConfigBase:
         url = f'{self.get_base_url()}{author_posts_path}'
         response = requests.get(url = url, auth = (self.username, self.password))
         
-        if response.status_code < 200 or response.status_code > 200:
+        if response.status_code < 200 or response.status_code > 300:
             return Response("Failed to get author's post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(json.loads(response.content), status = status.HTTP_200_OK)

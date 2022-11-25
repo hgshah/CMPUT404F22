@@ -59,7 +59,7 @@ class LikeView(GenericViewSet):
                 object_id = request.path
                 node_config = base.REMOTE_CONFIG.get(target_author.host)
                 response = node_config.get_authors_liked_on_post(object_id)
-                if response.status_code < 200 or response.status_code > 200:
+                if response.status_code < 200 or response.status_code > 300:
                     return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 return Response(json.loads(response.content), status = status.HTTP_200_OK)
@@ -96,7 +96,7 @@ class LikeView(GenericViewSet):
                 object_id = request.path
                 node_config = base.REMOTE_CONFIG.get(target_author.host)
                 response = node_config.get_authors_liked_on_comment(object_id)
-                if response.status_code < 200 or response.status_code > 200:
+                if response.status_code < 200 or response.status_code > 300:
                     return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 return Response(json.loads(response.content), status = status.HTTP_200_OK)
@@ -136,7 +136,7 @@ class LikeView(GenericViewSet):
                 node_config = base.REMOTE_CONFIG.get(target_author.host)
                 response = node_config.get_authors_likes(target_author.get_url())
 
-                if response.status_code < 200 or response.status_code > 200:
+                if response.status_code < 200 or response.status_code > 300:
                     return Response("Failed to get all author likes on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 return Response(json.loads(response.content), status = status.HTTP_200_OK)
