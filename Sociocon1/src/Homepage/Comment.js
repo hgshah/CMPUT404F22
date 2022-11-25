@@ -1,3 +1,6 @@
+// link: https://github.com/azharsaleem18/react-projects/blob/main/2-instagram-app/instagram/src/components/Comments.js
+// author: https://github.com/azharsaleem18
+// license: https://www.apache.org/licenses/LICENSE-2.0
 import React from 'react'
 import List from '@mui/material/List';
 import  {useState, useEffect} from 'react'
