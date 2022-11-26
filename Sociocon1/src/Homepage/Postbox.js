@@ -8,6 +8,7 @@ import "./Postbox.css"
 import { Avatar} from '@mui/material';
 import {useNavigate} from 'react-router-dom'
 import profilepic from "../profilepic.jpeg"
+import Login from '../Login';
 
 const Postbox = () => {
     const [title, setPostTitle] = useState('');
@@ -32,6 +33,7 @@ const Postbox = () => {
     // link: https://www.youtube.com/watch?v=xtQ74HKTOwY
     // author: https://www.youtube.com/c/GreatAdib
     //license: https://creativecommons.org/
+    
     const AddPostInfo = async () => {
         let formField = new FormData()
         formField.append("title", title)

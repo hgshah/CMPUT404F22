@@ -18,6 +18,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
 import axios from 'axios'
+import Login from '../Login';
 import EditPost from './EditPost';
 function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype, purl}) {
     const[value, setValue] = useState(""); 
@@ -33,7 +34,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const [ContentType, setPostContentType] = useState('');
     const [like, setPostLike] = useState(1);
     const [likeactive, setPostLikeactive] = useState(false);
-    const[author_id, setAuthor_id] = useState('');
+    
     //const[p_post, setPost] = useState([]); 
     // link : https://www.youtube.com/watch?v=a8KruvMkEtY
     function postlike(){
@@ -235,7 +236,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 
                     <h3>
                         {displayName} {" "} <span></span>
-                         
+                        
                         
                         
                         <span className='follow_span'> 

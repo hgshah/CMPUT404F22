@@ -8,9 +8,10 @@ import { Avatar, Button, TextField} from '@mui/material';
 
 // link: https://contactmentor.com/login-form-react-js-code/
 //link :https://bobbyhadz.com/blog/react-onclick-redirect
-function Login() {
+function Login(author_id) {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+
   const navigateHome = () => {
     // 👇️ navigate to /
     navigate('/home');
@@ -20,11 +21,13 @@ function Login() {
   const database = [
     {
       username: "hgshah",
-      password: "hgshah"
+      password: "hgshah",
+      authorid: "fdb67522-b0e6-45bb-8896-73972c2147ed"
     },
     {
-      username: "user2",
-      password: "pass2"
+      username: "hgshah1",
+      password: "hgshah1",
+      authorid: "745e792f-2a17-4b1a-8db4-3940aba96b2e"
     }
   ];
 
@@ -48,8 +51,10 @@ function Login() {
         // Invalid password
         setErrorMessages({ name: "pass", message: errors.pass });
       } else {
+        
         setIsSubmitted(true);
         navigateHome();
+        database.authorid = author_id
       }
     } else {
       // Username not found
