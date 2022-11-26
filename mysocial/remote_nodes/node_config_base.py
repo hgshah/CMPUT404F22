@@ -91,7 +91,7 @@ class NodeConfigBase:
         except ConnectionError:
             return None
         except Exception as e:
-            print(f"NodeConfigBase: Unknown err: {e}")
+            print(f"NodeConfigBase: Unknown err: {str(e)}")
             return None
 
         if response.status_code == 200:
