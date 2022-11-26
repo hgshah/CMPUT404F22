@@ -59,6 +59,7 @@ class Team7Local(LocalDefault):
             author_json = json.loads(response.content.decode('utf-8'))
             author_list = []
             for raw_author in author_json['items']:
+                raw_author['url'] = url  # since we don't trust their url; this works
                 author_deserializer = AuthorSerializer(data=raw_author)
                 if author_deserializer.is_valid():
                     author = author_deserializer.validated_data
