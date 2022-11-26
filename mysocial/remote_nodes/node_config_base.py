@@ -8,6 +8,7 @@ from requests import ConnectionError
 from rest_framework import status
 
 from authors.models.author import Author
+from authors.models.remote_node import NodeStatus
 from authors.serializers.author_serializer import AuthorSerializer
 from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestSerializer
@@ -27,6 +28,7 @@ class NodeConfigBase:
     """
     domain = 'domain.herokuapp.com'
     username = 'domain'
+    team_metadata_tag = 'default'
     author_serializer = AuthorSerializer
 
     """Mapping: remote to local"""
@@ -52,6 +54,11 @@ class NodeConfigBase:
         try:
             self.node_author = Author.objects.get(username=self.username)
             self.node_detail = self.node_author.node_detail
+            if self.node_detail.status != NodeStatus.ACTIVE:
+                # if we set inactive, don't include!
+                print(f'Node author is deactivated: {self.username}: {self.__class__}')
+                return
+
             self.username = self.node_detail.remote_username
             self.password = self.node_detail.remote_password
             self.is_valid = True

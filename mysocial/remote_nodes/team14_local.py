@@ -16,6 +16,7 @@ from rest_framework import status
 
 from common.pagination_helper import PaginationHelper
 
+
 class Team14Local(LocalDefault):
     domain = '127.0.0.1:8014'
     username = 'team14_local'
@@ -39,7 +40,7 @@ class Team14Local(LocalDefault):
         "created_at": "published",
         "visibility": "visibility",
         "unlisted": "unlisted"
-    } 
+    }
 
     def get_base_url(self):
         return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}/api'
@@ -64,7 +65,7 @@ class Team14Local(LocalDefault):
             url += '?' + query_param
 
         try:
-            response = requests.get(url, auth=(self.username, self.password))
+            response = requests.get(url)  # no auth
         except ConnectionError as e:
             print(f"{self.__class__.username}: url ({url}) Connection error: {e}")
             return None
@@ -92,8 +93,9 @@ class Team14Local(LocalDefault):
         try:
             response = requests.get(url, auth=(self.username, self.password))
         except Exception as e:
-            return Response(f"Failed to get author's post from remote server, error: {e}", status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            return Response(f"Failed to get author's post from remote server, error: {e}",
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         data = []
         post_data = json.loads(response.content.decode('utf-8'))
         for post in post_data:
@@ -102,27 +104,28 @@ class Team14Local(LocalDefault):
         data, err = PaginationHelper.paginate_serialized_data(request, data)
 
         if err is not None:
-            return Response(err, status = status.HTTP_400_BAD_REQUEST)
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'type': 'posts', 'items': data}, status = status.HTTP_200_OK)
-    
+            return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
+
     def get_post_by_post_id(self, post_url: str):
         url = f'{self.get_base_url()}{post_url}'
 
         try:
             response = requests.get(url, auth=(self.username, self.password))
         except Exception as e:
-            return Response(f"Failed to get author's post from remote server, error: {e}", status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            return Response(f"Failed to get author's post from remote server, error: {e}",
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         post_data = json.loads(response.content.decode('utf-8'))
 
         post = self.convert_team14_post(url, post_data)
-        return Response(post, status = status.HTTP_200_OK)
+        return Response(post, status=status.HTTP_200_OK)
 
     def convert_team14_post(self, url, post_data):
-        post_data["url"] = url 
-        
-        serializer = PostSerializer(data = post_data)
+        post_data["url"] = url
+
+        serializer = PostSerializer(data=post_data)
         if serializer.is_valid():
             return serializer.data
         else:
