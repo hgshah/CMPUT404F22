@@ -1,17 +1,18 @@
 import React from 'react'
 import Sidebar from './Sidebar'
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {useNavigate, useParams} from 'react-router-dom'
 import axios from 'axios'
 import "./Login.css"
 import { Avatar, Button, TextField} from '@mui/material';
+import Post from './Homepage/Post';
 
 // link: https://contactmentor.com/login-form-react-js-code/
 //link :https://bobbyhadz.com/blog/react-onclick-redirect
-function Login(author_id) {
+function Login(author_id, token) {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-
+  const [login_info, setLogin] = useState('')
   const navigateHome = () => {
     // 👇️ navigate to /
     navigate('/home');
@@ -22,12 +23,31 @@ function Login(author_id) {
     {
       username: "hgshah",
       password: "hgshah",
-      authorid: "fdb67522-b0e6-45bb-8896-73972c2147ed"
+
     },
     {
       username: "hgshah1",
       password: "hgshah1",
-      authorid: "745e792f-2a17-4b1a-8db4-3940aba96b2e"
+
+    },
+    {
+      username: "amanda",
+      password: "amanda",
+
+    },
+    {
+      username: "allan",
+      password: "allan",
+
+    },
+    {
+      username: "john",
+      password: "john",
+
+    },
+    {
+      username: "harkirat",
+      password: "harkirat",
     }
   ];
 
@@ -36,15 +56,44 @@ function Login(author_id) {
     pass: "invalid password"
   };
 
+  const PostToken = async () => {
+    var { uname, pass } = document.forms[0];
+    
+
+    // Find user login info
+    // const userData = database.find((user) => user.username === uname.value && user.pass === pass.value);
+
+    let formField_token = new FormData()
+    formField_token.append("username",uname.value)
+    formField_token.append("password", pass.value)
+    
+     await axios({
+            method:'post',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
+            url: 'http://127.0.0.1:8000/tokens/',
+            data: formField_token,
+        
+    }).then((login_info) =>{
+        console.log(login_info.data.token)
+        console.log(login_info.data.author.id)
+        navigate.push('/')
+    })
+}
+  
+
+
+
   const handleSubmit = (event) => {
     //Prevent page reload
     event.preventDefault();
 
     var { uname, pass } = document.forms[0];
+    
 
     // Find user login info
     const userData = database.find((user) => user.username === uname.value);
-
+    
     // Compare user info
     if (userData) {
       if (userData.password !== pass.value) {
@@ -54,7 +103,11 @@ function Login(author_id) {
         
         setIsSubmitted(true);
         navigateHome();
-        database.authorid = author_id
+        PostToken();
+        
+        // author_id = userData.authorid;
+        // token = userData.token;
+        
       }
     } else {
       // Username not found
@@ -95,6 +148,7 @@ function Login(author_id) {
         <div className="title">Sign In</div>
         {isSubmitted ? <div></div> : renderForm}
       </div>
+           
     </div>
   );
 }

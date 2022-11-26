@@ -20,7 +20,7 @@ import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
 import EditPost from './EditPost';
-function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype, purl}) {
+function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype, purl, token, authorid}) {
     const[value, setValue] = useState(""); 
 
     // const [userName, setUserName] = useState('');
@@ -268,7 +268,10 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                     {/* <p>{text}</p> */}
                     {title} <br></br>
                     {description}
+                    {token}
+                    {authorid}
                     
+
 
                 </div>
                 
