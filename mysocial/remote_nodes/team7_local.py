@@ -7,6 +7,7 @@ import requests
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from common.base_util import BaseUtil
+from mysocial.settings import base
 from remote_nodes.local_default import LocalDefault
 
 
@@ -23,6 +24,21 @@ class Team7Local(LocalDefault):
         'github': 'github',
         'profileImage': 'profile_image'
     }
+
+    def __init__(self):
+
+        """
+        To use headers:
+            response = requests.get('url',
+                                    headers=self.headers,
+                                    auth=(self.username, self.password))
+        """
+        self.origin = f'{BaseUtil.get_http_or_https()}{base.CURRENT_DOMAIN}'
+        self.headers = {
+            'Origin': self.origin,
+        }
+
+        super().__init__()
 
     def get_base_url(self):
         return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}/service'

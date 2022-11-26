@@ -47,9 +47,9 @@ class AuthorView(GenericViewSet):
         """
         Gets all authors (remote or local)
 
-        If the request was from an anonymous user or is a local user, we return users from both local and remote.
+        If the request was from a local user, we return users from both local and remote.
 
-        If the request was from a **node**, we only return local users.
+        If the request was from a **node** or an anonymous user, we only return local users.
         """
         node_target, other_params = RemoteUtil.extract_node_target(request)
         if node_target is not None:
@@ -67,8 +67,8 @@ class AuthorView(GenericViewSet):
         data = serializer.data
 
         # look at everyone else
-        # do not recursively find an author if this is a node
-        should_do_recursively = not (request.user.is_authenticated and request.user.is_authenticated_node)
+        # recursively find an author if this is a user
+        should_do_recursively = request.user.is_authenticated and request.user.is_authenticated_user
         if should_do_recursively:
             for node in BaseUtil.connected_nodes:
                 # todo: for team 14
@@ -117,9 +117,9 @@ class AuthorView(GenericViewSet):
         """
         Get an individual author
 
-        If the request was from an anonymous user or is a local user, we return try find the author locally and remotely.
+        If the request was from a local user, we return users from both local and remote.
 
-        If the request was from a **node**, we only return local users.
+        If the request was from a **node** or an anonymous user, we only return local users.
         """
 
         node_target, _ = RemoteUtil.extract_node_target(request)
@@ -127,8 +127,8 @@ class AuthorView(GenericViewSet):
             return AuthorView.retrieve_author(request, node_target, author_id)
 
         try:
-            # do not recursively find an author if this is a node
-            should_do_recursively = not (request.user.is_authenticated and request.user.is_authenticated_node)
+            # recursively find an author if this is a user
+            should_do_recursively = request.user.is_authenticated and request.user.is_authenticated_user
             author = Author.get_author(official_id=author_id, should_do_recursively=should_do_recursively)
         except Author.DoesNotExist:
             return HttpResponseNotFound()
