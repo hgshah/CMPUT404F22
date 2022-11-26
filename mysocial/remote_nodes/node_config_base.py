@@ -111,6 +111,7 @@ class NodeConfigBase:
             "items": author_jsons
         })
 
+    # todo: double check this is no longer used
     def from_author_id_to_url(self, author_id: str) -> str:
         url = f'{self.get_base_url()}/authors/{author_id}/'
         response = requests.get(url, auth=(self.username, self.password))
@@ -124,6 +125,7 @@ class NodeConfigBase:
         url = f'{self.get_base_url()}/authors/{author_id}/'
         return self.get_author_via_url(url)
 
+    # todo: double check this is no longer used
     def get_author_request(self, author_id: str):
         response = requests.get(f'{self.get_base_url()}/authors/{author_id}/', auth=(self.username, self.password))
         if response.status_code == 200:
@@ -141,7 +143,7 @@ class NodeConfigBase:
             if serializer.is_valid():
                 return serializer.validated_data  # <- GOOD RESULT HERE!!!
 
-            print('GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
+            print(f'{self} GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
 
         return None
 

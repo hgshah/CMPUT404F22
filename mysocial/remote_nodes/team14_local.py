@@ -65,7 +65,7 @@ class Team14Local(LocalDefault):
             url += '?' + query_param
 
         try:
-            response = requests.get(url)  # no auth
+            response = requests.get(url, auth=(self.username, self.password))
         except ConnectionError as e:
             print(f"{self.__class__.username}: url ({url}) Connection error: {e}")
             return None

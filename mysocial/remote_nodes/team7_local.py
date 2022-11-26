@@ -4,6 +4,7 @@ import urllib.parse
 
 import requests
 
+from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from common.base_util import BaseUtil
 from remote_nodes.local_default import LocalDefault
@@ -46,7 +47,7 @@ class Team7Local(LocalDefault):
             url += '?' + query_param
 
         try:
-            response = requests.get(url, auth=(self.username, self.password))
+            response = requests.get(url)
         except ConnectionError as e:
             print(f"{self.__class__.username}: url ({url}) Connection error: {e}")
             return None
@@ -66,4 +67,32 @@ class Team7Local(LocalDefault):
                     for err in author_deserializer.errors:
                         print(f'{self}: get_all_author_jsons: {err}')
             return author_list
+        return None
+
+    def get_author_via_url(self, author_url: str) -> Author:
+        response = requests.get(author_url)  # no password
+
+        if response.status_code == 200:
+            author_json = json.loads(response.content.decode('utf-8'))
+            serializer = AuthorSerializer(data=author_json)
+
+            if serializer.is_valid():
+                return serializer.validated_data  # <- GOOD RESULT HERE!!!
+
+            print(f'{self} GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
+
+        return None
+
+    def get_author_via_url(self, author_url: str) -> Author:
+        response = requests.get(author_url)  # no password
+
+        if response.status_code == 200:
+            author_json = json.loads(response.content.decode('utf-8'))
+            serializer = AuthorSerializer(data=author_json)
+
+            if serializer.is_valid():
+                return serializer.validated_data  # <- GOOD RESULT HERE!!!
+
+            print(f'{self} GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
+
         return None
