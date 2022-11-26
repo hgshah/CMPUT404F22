@@ -63,9 +63,6 @@ class Team7Local(LocalDefault):
                 if author_deserializer.is_valid():
                     author = author_deserializer.validated_data
                     author_list.append(AuthorSerializer(author).data)
-                else:
-                    for err in author_deserializer.errors:
-                        print(f'{self}: get_all_author_jsons: {err}')
             return author_list
         return None
 
