@@ -30,6 +30,10 @@ AUTHOR_SERIALIZER_EXAMPLE = {
 class AuthorSerializer(serializers.ModelSerializer):
     """
     Author object
+
+    Note:
+        - displayName: the name the user explicitly wanted to be known
+        - preferredName: the name the user defaults to when there's no displayName
     """
     type = serializers.SerializerMethodField('get_type')
     id = serializers.SerializerMethodField('get_id')
@@ -37,6 +41,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     profileImage = serializers.CharField(source='profile_image')
     url = serializers.SerializerMethodField('get_url')
     host = serializers.SerializerMethodField('get_host')
+    preferredName = serializers.SerializerMethodField('get_preferred_name')
 
     @staticmethod
     def get_type(model: Author) -> str:
@@ -58,6 +63,10 @@ class AuthorSerializer(serializers.ModelSerializer):
             return base.CURRENT_DOMAIN
 
         return model.host
+
+    @staticmethod
+    def get_preferred_name(model: Author) -> str:
+        return str(model)
 
     def to_internal_value(self, data: dict) -> Author:
         """
@@ -126,7 +135,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ('type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage')
+        fields = ('type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage', 'preferredName')
 
         # custom fields
         required_fields = ('url',)
