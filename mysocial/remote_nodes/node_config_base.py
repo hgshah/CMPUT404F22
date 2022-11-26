@@ -89,6 +89,7 @@ class NodeConfigBase:
         try:
             response = requests.get(url, auth=(self.username, self.password))
         except ConnectionError:
+            print(f'Connection error: {self}')
             return None
         except Exception as e:
             print(f"NodeConfigBase: Unknown err: {str(e)}")

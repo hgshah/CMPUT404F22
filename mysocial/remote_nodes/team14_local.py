@@ -84,6 +84,9 @@ class Team14Local(LocalDefault):
                     for err in author_deserializer.errors:
                         print(f'{self}: get_all_author_jsons: {err}')
             return author_list
+        else:
+            print(f'Non-200 status code for team 14: {url}')
+            print(response.content.decode('utf-8'))
         return None
 
     def get_authors_posts(self, request, author_post_path: str):
