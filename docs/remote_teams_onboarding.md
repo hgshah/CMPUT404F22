@@ -21,7 +21,7 @@ You can have another database using settings=mysocial.settings.local_mirror, but
 ### Method 0: The default ones in local testing
 
 To make local testing easier, if your team is listed in this documentation, you might not need to set up the things
-below.
+below. If your team is in here, you don't need to do the other methods below.
 
 #### Team 14
 
@@ -37,6 +37,23 @@ This assumes that:
 
 - team14 (your) server is running at http://127.0.0.1:8014
 - team10 (our) server is running at http://127.0.0.1:8000 or http://127.0.0.1:8080
+
+Contact us on discord if this is not feasible.
+
+#### Team 7
+
+You call our server using:
+username: team7_local
+password: team7_local
+
+We call your server using:
+remote_username: local_default
+remote_password: local_default
+
+This assumes that:
+
+- team7 (your) server is running at http://127.0.0.1:8000
+- team10 (our) server is running at http://127.0.0.1:8080
 
 Contact us on discord if this is not feasible.
 
