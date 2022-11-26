@@ -72,6 +72,7 @@ class Team7Local(LocalDefault):
 
         if response.status_code == 200:
             author_json = json.loads(response.content.decode('utf-8'))
+            author_json['url'] = author_url  # since we don't trust their url; this works
             serializer = AuthorSerializer(data=author_json)
 
             if serializer.is_valid():
@@ -86,6 +87,7 @@ class Team7Local(LocalDefault):
 
         if response.status_code == 200:
             author_json = json.loads(response.content.decode('utf-8'))
+            author_json['url'] = author_url  # since we don't trust their url; this works
             serializer = AuthorSerializer(data=author_json)
 
             if serializer.is_valid():
