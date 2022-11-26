@@ -158,7 +158,8 @@ class AuthorSelfView(APIView):
     @staticmethod
     @extend_schema(
         parameters=PaginationHelper.OPEN_API_PARAMETERS,
-        summary="Get current author logged in details"
+        summary="Get current author logged in details",
+        responses=AuthorSerializer,
     )
     def get(request: Request) -> HttpResponse:
         """Get details about the current author"""
