@@ -317,9 +317,32 @@ class CreationPostView(GenericAPIView):
             serializer = CreatePostSerializer(data=request.data)
             if serializer.is_valid():
                 data = serializer.data
-                data['author'] = Author.objects.get(official_id = kwargs['author_id'])
+                author = Author.get_author(kwargs['author_id'])
+                data['author'] = author
                 post = serializer.create(validated_data=data)
-                return Response(PostSerializer(post).data, status = status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+            try:
+                if post.visibility == Visibility.FRIENDS:
+                    inbox_post = PostSerializer(post).data
+                    followers = FollowUtil.get_followers(author)
+                
+                    for follower in followers: 
+                        if follower.is_local():
+                            inbox = Inbox.objects.get(author = follower)
+                            inbox.add_to_inbox(inbox_post)
+                        else:
+                            node_config = base.REMOTE_CONFIG.get(follower.host)
+                            response = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = inbox_post)
+                            if response.status_code < 200 or response.status_code > 300:  
+                                print("Did not send to remote inbox")
+
+            except Exception as e:
+                return Response(f"Error sending post to inbox, error: {e}", status = status.HTTP_400_BAD_REQUEST)
+
+            return Response(PostSerializer(post).data, status = status.HTTP_200_OK)
+
         except Exception as e:
             logger.info(e)
             return HttpResponseNotFound()

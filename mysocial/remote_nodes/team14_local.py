@@ -9,8 +9,6 @@ from rest_framework import status
 from authors.serializers.author_serializer import AuthorSerializer
 from common.base_util import BaseUtil
 from remote_nodes.local_default import LocalDefault
-from authors.models.author import Author
-from post.models import Post
 from post.serializer import PostSerializer
 from rest_framework import status
 
