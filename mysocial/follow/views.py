@@ -598,7 +598,11 @@ class FollowersIndividualView(GenericAPIView):
     @staticmethod
     @extend_schema(
         summary="Decline or delete follow request",
-        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
+        tags=[
+            'follows',
+            RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+            RemoteUtil.TEAM14_CONNECTED
+        ],
         responses={
             200: OpenApiResponse(response=FollowRequestSerializer)
         }

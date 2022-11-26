@@ -36,7 +36,11 @@ class AuthorView(GenericViewSet):
         parameters=PaginationHelper.OPEN_API_PARAMETERS + RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializerList,
         summary="Authors retrieve all",
-        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM14_CONNECTED]
+        tags=["authors",
+              RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+              RemoteUtil.TEAM14_CONNECTED,
+              RemoteUtil.TEAM7_CONNECTED
+              ]
     )
     @action(detail=True, methods=['get'], url_name='retrieve_all')
     def retrieve_all(request: Request):
@@ -102,7 +106,12 @@ class AuthorView(GenericViewSet):
         parameters=RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializer,
         summary="Retrieve an author",
-        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM14_CONNECTED]
+        tags=[
+            "authors",
+            RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+            RemoteUtil.TEAM14_CONNECTED,
+            RemoteUtil.TEAM7_CONNECTED
+        ]
     )
     def retrieve(request: Request, author_id: str) -> HttpResponse:
         """
@@ -173,9 +182,16 @@ class RemoteNodeView(GenericAPIView):
 
     @staticmethod
     @extend_schema(
-        tags=["remote-debug", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=[
+            "remote debug",
+            RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+            RemoteUtil.TEAM14_CONNECTED,
+            RemoteUtil.TEAM7_CONNECTED
+        ],
+        summary="Check node connection",
     )
     def get(request) -> HttpResponse:
+        """Check if remote node or server can connect to this server"""
         return Response({
             'type': 'remoteNode',
             'message': 'Authentication passed!'

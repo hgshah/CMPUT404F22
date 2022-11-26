@@ -149,3 +149,24 @@ node.save()
 
 For `other_args`, you don't need to add all fields, like the example above.
 
+## Sanity check with calling our server
+
+If we've made aware that you can call our production server, such that we've made a node or user for you. Or we gave you
+a username and password to call our server (or the other way around), then here's a reference to do some sanity checking
+that we can do basic connection with each other.
+
+Try to call our `remote-node/` endpoint:
+
+Here's a sample http call:
+
+```bash
+http https://socioecon.herokuapp.com/remote-node/ -a team7:pot8os_are_yummy
+```
+
+the expected response is:
+```json
+{
+    "message": "Authentication passed!",
+    "type": "remoteNode"
+}
+```
