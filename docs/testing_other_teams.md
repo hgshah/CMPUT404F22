@@ -62,3 +62,19 @@ As a sanity check, try to connect to their endpoint as a node.
    ```
    To test on our end, run the server in port 8007.
 4. Run server with `python main.py`
+
+### Sanity check
+
+Our headers and auth maybe wrong, so to sanity check that the basics are correct.
+
+To test their local server:
+
+```curl
+curl -u team7_local:team7_local -H 'Origin: http://127.0.0.1:8000' http://127.0.0.1:8007
+```
+
+To test their production server:
+
+```curl
+curl -u team10:pot8os_are_tasty -H 'Origin: https://socioecon.herokuapp.com' https://cmput404-social.herokuapp.com/remote-node
+```

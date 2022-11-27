@@ -54,7 +54,7 @@ class TestMirrorFollow(TestCase):
         # local actor follows remote target
         response = self.local.session.post(f'{self.local.base}/authors/{self.remote.author_id}/followers/')
         content = response.content.decode('utf-8')
-        self.assertEqual(response.status_code, 200, content)
+        self.assertEqual(response.status_code, 201, content)
 
         # # target receives follow request
         response = self.remote.session.get(f'{self.remote.base}/follows/incoming')
@@ -103,7 +103,7 @@ class TestMirrorFollow(TestCase):
         # just kidding! i wanna unfollow now >.>
         response = self.local.session.delete(
             f'{self.local.base}/authors/{self.remote.author_id}/followers/{self.local.author_id}')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
 
         # local actor checks if they are following (404)
         response = self.local.session.get(
@@ -128,11 +128,11 @@ class TestMirrorFollow(TestCase):
         # local actor follows remote target
         response = self.local.session.post(f'{self.local.base}/authors/{self.remote.author_id}/followers/')
         content = response.content.decode('utf-8')
-        self.assertEqual(response.status_code, 200, content)
+        self.assertEqual(response.status_code, 201, content)
 
         response = self.remote.session.delete(
             f'{self.remote.base}/authors/{self.remote.author_id}/followers/{self.local.author_id}')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
 
         # local actor checks if they are following (404)
         response = self.local.session.get(

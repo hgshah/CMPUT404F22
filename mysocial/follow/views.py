@@ -22,6 +22,8 @@ from follow.serializers.follow_serializer import FollowRequestListSerializer, Fo
 from mysocial.settings import base
 from remote_nodes.node_config_base import NodeConfigBase
 from remote_nodes.remote_util import RemoteUtil
+from remote_nodes.team14_local import Team14Local
+from remote_nodes.team14_main import Team14Main
 
 logger = logging.getLogger(__name__)
 
@@ -215,7 +217,7 @@ class IndividualRequestView(APIView):
 
             # todo(turnip): if remote, delete Follow reference or mirror from the remote server
 
-            return Response()
+            return Response(status=204)
         except Follow.DoesNotExist:
             return HttpResponseNotFound()
         except Exception as e:
@@ -297,7 +299,16 @@ class FollowersView(APIView):
                 'actor': serializers.URLField(allow_null=True)
             }
         ),
-        responses=FollowRequestSerializer(),
+        responses={
+            200: OpenApiResponse(
+                response=FollowRequestSerializer,
+                description='Returns 200 for certain servers'
+            ),
+            201: OpenApiResponse(
+                response=FollowRequestSerializer,
+                description='Normal return code'
+            )
+        },
     )
     def post(request: Request, author_id: str = None) -> HttpResponse:
         """
@@ -371,15 +382,15 @@ class FollowersView(APIView):
         except Exception as e:
             print(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data)
+        return Response(data=data, status=201)
 
     @staticmethod
     def post_local_follow_remote(request: Request, author_target: Author) -> HttpResponse:
-        node_config = base.REMOTE_CONFIG.get(author_target.host)
+        node_config: NodeConfigBase = base.REMOTE_CONFIG.get(author_target.host)
         if node_config is None:
             print(f"post_local_follow_remote: missing config for host: {author_target.host}")
             return HttpResponseNotFound()
-        response_json = node_config.post_local_follow_remote(request.user.get_url(), author_target)
+        response_json = node_config.post_local_follow_remote(request.user, author_target)
         if isinstance(response_json, int):
             return Response(status=response_json)
         try:
@@ -402,7 +413,7 @@ class FollowersView(APIView):
         except Exception as e:
             print(f'FollowersView: post_local_follow_remote: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data)
+        return Response(data=data, status=201)
 
     @staticmethod
     def post_remote_follow_local(request: Request, author_id: str = None) -> HttpResponse:
@@ -443,7 +454,10 @@ class FollowersView(APIView):
         except Exception as e:
             print(f'FollowersView: post: unknown error: {e}')
             return HttpResponseBadRequest()
-        return Response(data=data)
+        normal_success = 201
+        if target.host in (Team14Local.domain, Team14Main.domain):
+            normal_success = 200  # exception <3
+        return Response(data=data, status=normal_success)
 
 
 class FollowersIndividualView(GenericAPIView):
@@ -495,7 +509,7 @@ class FollowersIndividualView(GenericAPIView):
                 return None, HttpResponseNotFound("User does not follow the following author on our end")
         else:
             # trust THEIR data
-            node_config = base.REMOTE_CONFIG.get(target.host)
+            node_config: NodeConfigBase = base.REMOTE_CONFIG.get(target.host)
             if node_config is None:
                 print(f"FollowersIndividualView: get: unknown host: {target.host}")
                 return None, HttpResponseNotFound()
@@ -598,7 +612,11 @@ class FollowersIndividualView(GenericAPIView):
     @staticmethod
     @extend_schema(
         summary="Decline or delete follow request",
-        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
+        tags=[
+            'follows',
+            RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+            RemoteUtil.TEAM14_CONNECTED
+        ],
         responses={
             200: OpenApiResponse(response=FollowRequestSerializer)
         }
@@ -653,7 +671,7 @@ class FollowersIndividualView(GenericAPIView):
         # delete
         follow.delete()
 
-        return Response(follow_json)
+        return Response(follow_json, status=204)
 
 
 # todo(turnip): add test

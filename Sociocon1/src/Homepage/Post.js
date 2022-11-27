@@ -18,10 +18,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
 import axios from 'axios'
+import Login from '../Login';
 import EditPost from './EditPost';
 function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype, purl}) {
     const[value, setValue] = useState(""); 
-
+    const authorid = localStorage.getItem("authorid")
+    const token = localStorage.getItem("token")
     // const [userName, setUserName] = useState('');
     // const[followButtonText, newFollowButtonText] = useState("Follow");
     const[following, setFollowing] = useState(false);
@@ -33,7 +35,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const [ContentType, setPostContentType] = useState('');
     const [like, setPostLike] = useState(1);
     const [likeactive, setPostLikeactive] = useState(false);
-    const[author_id, setAuthor_id] = useState('');
+    
     //const[p_post, setPost] = useState([]); 
     // link : https://www.youtube.com/watch?v=a8KruvMkEtY
     function postlike(){
@@ -58,7 +60,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method: 'post',
             withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1"},
+            headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
             url: purl + '/comments' ,
             data: formField
         }).then((response) =>{
@@ -74,7 +76,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method: 'post',
             withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token 4b2f6de222e42aca42d129851b9a4dedd7e08d41"},
+            headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
             // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
@@ -98,7 +100,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'delete',
                 withCredentials: true ,
-                headers: { "Authorization": "Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1"},
+                headers: { "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl
                 
@@ -117,9 +119,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'post',
                 withCredentials: true ,
-                headers: {'Content-Type': 'application/json' , "Authorization": "Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1"},
+                headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: 'http://127.0.0.1:8000/authors/22c4d5a1-06ae-42d1-9882-3dd5a9d5f5ab/inbox',
+                url: 'http://127.0.0.1:8000/authors/' + authorid + '/inbox',
                 data: formField12
             
         }).then((response) =>{
@@ -162,7 +164,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'put',
                 withCredentials: true ,
-                headers: {'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl + '/share',
                 data: formField_share
@@ -229,7 +231,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 
                     <h3>
                         {displayName} {" "} <span></span>
-                         
+                        
                         
                         
                         <span className='follow_span'> 
@@ -261,7 +263,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                     {/* <p>{text}</p> */}
                     {title} <br></br>
                     {description}
+ 
                     
+
 
                 </div>
                 

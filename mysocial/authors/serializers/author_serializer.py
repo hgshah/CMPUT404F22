@@ -1,3 +1,4 @@
+import json
 import pathlib
 from urllib.parse import urlparse
 
@@ -30,6 +31,10 @@ AUTHOR_SERIALIZER_EXAMPLE = {
 class AuthorSerializer(serializers.ModelSerializer):
     """
     Author object
+
+    Note:
+        - displayName: the name the user explicitly wanted to be known
+        - preferredName: the name the user defaults to when there's no displayName
     """
     type = serializers.SerializerMethodField('get_type')
     id = serializers.SerializerMethodField('get_id')
@@ -37,6 +42,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     profileImage = serializers.CharField(source='profile_image')
     url = serializers.SerializerMethodField('get_url')
     host = serializers.SerializerMethodField('get_host')
+    preferredName = serializers.SerializerMethodField('get_preferred_name')
 
     @staticmethod
     def get_type(model: Author) -> str:
@@ -58,6 +64,10 @@ class AuthorSerializer(serializers.ModelSerializer):
             return base.CURRENT_DOMAIN
 
         return model.host
+
+    @staticmethod
+    def get_preferred_name(model: Author) -> str:
+        return str(model)
 
     def to_internal_value(self, data: dict) -> Author:
         """
@@ -126,10 +136,31 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ('type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage')
+        fields = ('type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage', 'preferredName')
 
         # custom fields
         required_fields = ('url',)
+
+    @classmethod
+    def deserializer_author_list(cls, response_json: str):
+        author_json = json.loads(response_json)
+
+        if isinstance(author_json, dict):
+            author_json = author_json.get('items')
+
+        if author_json is None:
+            print('AuthorSerializer: deserializer_author_list: author_json is None')
+            return []
+
+        author_list = []
+        for raw_author in author_json:
+            author_deserializer = AuthorSerializer(data=raw_author)
+            if author_deserializer.is_valid():
+                author = author_deserializer.validated_data
+                author_list.append(AuthorSerializer(author).data)
+            else:
+                print(f'AuthorSerializer: deserializer_author_list: unknown error')
+        return author_list
 
 
 @extend_schema_serializer(

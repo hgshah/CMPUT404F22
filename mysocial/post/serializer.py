@@ -100,6 +100,7 @@ class PostSerializer(serializers.ModelSerializer):
                 if node_config is None:
                     print(f"PostSerializer: Host not found: {host}")
                     return serializers.ValidationError(f"PostSerializer: Host not found: {host}")
+
                 post_remote_fields: dict = node_config.post_remote_fields
    
                 for remote_field, local_field in post_remote_fields.items():

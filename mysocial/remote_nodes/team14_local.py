@@ -6,6 +6,7 @@ import urllib.parse
 from rest_framework.response import Response
 from rest_framework import status
 
+from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from common.base_util import BaseUtil
 from remote_nodes.local_default import LocalDefault
@@ -18,6 +19,8 @@ from common.pagination_helper import PaginationHelper
 class Team14Local(LocalDefault):
     domain = '127.0.0.1:8014'
     username = 'team14_local'
+
+    """team14 fields <-> our fields"""
     remote_author_fields = {
         'id': 'official_id',
         'url': 'url',
@@ -56,6 +59,33 @@ class Team14Local(LocalDefault):
             }
         }
 
+    def post_local_follow_remote(self, author_actor: Author, author_target: Author) -> dict:
+        url = f'{author_target.get_url()}/inbox/'
+        response = requests.post(url,
+                                 auth=(self.username, self.password),
+                                 json={
+                                     'type': 'follow',
+                                     'sender': {
+                                         'url': author_actor.get_url(),
+                                         'id': author_actor.get_id()
+                                     },
+                                     'receiver': {
+                                         'url': author_target.get_url(),
+                                         'id': author_target.get_id(),
+                                     }
+                                 })
+        if 200 <= response.status_code < 300:
+            return {
+                'type': 'follow',
+                'actor': {'url': author_actor.get_url()},
+                'object': {'url': author_target.get_url()},
+                'hasAccepted': False,
+                'localUrl': f'{author_actor.get_url()}/followers/{author_target.get_id()}/',
+                'id': None
+            }  # <- GOOD
+        print(f'{self}: post_local_follow_remote: {response.content}')
+        return response.status_code
+
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""
         url = f'{self.get_base_url()}/authors/'
@@ -73,17 +103,10 @@ class Team14Local(LocalDefault):
             return None
 
         if response.status_code == 200:
-            author_json = json.loads(response.content.decode('utf-8'))
-            author_list = []
-            for raw_author in author_json:
-                author_deserializer = AuthorSerializer(data=raw_author)
-                if author_deserializer.is_valid():
-                    author = author_deserializer.validated_data
-                    author_list.append(AuthorSerializer(author).data)
-                else:
-                    for err in author_deserializer.errors:
-                        print(f'{self}: get_all_author_jsons: {err}')
-            return author_list
+            return AuthorSerializer.deserializer_author_list(response.content.decode('utf-8'))
+        else:
+            print(f'Non-200 status code for team 14: {url}')
+            print(response.content.decode('utf-8'))
         return None
 
     def get_authors_posts(self, request, author_post_path: str):
