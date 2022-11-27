@@ -6,7 +6,6 @@ from rest_framework.request import Request
 
 from authors.models.author import Author
 from authors.models.remote_node import NodeStatus
-from authors.serializers.author_serializer import AuthorSerializer
 from common.base_util import BaseUtil
 from common.pagination_helper import PaginationHelper
 from common.test_helper import TestHelper

@@ -53,7 +53,7 @@ class FollowRequestSerializer(serializers.ModelSerializer):
     remoteUrl = serializers.SerializerMethodField('get_remote_url')
 
     def get_type(self, model) -> str:
-        return "Follow"
+        return 'follow'
 
     def get_summary(self, model) -> str:
         return str(model)

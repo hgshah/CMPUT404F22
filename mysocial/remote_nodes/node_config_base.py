@@ -96,8 +96,7 @@ class NodeConfigBase:
             return None
 
         if response.status_code == 200:
-            author_jsons = json.loads(response.content.decode('utf-8'))
-            return author_jsons['items']
+            return AuthorSerializer.deserializer_author_list(response.content.decode('utf-8'))
         return None
 
     # endpoints
@@ -161,8 +160,7 @@ class NodeConfigBase:
             url += '?' + query_param
         response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
-            follower_json: dict = json.loads(response.content)
-            return follower_json.get('items')
+            return AuthorSerializer.deserializer_author_list(response.content.decode('utf-8'))
         return None
 
     def get_all_followers_request(self, author: Author, params: dict):
@@ -174,12 +172,12 @@ class NodeConfigBase:
             })
         return HttpResponseNotFound()
 
-    def post_local_follow_remote(self, actor_url: str, author_target: Author) -> dict:
+    def post_local_follow_remote(self, author_actor: Author, author_target: Author) -> dict:
         """Make call to remote node to follow"""
         url = f'{author_target.get_url()}/followers/'
         response = requests.post(url,
                                  auth=(self.username, self.password),
-                                 data={'actor': actor_url})
+                                 data={'actor': author_actor.get_url()})
         if 200 <= response.status_code < 300:
             try:
                 return json.loads(response.content.decode('utf-8'))

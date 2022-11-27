@@ -9,7 +9,8 @@ import { Avatar} from '@mui/material';
 import {useNavigate} from 'react-router-dom'
 import profilepic from "../profilepic.jpeg"
 
-const Postbox = () => {
+
+function Postbox ({authorid, token}) {
     const [title, setPostTitle] = useState('');
     const [description, setPostBody] = useState('');
     const [visibility, setPostVisibility] = useState('');
@@ -27,7 +28,7 @@ const Postbox = () => {
     // license:  https://creativecommons.org/licenses/by-sa/4.0/
     const[value, setValue] = useState(""); 
     function handle() {
-        alert("post has been created")
+        alert()
     }
     // link: https://www.youtube.com/watch?v=xtQ74HKTOwY
     // author: https://www.youtube.com/c/GreatAdib
@@ -45,7 +46,7 @@ const Postbox = () => {
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             
             // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
-            url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6/posts/',
+            url: 'http://127.0.0.1:8000/authors/' + authorid + '/posts/',
 
             data: formField
         }).then((res) =>{
@@ -60,7 +61,8 @@ const Postbox = () => {
             
             <div className="postbox_input">
                 <Avatar sr  c = {profilepic} />
-                
+                <input value= {authorid}></input>
+    
                 <input 
                 onChange={e => setPostTitle(e.target.value)} 
                 value={title} 
@@ -97,7 +99,7 @@ const Postbox = () => {
             {/* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
                 // license:  https://creativecommons.org/licenses/by-sa/4.0/ */}
-            <Button onClick = {AddPostInfo}  className = "postbox_button" type = "submit">Post</Button>
+            <Button onClick = {AddPostInfo}  className = "postbox_button" >Post</Button>
             
         </form>
       
