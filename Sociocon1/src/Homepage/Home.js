@@ -9,7 +9,7 @@ function Home() {
   return (
     <div className='home'>
         <Sidebar />
-
+        
         {/*feed */}
         < Feed />
         {/*widgets */}

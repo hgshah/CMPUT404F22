@@ -268,8 +268,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                     {/* <p>{text}</p> */}
                     {title} <br></br>
                     {description}
-                    {token}
-                    {authorid}
+ 
                     
 
 

@@ -6,6 +6,7 @@ import axios from 'axios'
 import "./Login.css"
 import { Avatar, Button, getAccordionDetailsUtilityClass, TextField} from '@mui/material';
 import Post from './Homepage/Post';
+import Feed from './Homepage/Feed';
 import Postbox from './Homepage/Postbox';
 import { Construction, DataSaverOffTwoTone, LocalConvenienceStoreOutlined, ReceiptLongOutlined } from '@mui/icons-material';
 // link: https://contactmentor.com/login-form-react-js-code/
@@ -83,16 +84,17 @@ function Login() {
     }).then((login_info) =>{
         
         
-        // const info_token = [];
+         const info_token = [];
         // const info_authorid = [];
-        // info_token.push({...login_info.data.token})
+         info_token.push({...login_info.data})
         // info_authorid.push({...login_info.data.author.id})
         // const newinfo_token = Object.values(info_token[0]).join('')
         // const newinfo_authorid = Object.values(info_authorid[0]).join('')
         // console.log(newinfo_token)
         // console.log(newinfo_authorid)
-        setAuthorid((authorid1) =>[login_info.data.author.id, ...authorid1])
-        console.log({authorid1})
+        setAuthorid(info_token)
+        console.log(info_token)
+        
     })
     
 }
@@ -122,13 +124,6 @@ function Login() {
         
         
         
-     
-      
-        
-          
-        // author_id = userData.authorid;
-        // token = userData.token;
-        
       }
     } else {
       // Username not found
@@ -139,41 +134,74 @@ function Login() {
 
 
   // Generate JSX code for error message
-  const renderErrorMessage = (name) =>
-    name === errorMessages.name && (
-      <div className="error">{errorMessages.message}</div>
-    );
+  // const renderErrorMessage = (name) =>
+  //   name === errorMessages.name && (
+  //     <div className="error">{errorMessages.message}</div>
+  //   );
 
   // JSX code for login form
-  const renderForm = (
+  // const renderForm = (
+  //   <div className="form">
+  //     <form onSubmit={handleSubmit}>
+  //       <div className="input-container">
+  //         <label>Username </label>
+  //         <input type="text" name="uname" required />
+  //         {renderErrorMessage("uname")}
+  //       </div>
+  //       <div className="input-container">
+  //         <label>Password </label>
+  //         <input type="password" name="pass" required />
+  //         {renderErrorMessage("pass")}
+  //       </div>
+  //       <div className="button-container">
+  //           <input type="submit" />
+  //       </div>
+  //     </form>
+  //   </div>
+  // );
+//   <div className="app">
+//   <div className="login-form">
+//     <div className="title">Sign In</div>
+//     <div>
+     
+//             {
+//                 authorid1.map((autho) => {
+//                     return <p> {autho.author.id}</p>
+//                 })
+//             }
+      
+//     </div>
+//     {isSubmitted ? <div></div> : renderForm}
+    
+//   </div>
+
+  
+       
+// </div>
+
+  return (
     <div className="form">
-      <form onSubmit={handleSubmit}>
+      <form >
         <div className="input-container">
           <label>Username </label>
           <input type="text" name="uname" required />
-          {renderErrorMessage("uname")}
+          
         </div>
         <div className="input-container">
-          <label>Password </label>
-          <input type="password" name="pass" required />
-          {renderErrorMessage("pass")}
-        </div>
-        <div className="button-container">
-            <input type="submit" />
+            <label>Password </label>
+            <input type="password" name="pass" required />
+            <button onClick = {handleSubmit} > Submit </button>
+                {
+                    authorid1.map((autho) => {
+                        return <p> <Postbox authorid = {autho.author.id} 
+                                />
+                        </p>
+                    })
+                }
         </div>
       </form>
     </div>
-  );
 
-  return (
-    <div className="app">
-      <div className="login-form">
-        <div className="title">Sign In</div>
-        {isSubmitted ? <div></div> : renderForm}
-        
-      </div>
-           
-    </div>
   );
 }
 export default Login
