@@ -105,17 +105,7 @@ class Team14Local(LocalDefault):
             return None
 
         if response.status_code == 200:
-            author_json = json.loads(response.content.decode('utf-8'))
-            author_list = []
-            for raw_author in author_json:
-                author_deserializer = AuthorSerializer(data=raw_author)
-                if author_deserializer.is_valid():
-                    author = author_deserializer.validated_data
-                    author_list.append(AuthorSerializer(author).data)
-                else:
-                    for err in author_deserializer.errors:
-                        print(f'{self}: get_all_author_jsons: {err}')
-            return author_list
+            return AuthorSerializer.deserializer_author_list(response.content.decode('utf-8'))
         else:
             print(f'Non-200 status code for team 14: {url}')
             print(response.content.decode('utf-8'))

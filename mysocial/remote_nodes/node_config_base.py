@@ -96,8 +96,7 @@ class NodeConfigBase:
             return None
 
         if response.status_code == 200:
-            author_jsons = json.loads(response.content.decode('utf-8'))
-            return author_jsons['items']
+            return AuthorSerializer.deserializer_author_list(response.content.decode('utf-8'))
         return None
 
     # endpoints
@@ -161,8 +160,7 @@ class NodeConfigBase:
             url += '?' + query_param
         response = requests.get(url, auth=(self.username, self.password))
         if response.status_code == 200:
-            follower_json: dict = json.loads(response.content)
-            return follower_json.get('items')
+            return AuthorSerializer.deserializer_author_list(response.content.decode('utf-8'))
         return None
 
     def get_all_followers_request(self, author: Author, params: dict):

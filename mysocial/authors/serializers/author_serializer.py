@@ -1,3 +1,4 @@
+import json
 import pathlib
 from urllib.parse import urlparse
 
@@ -139,6 +140,20 @@ class AuthorSerializer(serializers.ModelSerializer):
 
         # custom fields
         required_fields = ('url',)
+
+    @classmethod
+    def deserializer_author_list(cls, response_json: str):
+        author_json = json.loads(response_json)
+        author_list = []
+        for raw_author in author_json:
+            author_deserializer = AuthorSerializer(data=raw_author)
+            if author_deserializer.is_valid():
+                author = author_deserializer.validated_data
+                author_list.append(AuthorSerializer(author).data)
+            else:
+                for err in author_deserializer.errors:
+                    print(f'AuthorSerializer: get_all_author_jsons: {str(err)}')
+        return author_list
 
 
 @extend_schema_serializer(
