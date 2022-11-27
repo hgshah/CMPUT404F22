@@ -37,7 +37,7 @@ class Follow(models.Model):
     """
     remote_id is the id of the authoritative Follow object in the other server
     """
-    remote_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    remote_id = models.UUIDField(default=uuid.uuid4, editable=True, blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         self._author_actor: Author = None
