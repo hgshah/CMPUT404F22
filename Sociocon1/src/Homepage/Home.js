@@ -12,7 +12,7 @@ function Home({authorid, token}) {
         <Sidebar />
         
         {/*feed */}
-        < Feed authorid = {authorid} />
+        < Feed />
         {/*widgets */}
         <News />
     </div>

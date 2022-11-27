@@ -149,8 +149,8 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method:'post',
             withCredentials: true,
-            headers: {'Content-Type':'application/json', 'Authorization':'Token 7dfbab16c928892276793397732be2f0d4f6835a'},
-            url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/followers/',
+            headers: {'Content-Type':'application/json', 'Authorization':'Token ' + token},
+            url: 'http://127.0.0.1:8000/authors/' + authorid + '/followers/',
             // data: formField_follow
         }).then((response) => {
             console.log(response.data)

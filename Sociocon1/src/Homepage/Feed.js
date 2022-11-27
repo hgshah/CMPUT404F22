@@ -21,6 +21,7 @@ function Feed({}) {
     const[p_post, setPost] = useState([]); 
     const[p_comment, setComment] = useState([]); 
     const authorid = localStorage.getItem("authorid")
+    const preferredName = localStorage.getItem("preferredName")
     // useEffect(() =>{
     //         setPosts()
     // }, [])
@@ -78,7 +79,12 @@ function Feed({}) {
   return (
     <div className='feed'>
         <div className="feed_header">
-           <h2>Home </h2>
+           <h2>Home              
+            </h2>
+            <h3>
+              user:{preferredName} 
+            </h3>
+          
         </div>
         
       {/* header*/}

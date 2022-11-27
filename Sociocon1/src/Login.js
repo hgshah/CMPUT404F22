@@ -89,18 +89,23 @@ function Login() {
          const info_token_send = [];
          const info_token =[];
          const info_authorid = [];
+         const info_preferredName = []
          info_token_send.push({...login_info.data})
          info_token.push({...login_info.data.token})
          info_authorid.push({...login_info.data.author.id})
+         info_preferredName.push({...login_info.data.author.preferredName})
          const newinfo_token = Object.values(info_token[0]).join('')
          const newinfo_authorid = Object.values(info_authorid[0]).join('')
         // console.log(newinfo_token)
         // console.log(newinfo_authorid)
         setAuthorid(info_token_send)
-        
+        //link :https://www.youtube.com/watch?v=HTSAJna3X8c
+        //author: 
+        //license:
+        console.log(info_token_send)
         localStorage.setItem("authorid", Object.values(info_authorid[0]).join(''))
         localStorage.setItem("token", Object.values(info_token[0]).join(''))
-        
+        localStorage.setItem("preferredName", Object.values(info_preferredName[0]).join(''))
     })
     
 }
