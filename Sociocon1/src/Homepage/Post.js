@@ -25,7 +25,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
     // const [userName, setUserName] = useState('');
-    const[followButtonText, newFollowButtonText] = useState("Follow");
+    // const[followButtonText, newFollowButtonText] = useState("Follow");
     const[following, setFollowing] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [updatetitle, setPostTitle] = useState('')
@@ -132,25 +132,19 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     }
 
     const follow_clicked = async() => {
-        if (followButtonText == "Follow") {
-            newFollowButtonText("Following");
-        } else {
-            newFollowButtonText("Follow")
-        }
+        // if (followButtonText == "Follow") {
+        //     newFollowButtonText("Following");
+        // } else {
+        //     newFollowButtonText("Follow")
+        // }
 
         //show the friend request is sent
         setFollowing(!following);
-        // if (following == false) {
-        //     alert("Friend request sent")
-        // }
-
-        // let formField_follow = new FormData();
-        // formField_follow.append("actor", "actor")
         await axios({
             method:'post',
             withCredentials: true,
-            headers: {'Content-Type':'application/json', 'Authorization':'Token ' + token},
-            url: 'http://127.0.0.1:8000/authors/' + authorid + '/followers/',
+            headers: {'Content-Type':'application/json', 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'},
+            url: 'http://127.0.0.1:8000/authors/22c4d5a1-06ae-42d1-9882-3dd5a9d5f5ab/followers/', //hard coded to show "malhi wants to follow harkirat on following any post"
             // data: formField_follow
         }).then((response) => {
             console.log(response.data)
@@ -265,8 +259,8 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             <Button 
                             className='follow_btn' 
                             onClick={follow_clicked}
-                            style={{backgroundColor: following ? "rgb(159, 185, 31)" : "aqua"}} >
-                                {followButtonText}
+                            style={{backgroundColor: following ? "rgb(211, 211, 211)" : "rgb(159, 185, 31)"}} >
+                                {following ? "Following" : "Follow"}
                             </Button>
                             {/* hardcode */}
                             {/* <input 
