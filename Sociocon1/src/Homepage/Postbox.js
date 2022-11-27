@@ -28,7 +28,7 @@ const Postbox = (authorid, token) => {
     // license:  https://creativecommons.org/licenses/by-sa/4.0/
     const[value, setValue] = useState(""); 
     function handle() {
-        alert(JSON.stringify(authorid))
+        alert()
     }
     // link: https://www.youtube.com/watch?v=xtQ74HKTOwY
     // author: https://www.youtube.com/c/GreatAdib

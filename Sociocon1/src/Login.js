@@ -4,21 +4,22 @@ import {useState, useEffect} from 'react';
 import {useNavigate, useParams} from 'react-router-dom'
 import axios from 'axios'
 import "./Login.css"
-import { Avatar, Button, TextField} from '@mui/material';
+import { Avatar, Button, getAccordionDetailsUtilityClass, TextField} from '@mui/material';
 import Post from './Homepage/Post';
 import Postbox from './Homepage/Postbox';
-import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
+import { Construction, DataSaverOffTwoTone, LocalConvenienceStoreOutlined, ReceiptLongOutlined } from '@mui/icons-material';
 // link: https://contactmentor.com/login-form-react-js-code/
 //link :https://bobbyhadz.com/blog/react-onclick-redirect
 function Login() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [token1, setToken] = useState([])
+  const [token1, setToken] = useState('')
   const [authorid1, setAuthorid] = useState([])
   const navigateHome = () => {
     // 👇️ navigate to /
     navigate('/home');
   };
+  
   const navigate = useNavigate();
   // User Login info
   const database = [
@@ -58,6 +59,9 @@ function Login() {
     pass: "invalid password"
   };
 
+  
+
+
   const PostToken = async () => {
     var { uname, pass } = document.forms[0];
     
@@ -78,19 +82,19 @@ function Login() {
         
     }).then((login_info) =>{
         
-        const info_token = [];
-        const info_authorid = [];
-        info_token.push({...login_info.data.token})
-        info_authorid.push({...login_info.data.author.id})
-        const newinfo_token = Object.values(info_token[0]).join('')
-        const newinfo_authorid = Object.values(info_authorid[0]).join('')
-        console.log(newinfo_token)
-        console.log(newinfo_authorid)
-        setAuthorid(newinfo_authorid)
         
-        setToken(newinfo_token)
-        navigate.push('/')
+        // const info_token = [];
+        // const info_authorid = [];
+        // info_token.push({...login_info.data.token})
+        // info_authorid.push({...login_info.data.author.id})
+        // const newinfo_token = Object.values(info_token[0]).join('')
+        // const newinfo_authorid = Object.values(info_authorid[0]).join('')
+        // console.log(newinfo_token)
+        // console.log(newinfo_authorid)
+        setAuthorid((authorid1) =>[login_info.data.author.id, ...authorid1])
+        console.log({authorid1})
     })
+    
 }
   
 
@@ -114,9 +118,13 @@ function Login() {
       } else {
         
         setIsSubmitted(true);
-        navigateHome();
         PostToken();
-
+        
+        
+        
+     
+      
+        
           
         // author_id = userData.authorid;
         // token = userData.token;
@@ -126,7 +134,9 @@ function Login() {
       // Username not found
       setErrorMessages({ name: "uname", message: errors.uname });
     }
+    
   };
+
 
   // Generate JSX code for error message
   const renderErrorMessage = (name) =>
