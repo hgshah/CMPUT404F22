@@ -1,7 +1,7 @@
 import pathlib
 from urllib.parse import urlparse
 
-from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_schema_serializer
+from drf_spectacular.utils import OpenApiExample, extend_schema_serializer
 from rest_framework import serializers
 
 from authors.models.author import Author
@@ -30,6 +30,10 @@ AUTHOR_SERIALIZER_EXAMPLE = {
 class AuthorSerializer(serializers.ModelSerializer):
     """
     Author object
+
+    Note:
+        - displayName: the name the user explicitly wanted to be known
+        - preferredName: the name the user defaults to when there's no displayName
     """
     type = serializers.SerializerMethodField('get_type')
     id = serializers.SerializerMethodField('get_id')
@@ -37,6 +41,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     profileImage = serializers.CharField(source='profile_image')
     url = serializers.SerializerMethodField('get_url')
     host = serializers.SerializerMethodField('get_host')
+    preferredName = serializers.SerializerMethodField('get_preferred_name')
 
     @staticmethod
     def get_type(model: Author) -> str:
@@ -58,6 +63,10 @@ class AuthorSerializer(serializers.ModelSerializer):
             return base.CURRENT_DOMAIN
 
         return model.host
+
+    @staticmethod
+    def get_preferred_name(model: Author) -> str:
+        return str(model)
 
     def to_internal_value(self, data: dict) -> Author:
         """
@@ -85,7 +94,7 @@ class AuthorSerializer(serializers.ModelSerializer):
                 node_config = base.REMOTE_CONFIG.get(host)
                 if node_config is None:
                     print(f"AuthorSerializer: Host not found: {host}")
-                    return serializers.ValidationError(f"AuthorSerializer: Host not found: {host}")
+                    raise serializers.ValidationError(f"AuthorSerializer: Host not found: {host}")
                 remote_fields: dict = node_config.remote_author_fields
 
                 for remote_field, local_field in remote_fields.items():
@@ -110,7 +119,14 @@ class AuthorSerializer(serializers.ModelSerializer):
 
                     setattr(author, local_field, entry)
                     # end loop for processing and setting entries
+
                 author.host = host  # force a set even if field was not given
+
+                # special processing for team7
+                if node_config.team_metadata_tag == 'team7':
+                    author_id = data['id']
+                    entry = f'{BaseUtil.get_http_or_https()}{node_config.domain}/service/authors/{author_id}'
+                    setattr(author, 'url', entry)
         except Exception as e:
             print(f"AuthorSerializer: failed serializing: {e}")
             raise serializers.ValidationError(f"AuthorSerializer: failed serializing: {e}")
@@ -119,7 +135,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ('type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage')
+        fields = ('type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage', 'preferredName')
 
         # custom fields
         required_fields = ('url',)

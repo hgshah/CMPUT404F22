@@ -284,5 +284,5 @@ In socioecon's ConfigVars (or staging), add this with key REMOTE_NODE_CREDENTIAL
 ### Part 4: Double deploy... (Some funky issues I haven't solved)
 
 We have a weird bug where you might need to deploy twice due to some ordering with node creation and node config
-creation. Might not solve this bug but we could just deploy twice once we add a new REMOTE_NODE_CREDENTIALS. You may do
+creation. Might not solve this bug, but we could just deploy twice once we add a new REMOTE_NODE_CREDENTIALS. You may do
 this by adding a comment anywhere, then pushing it again.
