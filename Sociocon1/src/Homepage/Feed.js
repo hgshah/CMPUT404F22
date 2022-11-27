@@ -29,7 +29,7 @@ function Feed({}) {
     useEffect(() => {
       async function getAllPosts(){
           try {
-                  const p_post = await axios.get("http://localhost:8000/posts/public/")
+                  const p_post = await axios.get("https://socioecon.herokuapp.com/posts/public/")
                   console.log(p_post.data)
                   setPost(p_post.data)
           }

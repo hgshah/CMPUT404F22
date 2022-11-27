@@ -121,7 +121,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: 'http://127.0.0.1:8000/authors/' + authorid + '/inbox',
+                url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/inbox',
                 data: formField12
             
         }).then((response) =>{
@@ -144,7 +144,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             method:'post',
             withCredentials: true,
             headers: {'Content-Type':'application/json', 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'},
-            url: 'http://127.0.0.1:8000/authors/22c4d5a1-06ae-42d1-9882-3dd5a9d5f5ab/followers/', //hard coded to show "malhi wants to follow harkirat on following any post"
+            url: 'https://socioecon.herokuapp.com/authors/22c4d5a1-06ae-42d1-9882-3dd5a9d5f5ab/followers/', //hard coded to show "malhi wants to follow harkirat on following any post"
             // data: formField_follow
         }).then((response) => {
             console.log(response.data)
