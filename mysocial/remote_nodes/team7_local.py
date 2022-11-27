@@ -7,6 +7,8 @@ import requests
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from common.base_util import BaseUtil
+from follow.models import Follow
+from follow.serializers.follow_serializer import FollowRequestSerializer
 from mysocial.settings import base
 from remote_nodes.local_default import LocalDefault
 
@@ -98,17 +100,46 @@ class Team7Local(LocalDefault):
 
         return None
 
-    def get_author_via_url(self, author_url: str) -> Author:
-        response = requests.get(author_url)  # no password
+    def post_local_follow_remote(self, author_actor: Author, author_target: Author) -> dict:
+        url = f'{author_target.get_url()}/followers/{author_actor.get_id()}'
+        response = requests.put(url,
+                                auth=(self.username, self.password),
+                                headers=self.headers)
+        if 200 <= response.status_code < 300:
+            return {
+                'type': 'follow',
+                'actor': {'url': author_actor.get_url()},
+                'object': {'url': author_target.get_url()},
+                'hasAccepted': False,
+                'localUrl': f'{author_actor.get_url()}/followers/{author_target.get_id()}/',
+                'id': None
+            }  # <- GOOD
+        print(f'{self}: post_local_follow_remote: {response.content}')
+        return response.status_code
 
-        if response.status_code == 200:
-            author_json = json.loads(response.content.decode('utf-8'))
-            author_json['url'] = author_url  # since we don't trust their url; this works
-            serializer = AuthorSerializer(data=author_json)
+    def get_remote_follow(self, target: Author, follower: Author) -> Follow:
+        """
+        Make call to remote node to get a follow object or request
 
-            if serializer.is_valid():
-                return serializer.validated_data  # <- GOOD RESULT HERE!!!
-
-            print(f'{self} GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
-
-        return None
+        Returns a Follow object if there is one;
+        Returns None if cannot be found
+        """
+        url = f'{target.get_url()}/followers/{follower.get_id()}'
+        response = requests.get(url, auth=(self.username, self.password))
+        if 200 <= response.status_code < 300:
+            follow_json = json.loads(response.content)
+            follow_serializer = FollowRequestSerializer(data={
+                'actor': AuthorSerializer(follower).data,
+                'object': AuthorSerializer(target).data,
+                'hasAccepted': True,  # team7 does not have follow request, you get followed immediately somehow
+                'localUrl': f'{follower.get_url()}/followers/{target.get_id()}/',
+                'id': None
+            })
+            if not follow_serializer.is_valid():
+                for err in follow_serializer.errors:
+                    print(f'NodeConfigBase: get_remote_follow: serialization error: {err}')
+                return None
+            return follow_serializer.validated_data
+        else:
+            print(f'NodeConfigBase: get_follow_request: get failed: {response.status_code}')
+            return None

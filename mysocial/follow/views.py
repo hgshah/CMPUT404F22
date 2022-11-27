@@ -550,7 +550,11 @@ class FollowersIndividualView(GenericAPIView):
             return error_response
 
         follow_serializer = FollowRequestSerializer(follow)
-        follow_json = follow_serializer.data
+        try:
+            follow_json = follow_serializer.data
+        except Exception as e:
+            print(f'FollowersIndividualView: Bad serialization error: {e}')
+            return HttpResponseNotFound()
 
         if follow.has_accepted:
             # public information
