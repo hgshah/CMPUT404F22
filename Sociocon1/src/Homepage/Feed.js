@@ -13,6 +13,7 @@ import axios from 'axios'
 import Comment from './Comment'
 import Test from '../Test';
 import Profile from "../Profile";
+import Login from '../Login';
 import {useNavigate, useParams} from 'react-router-dom'
 function Feed() {
     //const [posts, setPosts] = useState([]);
