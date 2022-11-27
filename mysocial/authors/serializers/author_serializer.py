@@ -144,6 +144,14 @@ class AuthorSerializer(serializers.ModelSerializer):
     @classmethod
     def deserializer_author_list(cls, response_json: str):
         author_json = json.loads(response_json)
+
+        if isinstance(author_json, dict):
+            author_json = author_json.get('items')
+
+        if author_json is None:
+            print('AuthorSerializer: deserializer_author_list: author_json is None')
+            return []
+
         author_list = []
         for raw_author in author_json:
             author_deserializer = AuthorSerializer(data=raw_author)
