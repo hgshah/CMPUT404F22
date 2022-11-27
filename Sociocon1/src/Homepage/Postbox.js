@@ -33,26 +33,55 @@ function Postbox ({}) {
     // author: https://www.youtube.com/c/GreatAdib
     //license: https://creativecommons.org/
     const AddPostInfo = async () => {
-        let formField = new FormData()
-        formField.append("title", title)
-        formField.append("description", description)
-        formField.append("visibility", visibility)
-        await axios({
-            method: 'post',
 
-            // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+        if(visibility === "Friends"){
+            console.log({visibility})
+            let formField = new FormData()
+            formField.append("title", title)
+            formField.append("description", description)
+            formField.append("visibility", visibility)
+            await axios({
+                method: 'post',
+
+                // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
+                // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                
+                // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+                url: 'http://127.0.0.1:8000/authors/' + authorid + '/posts/',
+
+                data: formField
+            }).then((res) =>{
+                console.log(res.data)
+                
+            })
             
-            // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
-            url: 'http://127.0.0.1:8000/authors/' + authorid + '/posts/',
+        } else {
+                let formField = new FormData()
+            formField.append("title", title)
+            formField.append("description", description)
+            formField.append("visibility", visibility)
+            await axios({
+                method: 'post',
 
-            data: formField
-        }).then((res) =>{
-            console.log(res.data)
-            navigate.push('/')
+                // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
+                // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                
+                // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+                url: 'http://127.0.0.1:8000/authors/' + authorid + '/posts/',
+
+                data: formField
+            }).then((res) =>{
+                console.log(res.data)
+                
         })
+
+        }
+        
     }
+
+
     
   return (
     <div className='postbox'>
@@ -80,10 +109,10 @@ function Postbox ({}) {
                 {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
                        author: https://developer.mozilla.org/en-US/
                        License: https://creativecommons.org/licenses/by-sa/4.0/*/}
-                <select name="visibility" id="visibility">
-                    <option value="">choose an option--</option>
-                    <option value={visibility}>Public</option>
-                    <option value="Friends">Friends</option>
+                <select value={visibility} onChange={e => setPostVisibility(e.target.value)} name="visibility" id="visibility">
+                    <option  value="" >choose an option--</option>
+                    <option  value="public">Public</option>
+                    <option value = "friends">Friends</option>
                 </select>
                 
             </div>
