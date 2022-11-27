@@ -21,7 +21,7 @@ You can have another database using settings=mysocial.settings.local_mirror, but
 ### Method 0: The default ones in local testing
 
 To make local testing easier, if your team is listed in this documentation, you might not need to set up the things
-below.
+below. If your team is in here, you don't need to do the other methods below.
 
 #### Team 14
 
@@ -37,6 +37,25 @@ This assumes that:
 
 - team14 (your) server is running at http://127.0.0.1:8014
 - team10 (our) server is running at http://127.0.0.1:8000 or http://127.0.0.1:8080
+
+Contact us on discord if this is not feasible.
+
+#### Team 7
+
+You call our server using:
+username: team7_local
+password: team7_local
+
+We call your server using:
+remote_username: local_default
+remote_password: local_default
+
+This assumes that:
+
+- team7 (your) server is running at http://127.0.0.1:8000
+- team10 (our) server is running at http://127.0.0.1:8080
+
+Contact us on discord if this is not feasible.
 
 ### Method 1: python manage.py shell
 
@@ -84,7 +103,7 @@ Call our endpoints via basic auth, and use the username and password you used to
 
 We call your endpoint using the remote_username and remote_password fields! :D
 
-(Yeah, I know, we don't have the POST set up yet for remote-nodes T.T)
+(Yeah, I know, we don't have the POST set up yet for remote-nodes so you'll have to give us your password... T.T)
 
 ## Creating users
 
@@ -92,6 +111,62 @@ So, we haven't made an endpoint for making an author. The way we do it was by us
 
 ```python
 from common.test_helper import TestHelper
+
 node = TestHelper.create_author(username='chris')
 node.save()
+
+# new safer version that overwrites or creates a new one
+node = TestHelper.overwrite_author(username='chris')
+node.save()
+```
+
+The default password is "1234567".
+
+To override properties, you can do:
+
+```python
+from common.test_helper import TestHelper
+
+node = TestHelper.create_author(username='chris', other_args={
+    'email': 'chris@gmail.com',
+    'password': '1234567',
+    'display_name': 'chris',
+    'github': 'https://github.com/chris/',
+    'is_staff': False,
+    'is_superuser': False,
+})
+node.save()
+
+# new safer version that overwrites or creates a new one
+node = TestHelper.create_author(username='chris', other_args={
+    'password': 'hunter2',
+    'github': 'https://github.com/hunter2/',
+    'is_staff': true,
+    'is_superuser': true,
+})
+node.save()
+```
+
+For `other_args`, you don't need to add all fields, like the example above.
+
+## Sanity check with calling our server
+
+If we've made aware that you can call our production server, such that we've made a node or user for you. Or we gave you
+a username and password to call our server (or the other way around), then here's a reference to do some sanity checking
+that we can do basic connection with each other.
+
+Try to call our `remote-node/` endpoint:
+
+Here's a sample http call:
+
+```bash
+http https://socioecon.herokuapp.com/remote-node/ -a team7:pot8os_are_yummy
+```
+
+the expected response is:
+```json
+{
+    "message": "Authentication passed!",
+    "type": "remoteNode"
+}
 ```

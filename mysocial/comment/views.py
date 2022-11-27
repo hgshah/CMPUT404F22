@@ -71,7 +71,7 @@ class CommentView(GenericAPIView):
             else:
                 node_config = base.REMOTE_CONFIG.get(target_author.host)
                 response = node_config.get_comments_for_post(request.get_full_path())
-                if response.status_code < 200 or response.status_code > 200:
+                if response.status_code < 200 or response.status_code > 300:
                     return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
                 return Response(json.loads(response.content), status = status.HTTP_200_OK)
@@ -107,13 +107,22 @@ class CommentView(GenericAPIView):
         User story: As an author, I want to comment on posts that I can access
         """
         try:
-            serializer = CreateCommentSerializer(data=request.data)
-            if serializer.is_valid():
-                data = serializer.data
-                data['author'] = Author.objects.get(official_id = self.request.user.official_id)
-                data['post'] = Post.objects.get(official_id = kwargs['post_id'])
-                comment = serializer.create(validated_data=data)
-                return Response(CommentSerializer(comment).data, status = status.HTTP_200_OK)
-        except Exception as e:
-            print(e)
-            return HttpResponseNotFound
+            author = Author.get_author(self.request.user.get_id())
+        except:
+            return Response(f'Failed to get author. Are you logged in? Did you pass auth information?', status = status.HTTP_400_BAD_REQUEST)
+
+        try:
+            post = Post.objects.get(official_id = kwargs['post_id'])
+        except:
+            return Response(f'Failed to get post for post id: {kwargs["post_id"]}', status = status.HTTP_400_BAD_REQUEST)
+        
+        serializer = CreateCommentSerializer(data=request.data)
+        
+        if serializer.is_valid() == False:
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            data['author'] = author
+            data['post'] = post
+            comment = serializer.create(validated_data = data)
+            return Response(CommentSerializer(comment).data, status = status.HTTP_200_OK)

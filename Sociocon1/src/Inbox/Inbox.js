@@ -1,13 +1,15 @@
 import React, {useState} from "react"
-import Sidebar from './Sidebar'
+import Sidebar from '../Sidebar'
+import News from '../News'
 import {NavLink, Routes, Route, Outlet } from "react-router-dom"
 //import "./Style.css";
-import "./Inbox.css"
+import "./styles/Inbox.css"
 import ActivityTab from "./ActivityTab";
 import FriendRequestsTab from "./FriendRequestsTab";
 import MessagesTab from "./MessagesTab";
 import TabDesc from "./TabDesc";
 import Tabs from "./Tabs";
+
 
 // const tabList = [
 //     {
@@ -22,7 +24,7 @@ import Tabs from "./Tabs";
 
 export default function Inbox() {
     //initial selected tab will be activity
-    const [currentTab, setCurrentTab] = useState("activity");
+    const [currentTab, setCurrentTab] = useState("requests");
     
     // Handle when user changes tabs
     function handleActivityTab() {
@@ -38,7 +40,9 @@ export default function Inbox() {
     }
 
     return (
-    <div
+    <div>
+        <Sidebar/>
+        <div
         
         className="Inbox">
             
@@ -55,6 +59,7 @@ export default function Inbox() {
                 onClick={handleRequestsTab}>Friend Requests</li>
                 <li className={currentTab === "messages" ? "current" : ""}
                 onClick={handleMessagesTab}>Messages</li> */}
+                
             </ul>
             <div className="outlet">
                 <Tabs id="activity" currentTab={currentTab}>
@@ -71,6 +76,7 @@ export default function Inbox() {
                 {currentTab === "requests" ? <FriendRequestsTab /> : ""}
                 {currentTab === "messages" ? <MessagesTab /> : ""} */}
             </div>
+        </div>
     </div>
   )
 }

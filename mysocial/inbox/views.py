@@ -40,6 +40,7 @@ class InboxView(GenericAPIView):
                 return HttpResponse(status=status.HTTP_403_FORBIDDEN)
 
             author = Author.get_author(kwargs["author_id"])
+            print('hello')
             inbox = Inbox.objects.get(author = author)
             serializer = InboxSerializer(inbox)
             return Response(serializer.data, status = status.HTTP_200_OK)
@@ -184,12 +185,7 @@ class InboxView(GenericAPIView):
     
     def send_post_or_comment_to_remote_inbox(self, request, target_author):
         node_config = base.REMOTE_CONFIG.get(target_author.host)
-        response = node_config.send_to_remote_inbox(data = request.data, target_author_url = target_author.get_url())
-
-        if response.status_code < 200 or response.status_code > 200:
-            return Response(json.loads(response.content), status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response(f"Successfully added {request.data['type']} to {target_author}", status = status.HTTP_200_OK)
+        return node_config.send_to_remote_inbox(data = request.data, target_author_url = target_author.get_url())
 
     def handle_likes(self, request, node, **kwargs):
         if node.is_authenticated_user:

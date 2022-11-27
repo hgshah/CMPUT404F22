@@ -76,7 +76,7 @@ https://github.com/iamshaunjp/Complete-React-Tutorial/blob/lesson-29/dojo-blog/s
 
 https://devooti.com/create-a-responsive-navbar-using-reactjs/#google_vignette
 https://www.youtube.com/watch?v=rJjaqSTzOxI
-
+https://www.youtube.com/watch?v=_juldkziiFc
 https://github.com/CleverProgrammers/twitter-clone
 https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select
 

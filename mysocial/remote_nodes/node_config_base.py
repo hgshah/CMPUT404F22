@@ -5,11 +5,14 @@ import requests
 from django.http import HttpResponseNotFound
 from rest_framework.response import Response
 from requests import ConnectionError
+from rest_framework import status
 
 from authors.models.author import Author
+from authors.models.remote_node import NodeStatus
 from authors.serializers.author_serializer import AuthorSerializer
 from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestSerializer
+from common.base_util import BaseUtil
 
 
 class NodeConfigBase:
@@ -25,6 +28,7 @@ class NodeConfigBase:
     """
     domain = 'domain.herokuapp.com'
     username = 'domain'
+    team_metadata_tag = 'default'
     author_serializer = AuthorSerializer
 
     """Mapping: remote to local"""
@@ -46,20 +50,34 @@ class NodeConfigBase:
     }
 
     def __init__(self):
+        self.is_valid = False
         try:
-            self.node_author = Author.objects.get(username=self.__class__.username)
+            self.node_author = Author.objects.get(username=self.username)
             self.node_detail = self.node_author.node_detail
+            if self.node_detail.status != NodeStatus.ACTIVE:
+                # if we set inactive, don't include!
+                print(f'Node author is deactivated: {self.username}: {self.__class__}')
+                return
+
             self.username = self.node_detail.remote_username
             self.password = self.node_detail.remote_password
+            self.is_valid = True
         except Exception as e:
-            print('Author does not exist yet...')
+            print(f'Node author does not exist yet...: Finding username {self.username} {self.__class__}): {e}')
 
     @classmethod
     def create_dictionary_entry(cls):
-        return {cls.domain: cls()}
+        result = cls()
+        if result.is_valid:
+            print(f"Adding node: {result.username}")
+            return {cls.domain: result}
+        else:
+            # prevent adding invalid classes
+            print(f"Removing node: {result.username}")
+            return {}
 
     def get_base_url(self):
-        return f'http://{self.__class__.domain}'
+        return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}'
 
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""
@@ -71,9 +89,10 @@ class NodeConfigBase:
         try:
             response = requests.get(url, auth=(self.username, self.password))
         except ConnectionError:
+            print(f'Connection error: {self}')
             return None
         except Exception as e:
-            print(f"NodeConfigBase: Unknown err: {e}")
+            print(f"NodeConfigBase: Unknown err: {str(e)}")
             return None
 
         if response.status_code == 200:
@@ -93,6 +112,7 @@ class NodeConfigBase:
             "items": author_jsons
         })
 
+    # todo: double check this is no longer used
     def from_author_id_to_url(self, author_id: str) -> str:
         url = f'{self.get_base_url()}/authors/{author_id}/'
         response = requests.get(url, auth=(self.username, self.password))
@@ -106,6 +126,7 @@ class NodeConfigBase:
         url = f'{self.get_base_url()}/authors/{author_id}/'
         return self.get_author_via_url(url)
 
+    # todo: double check this is no longer used
     def get_author_request(self, author_id: str):
         response = requests.get(f'{self.get_base_url()}/authors/{author_id}/', auth=(self.username, self.password))
         if response.status_code == 200:
@@ -123,7 +144,7 @@ class NodeConfigBase:
             if serializer.is_valid():
                 return serializer.validated_data  # <- GOOD RESULT HERE!!!
 
-            print('GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
+            print(f'{self} GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
 
         return None
 
@@ -203,9 +224,6 @@ class NodeConfigBase:
             print(f'NodeConfigBase: get_follow_request: get failed: {response.status_code}')
             return None
 
-    ## will have to change the url depending on what team it is
-    # dictionary: [host + endpoint, formatted url]
-    # will have to change the data for team 10
     def send_to_remote_inbox(self, data, target_author_url):
         if target_author_url is None:
             return 404
@@ -226,11 +244,21 @@ class NodeConfigBase:
 
     def get_post_by_post_id(self, post_url):
         url = f'{self.get_base_url()}{post_url}'
-        return requests.get(url = url, auth = (self.username, self.password))
+        response =  requests.get(url = url, auth = (self.username, self.password))
+
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
     def get_authors_posts(self, author_posts_path):
         url = f'{self.get_base_url()}{author_posts_path}'
-        return requests.get(url = url, auth = (self.username, self.password))
+        response = requests.get(url = url, auth = (self.username, self.password))
+        
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to get author's post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
     def get_comments_for_post(self, comments_path):
         url = f'{self.get_base_url()}{comments_path}'

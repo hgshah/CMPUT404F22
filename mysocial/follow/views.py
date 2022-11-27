@@ -400,6 +400,7 @@ class FollowersView(APIView):
             follow = Follow.objects.create(
                 actor=actor_json['url'],
                 target=target_json['url'],
+                has_accepted=response_json['hasAccepted'],
                 remote_url=response_json['localUrl'],
                 remote_id=response_json['id']
             )
@@ -611,7 +612,14 @@ class FollowersIndividualView(GenericAPIView):
     @staticmethod
     @extend_schema(
         summary="Decline or delete follow request",
-        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
+        tags=[
+            'follows',
+            RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+            RemoteUtil.TEAM14_CONNECTED
+        ],
+        responses={
+            200: OpenApiResponse(response=FollowRequestSerializer)
+        }
     )
     def delete(request: Request, target_id: str, follower_id: str):
         """

@@ -70,12 +70,8 @@ class PostView(GenericAPIView):
 
             # local -> remote
             else:
-                node_config = base.REMOTE_CONFIG.get(target_author.host)
-                response = node_config.get_post_by_post_id(request.path)
-                if response.status_code < 200 or response.status_code > 200:
-                    return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-                return Response(json.loads(response.content), status = status.HTTP_200_OK)
+                node_config = base.REMOTE_CONFIG.get(target_author.host) 
+                return node_config.get_post_by_post_id(request.path)
 
         # remote -> local
         if request.user.is_authenticated_node:
@@ -251,7 +247,7 @@ class CreationPostView(GenericAPIView):
     @action(detail=True, methods=['get'], url_name='post_get_author_posts')
     def get(self, request, *args, **kwargs):
         """
-        get posts by the author
+        Get authors posts
 
         User story: As an author I want to make public posts.
 
@@ -283,11 +279,7 @@ class CreationPostView(GenericAPIView):
             # local -> remote
             else:
                 node_config = base.REMOTE_CONFIG.get(target_author.host)
-                response = node_config.get_authors_posts(request.path)
-                if response.status_code < 200 or response.status_code > 200:
-                    return Response("Failed to get author's post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-                return Response(json.loads(response.content), status = status.HTTP_200_OK)
+                return node_config.get_authors_posts(request, request.path)
 
         # remote -> local
         if request.user.is_authenticated_node:
@@ -325,9 +317,32 @@ class CreationPostView(GenericAPIView):
             serializer = CreatePostSerializer(data=request.data)
             if serializer.is_valid():
                 data = serializer.data
-                data['author'] = Author.objects.get(official_id = kwargs['author_id'])
+                author = Author.get_author(kwargs['author_id'])
+                data['author'] = author
                 post = serializer.create(validated_data=data)
-                return Response(PostSerializer(post).data, status = status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+            try:
+                if post.visibility == Visibility.FRIENDS:
+                    inbox_post = PostSerializer(post).data
+                    followers = FollowUtil.get_followers(author)
+                
+                    for follower in followers: 
+                        if follower.is_local():
+                            inbox = Inbox.objects.get(author = follower)
+                            inbox.add_to_inbox(inbox_post)
+                        else:
+                            node_config = base.REMOTE_CONFIG.get(follower.host)
+                            response = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = inbox_post)
+                            if response.status_code < 200 or response.status_code > 300:  
+                                print("Did not send to remote inbox")
+
+            except Exception as e:
+                return Response(f"Error sending post to inbox, error: {e}", status = status.HTTP_400_BAD_REQUEST)
+
+            return Response(PostSerializer(post).data, status = status.HTTP_200_OK)
+
         except Exception as e:
             logger.info(e)
             return HttpResponseNotFound()
@@ -340,29 +355,56 @@ class SharePostView(GenericAPIView):
     )
     @action(detail=True, methods=['put'], url_name='post_share_post')
     def put(self, request: Request, *args, **kwargs) -> HttpResponse:
-        try:
-            post = PostSerializer(Post.objects.get(official_id = kwargs['post_id'])).data
-            requesting_author = Author.objects.get(official_id = self.request.user.official_id)
+        '''
+        Local wants to share local post
+        Local wants to share remote post
+
+        1. Get post 
+            a) if remote, you will need to fetch post through request
+
+        2. Get followers for the requesting author
+        3. Add post to local and remote followers
+        '''
+        node: Author = request.user
+        if not node.is_authenticated:
+            return Response("You are not authenticated", status.HTTP_400_BAD_REQUEST)
+
+        if node.is_authenticated_user:
+            try:
+                target_author = Author.get_author(kwargs['author_id'])
+            except:
+                return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+            #local getting a local post 
+            if target_author.is_local():
+                try:
+                    post = PostSerializer(Post.objects.get(official_id = kwargs['post_id'])).data
+                except:
+                    return Response(f"Error getting post id: {kwargs['post_id']}", status.HTTP_400_BAD_REQUEST)
+            #local getting a remote post
+            else:
+                node_config = base.REMOTE_CONFIG.get(target_author.host)
+                response = node_config.get_post_by_post_id(request.path.split('/share')[0])
+                if response.status_code < 200 or response.status_code > 300:
+                    return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                post = json.loads(response.content)
+
+            requesting_author = Author.get_author(self.request.user.get_id())
             followers = FollowUtil.get_followers(requesting_author)
 
             if len(followers) == 0:
                 return Response("You currently have no followers", status = status.HTTP_202_ACCEPTED)
-         
+        
             for follower in followers: 
                 if follower.is_local():
                     inbox = Inbox.objects.get(author = follower)
                     inbox.add_to_inbox(post)
                 else:
                     node_config = base.REMOTE_CONFIG.get(follower.host)
-                    response_status_code = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = post)
-                    if response_status_code < 200 or response_status_code > 200:
-                        return Response("Failed to send data to remote inbox", status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    response = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = post)
+                    if response.status_code < 200 or response.status_code > 300:  
+                        return Response(json.loads(response.content), status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response("Successfully added to all followers inbox", status = status.HTTP_200_OK)
-
-        except Exception as e:
-            print(e)
-            return HttpResponseNotFound()
-
-
 

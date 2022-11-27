@@ -31,6 +31,8 @@ class ObtainCookieAuthToken(ObtainAuthToken):
         ),
     )
     def post(self, request, *args, **kwargs) -> Response:
+        """For the login flow, look at this reference:
+        https://github.com/hgshah/cmput404-project/blob/staging/endpoints.txt#L145 """
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(status=401)

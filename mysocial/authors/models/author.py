@@ -30,7 +30,6 @@ class Author(AbstractUser):
 
     # placed over here to prevent circular dependency
     SERIALIZER = None
-    connected_node_classes = ()
 
     # Remove this unnecessary fields
     first_name = None
@@ -151,8 +150,11 @@ class Author(AbstractUser):
                     author = node.from_author_id_to_author(official_id)
                 except ConnectionError:
                     continue
+                except ValueError as e:
+                    print(f"Author.get_author: Value error: {str(e)}")
+                    continue
                 except Exception as e:
-                    print(f"Author.get_author: Unknown err: {e}")
+                    print(f"Author.get_author: Unknown err: {str(e)}")
                     continue
 
                 if author is not None:

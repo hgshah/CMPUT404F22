@@ -1,8 +1,7 @@
 import logging
 
 from django.http.response import HttpResponse, HttpResponseNotFound
-from drf_spectacular.utils import OpenApiExample, extend_schema, inline_serializer
-from rest_framework import serializers
+from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +12,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from authors.models.author import Author
 from authors.permissions import NodeIsAuthenticated
-from authors.serializers.author_serializer import AUTHOR_SERIALIZER_EXAMPLE, AuthorSerializer, AuthorSerializerList
+from authors.serializers.author_serializer import AuthorSerializer, AuthorSerializerList
 from common.base_util import BaseUtil
 from common.pagination_helper import PaginationHelper
 from mysocial.settings import base
@@ -37,16 +36,20 @@ class AuthorView(GenericViewSet):
         parameters=PaginationHelper.OPEN_API_PARAMETERS + RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializerList,
         summary="Authors retrieve all",
-        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM14_CONNECTED]
+        tags=["authors",
+              RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+              RemoteUtil.TEAM14_CONNECTED,
+              RemoteUtil.TEAM7_CONNECTED
+              ]
     )
     @action(detail=True, methods=['get'], url_name='retrieve_all')
     def retrieve_all(request: Request):
         """
         Gets all authors (remote or local)
 
-        If the request was from an anonymous user or is a local user, we return users from both local and remote.
+        If the request was from a local user, we return users from both local and remote.
 
-        If the request was from a **node**, we only return local users.
+        If the request was from a **node** or an anonymous user, we only return local users.
         """
         node_target, other_params = RemoteUtil.extract_node_target(request)
         if node_target is not None:
@@ -64,8 +67,8 @@ class AuthorView(GenericViewSet):
         data = serializer.data
 
         # look at everyone else
-        # do not recursively find an author if this is a node
-        should_do_recursively = not (request.user.is_authenticated and request.user.is_authenticated_node)
+        # recursively find an author if this is a user
+        should_do_recursively = request.user.is_authenticated and request.user.is_authenticated_user
         if should_do_recursively:
             for node in BaseUtil.connected_nodes:
                 # todo: for team 14
@@ -103,15 +106,20 @@ class AuthorView(GenericViewSet):
         parameters=RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
         responses=AuthorSerializer,
         summary="Retrieve an author",
-        tags=["authors", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM14_CONNECTED]
+        tags=[
+            "authors",
+            RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+            RemoteUtil.TEAM14_CONNECTED,
+            RemoteUtil.TEAM7_CONNECTED
+        ]
     )
     def retrieve(request: Request, author_id: str) -> HttpResponse:
         """
         Get an individual author
 
-        If the request was from an anonymous user or is a local user, we return try find the author locally and remotely.
+        If the request was from a local user, we return users from both local and remote.
 
-        If the request was from a **node**, we only return local users.
+        If the request was from a **node** or an anonymous user, we only return local users.
         """
 
         node_target, _ = RemoteUtil.extract_node_target(request)
@@ -119,8 +127,8 @@ class AuthorView(GenericViewSet):
             return AuthorView.retrieve_author(request, node_target, author_id)
 
         try:
-            # do not recursively find an author if this is a node
-            should_do_recursively = not (request.user.is_authenticated and request.user.is_authenticated_node)
+            # recursively find an author if this is a user
+            should_do_recursively = request.user.is_authenticated and request.user.is_authenticated_user
             author = Author.get_author(official_id=author_id, should_do_recursively=should_do_recursively)
         except Author.DoesNotExist:
             return HttpResponseNotFound()
@@ -150,7 +158,8 @@ class AuthorSelfView(APIView):
     @staticmethod
     @extend_schema(
         parameters=PaginationHelper.OPEN_API_PARAMETERS,
-        summary="Get current author logged in details"
+        summary="Get current author logged in details",
+        responses=AuthorSerializer,
     )
     def get(request: Request) -> HttpResponse:
         """Get details about the current author"""
@@ -174,9 +183,16 @@ class RemoteNodeView(GenericAPIView):
 
     @staticmethod
     @extend_schema(
-        tags=["remote-debug", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=[
+            "remote debug",
+            RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+            RemoteUtil.TEAM14_CONNECTED,
+            RemoteUtil.TEAM7_CONNECTED
+        ],
+        summary="Check node connection",
     )
     def get(request) -> HttpResponse:
+        """Check if remote node or server can connect to this server"""
         return Response({
             'type': 'remoteNode',
             'message': 'Authentication passed!'

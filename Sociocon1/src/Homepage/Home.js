@@ -3,8 +3,8 @@
 // license: https://www.apache.org/licenses/LICENSE-2.0
 import React from 'react'
 import Feed from './Feed'
-import Sidebar from './Sidebar'
-import News from './News'
+import Sidebar from '../Sidebar'
+import News from '../News'
 function Home() {
   return (
     <div className='home'>
