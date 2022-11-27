@@ -6,13 +6,15 @@ import axios from 'axios'
 import "./Login.css"
 import { Avatar, Button, TextField} from '@mui/material';
 import Post from './Homepage/Post';
-
+import Postbox from './Homepage/Postbox';
+import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
 // link: https://contactmentor.com/login-form-react-js-code/
 //link :https://bobbyhadz.com/blog/react-onclick-redirect
-function Login(author_id, token) {
+function Login() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [login_info, setLogin] = useState('')
+  const [token1, setToken] = useState([])
+  const [authorid1, setAuthorid] = useState([])
   const navigateHome = () => {
     // 👇️ navigate to /
     navigate('/home');
@@ -75,8 +77,18 @@ function Login(author_id, token) {
             data: formField_token,
         
     }).then((login_info) =>{
-        console.log(login_info.data.token)
-        console.log(login_info.data.author.id)
+        
+        const info_token = [];
+        const info_authorid = [];
+        info_token.push({...login_info.data.token})
+        info_authorid.push({...login_info.data.author.id})
+        const newinfo_token = Object.values(info_token[0]).join('')
+        const newinfo_authorid = Object.values(info_authorid[0]).join('')
+        console.log(newinfo_token)
+        console.log(newinfo_authorid)
+        setAuthorid(newinfo_authorid)
+        
+        setToken(newinfo_token)
         navigate.push('/')
     })
 }
@@ -90,7 +102,7 @@ function Login(author_id, token) {
 
     var { uname, pass } = document.forms[0];
     
-
+    
     // Find user login info
     const userData = database.find((user) => user.username === uname.value);
     
@@ -104,7 +116,8 @@ function Login(author_id, token) {
         setIsSubmitted(true);
         navigateHome();
         PostToken();
-        
+
+          
         // author_id = userData.authorid;
         // token = userData.token;
         
@@ -147,6 +160,7 @@ function Login(author_id, token) {
       <div className="login-form">
         <div className="title">Sign In</div>
         {isSubmitted ? <div></div> : renderForm}
+        
       </div>
            
     </div>

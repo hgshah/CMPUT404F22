@@ -8,9 +8,9 @@ import "./Postbox.css"
 import { Avatar} from '@mui/material';
 import {useNavigate} from 'react-router-dom'
 import profilepic from "../profilepic.jpeg"
-import Login from '../Login';
 
-const Postbox = () => {
+
+const Postbox = (authorid, token) => {
     const [title, setPostTitle] = useState('');
     const [description, setPostBody] = useState('');
     const [visibility, setPostVisibility] = useState('');
@@ -28,12 +28,11 @@ const Postbox = () => {
     // license:  https://creativecommons.org/licenses/by-sa/4.0/
     const[value, setValue] = useState(""); 
     function handle() {
-        alert("post has been created")
+        alert(JSON.stringify(authorid))
     }
     // link: https://www.youtube.com/watch?v=xtQ74HKTOwY
     // author: https://www.youtube.com/c/GreatAdib
     //license: https://creativecommons.org/
-    
     const AddPostInfo = async () => {
         let formField = new FormData()
         formField.append("title", title)
@@ -99,7 +98,7 @@ const Postbox = () => {
             {/* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
                 // license:  https://creativecommons.org/licenses/by-sa/4.0/ */}
-            <Button onClick = {AddPostInfo}  className = "postbox_button" type = "submit">Post</Button>
+            <Button onClick = {handle}  className = "postbox_button" type = "submit">Post</Button>
             
         </form>
       
