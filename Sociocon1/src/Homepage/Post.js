@@ -20,7 +20,7 @@ import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
 import EditPost from './EditPost';
-function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype, purl}) {
+function Post({displayName, title, description, text, image, avatar, visibility,contenttype, purl}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
@@ -35,7 +35,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const [ContentType, setPostContentType] = useState('');
     const [like, setPostLike] = useState(1);
     const [likeactive, setPostLikeactive] = useState(false);
-    
+    const [comments, setComments] = useState([])
     //const[p_post, setPost] = useState([]); 
     // link : https://www.youtube.com/watch?v=a8KruvMkEtY
     function postlike(){
@@ -182,6 +182,27 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         })
     }
 
+    const Show_Comments = async () => {
+        
+        await axios({
+                method: "get",
+                withCredentials: true ,
+                headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+                url: purl + '/comments' ,
+            
+        }).then((response) =>{
+           const newcom = []
+            
+            newcom.push({...response.data.items[0].comment})
+            const updatecom = Object.values(newcom[0]).join('')
+            setComments(updatecom)
+
+
+        })
+    }
+
+   
+
   return (
     <div className='post'>
         <div className = "post_avatar">
@@ -279,11 +300,21 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                  <form>
                     <span>
                         <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {like}  </Button>  &nbsp;&nbsp;&nbsp;
-                        <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button>
+                        <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button> &nbsp;&nbsp;&nbsp;
+                        <Button onClick = {Show_Comments} variant='contained' size = "small" endIcon= {<CommentIcon/>} > See Comments</Button>
+                        
                     </span>
 
                     </form>
-
+                    <h5 >
+                        <ol style = {{listStyleType: 'upper-roman'}}>
+                            <li>
+                                {comments}
+                            </li>
+                        </ol>
+                    </h5>
+                   
+                    
                 <div className='post_footer'>
                  
 
@@ -323,6 +354,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             
                         </form> 
                         <Button onClick = {DeletePostInfo} variant = 'contained' endIcon = {<DeleteIcon/>} className = "postdel_button" type = "submit"> Delete</Button>
+                        
                     </div> 
                     {/* <div className='getcomments'>
                     <h4>

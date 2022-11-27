@@ -33,7 +33,9 @@ function Postbox ({}) {
     // author: https://www.youtube.com/c/GreatAdib
     //license: https://creativecommons.org/
     const AddPostInfo = async () => {
-
+// link: https://stackoverflow.com/questions/29108779/how-to-get-selected-value-of-a-dropdown-menu-in-reactjs
+// author:
+// license:
         if(visibility === "Friends"){
             console.log({visibility})
             let formField = new FormData()
