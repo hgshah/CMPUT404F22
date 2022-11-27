@@ -75,16 +75,14 @@ class Team14Local(LocalDefault):
                                      }
                                  })
         if 200 <= response.status_code < 300:
-            response_json = json.loads(response.content.decode('utf-8'))
-            message = response_json.get('message')
-            if response_json is None:
-                return {
-                    'type': 'follow',
-                    'actor': author_actor.get_url(),
-                    'object': author_target.get_url(),
-                    'localUrl': f'{author_actor.get_url()}/followers/{author_target.get_id()}/',
-                    'id': None
-                }  # <- GOOD
+            return {
+                'type': 'follow',
+                'actor': {'url': author_actor.get_url()},
+                'object': {'url': author_target.get_url()},
+                'hasAccepted': False,
+                'localUrl': f'{author_actor.get_url()}/followers/{author_target.get_id()}/',
+                'id': None
+            }  # <- GOOD
         print(f'{self}: post_local_follow_remote: {response.content}')
         return response.status_code
 

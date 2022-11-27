@@ -151,8 +151,7 @@ class AuthorSerializer(serializers.ModelSerializer):
                 author = author_deserializer.validated_data
                 author_list.append(AuthorSerializer(author).data)
             else:
-                for err in author_deserializer.errors:
-                    print(f'AuthorSerializer: get_all_author_jsons: {str(err)}')
+                print(f'AuthorSerializer: deserializer_author_list: unknown error')
         return author_list
 
 
