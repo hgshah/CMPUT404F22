@@ -5,13 +5,14 @@ import React from 'react'
 import Feed from './Feed'
 import Sidebar from '../Sidebar'
 import News from '../News'
-function Home() {
+import Login from '../Login'
+function Home({authorid, token}) {
   return (
     <div className='home'>
         <Sidebar />
         
         {/*feed */}
-        < Feed />
+        < Feed authorid = {authorid} />
         {/*widgets */}
         <News />
     </div>

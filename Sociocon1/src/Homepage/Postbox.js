@@ -10,13 +10,14 @@ import {useNavigate} from 'react-router-dom'
 import profilepic from "../profilepic.jpeg"
 
 
-function Postbox ({authorid, token}) {
+function Postbox ({}) {
     const [title, setPostTitle] = useState('');
     const [description, setPostBody] = useState('');
     const [visibility, setPostVisibility] = useState('');
     const [postImage, setPostImage] = useState('');
     const [image, setImage] = useState('');
     const navigate = useNavigate()
+    const authorid = localStorage.getItem("authorid")
     // const handleClick = () => {
     //     //  "message" stores input field value
     //     setPostMessage(postMessage);
@@ -27,9 +28,7 @@ function Postbox ({authorid, token}) {
     // author: https://stackoverflow.com/
     // license:  https://creativecommons.org/licenses/by-sa/4.0/
     const[value, setValue] = useState(""); 
-    function handle() {
-        alert()
-    }
+  
     // link: https://www.youtube.com/watch?v=xtQ74HKTOwY
     // author: https://www.youtube.com/c/GreatAdib
     //license: https://creativecommons.org/
@@ -61,7 +60,7 @@ function Postbox ({authorid, token}) {
             
             <div className="postbox_input">
                 <Avatar sr  c = {profilepic} />
-                <input value= {authorid}></input>
+                
     
                 <input 
                 onChange={e => setPostTitle(e.target.value)} 

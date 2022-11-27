@@ -14,11 +14,13 @@ import Comment from './Comment'
 import Test from '../Test';
 import Profile from "../Profile";
 import Login from '../Login';
+import Home from './Home'
 import {useNavigate, useParams} from 'react-router-dom'
-function Feed({name}) {
+function Feed({}) {
     //const [posts, setPosts] = useState([]);
     const[p_post, setPost] = useState([]); 
     const[p_comment, setComment] = useState([]); 
+    const authorid = localStorage.getItem("authorid")
     // useEffect(() =>{
     //         setPosts()
     // }, [])
@@ -80,7 +82,7 @@ function Feed({name}) {
         </div>
         
       {/* header*/}
-      <Postbox />
+      <Postbox authorid = {authorid} />
       
       {
                         p_post.map((posts) => {

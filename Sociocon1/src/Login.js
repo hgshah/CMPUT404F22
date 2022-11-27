@@ -7,6 +7,7 @@ import "./Login.css"
 import { Avatar, Button, getAccordionDetailsUtilityClass, TextField} from '@mui/material';
 import Post from './Homepage/Post';
 import Feed from './Homepage/Feed';
+import Home from './Homepage/Home'
 import Postbox from './Homepage/Postbox';
 import { Construction, DataSaverOffTwoTone, LocalConvenienceStoreOutlined, ReceiptLongOutlined } from '@mui/icons-material';
 // link: https://contactmentor.com/login-form-react-js-code/
@@ -17,6 +18,7 @@ function Login() {
   const [token1, setToken] = useState('')
   const [authorid1, setAuthorid] = useState([])
   const navigateHome = () => {
+
     // 👇️ navigate to /
     navigate('/home');
   };
@@ -84,16 +86,20 @@ function Login() {
     }).then((login_info) =>{
         
         
-         const info_token = [];
-        // const info_authorid = [];
-         info_token.push({...login_info.data})
-        // info_authorid.push({...login_info.data.author.id})
-        // const newinfo_token = Object.values(info_token[0]).join('')
-        // const newinfo_authorid = Object.values(info_authorid[0]).join('')
+         const info_token_send = [];
+         const info_token =[];
+         const info_authorid = [];
+         info_token_send.push({...login_info.data})
+         info_token.push({...login_info.data.token})
+         info_authorid.push({...login_info.data.author.id})
+         const newinfo_token = Object.values(info_token[0]).join('')
+         const newinfo_authorid = Object.values(info_authorid[0]).join('')
         // console.log(newinfo_token)
         // console.log(newinfo_authorid)
-        setAuthorid(info_token)
-        console.log(info_token)
+        setAuthorid(info_token_send)
+        
+        localStorage.setItem("authorid", Object.values(info_authorid[0]).join(''))
+        localStorage.setItem("token", Object.values(info_token[0]).join(''))
         
     })
     
@@ -120,8 +126,9 @@ function Login() {
       } else {
         
         setIsSubmitted(true);
-        PostToken();
         
+        PostToken();
+        navigateHome();
         
         
       }
@@ -191,10 +198,12 @@ function Login() {
             <label>Password </label>
             <input type="password" name="pass" required />
             <button onClick = {handleSubmit} > Submit </button>
+            {isSubmitted}
+            
                 {
                     authorid1.map((autho) => {
-                        return <p> <Postbox authorid = {autho.author.id} 
-                                />
+                        return <p>  {autho.author.id} 
+                                
                         </p>
                     })
                 }

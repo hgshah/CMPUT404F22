@@ -20,9 +20,10 @@ import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
 import EditPost from './EditPost';
-function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype, purl, token, authorid}) {
+function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype, purl}) {
     const[value, setValue] = useState(""); 
-
+    const authorid = localStorage.getItem("authorid")
+    const token = localStorage.getItem("token")
     // const [userName, setUserName] = useState('');
     const[followButtonText, newFollowButtonText] = useState("Follow");
     const[following, setFollowing] = useState(false);
@@ -59,7 +60,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method: 'post',
             withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+            headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
             url: purl + '/comments' ,
             data: formField
         }).then((response) =>{
@@ -75,7 +76,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method: 'post',
             withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+            headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
             // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
@@ -99,7 +100,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'delete',
                 withCredentials: true ,
-                headers: { "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                headers: { "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl
                 
@@ -118,9 +119,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'post',
                 withCredentials: true ,
-                headers: {'Content-Type': 'application/json' , "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/inbox',
+                url: 'http://127.0.0.1:8000/authors/' + authorid + '/inbox',
                 data: formField12
             
         }).then((response) =>{
@@ -169,7 +170,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'put',
                 withCredentials: true ,
-                headers: {'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl + '/share',
                 data: formField_share
