@@ -12,6 +12,8 @@ export default function FriendRequestsTab() {
   const [acceptedRequests, setAcceptedRequests] = useState([{}]);
   const [followingBack, setFollowingBack] = useState(false);
   const navigate = useNavigate();
+  const authorid = localStorage.getItem("authorid")
+  const token = localStorage.getItem("token")
 
   //add to friends list, remove from requests
   const accept_clicked = async(id) => {
@@ -20,7 +22,7 @@ export default function FriendRequestsTab() {
     formField.append("hasAccepted",true)
 
     await axios.put('http://127.0.0.1:8000/follows/'+ id + '/', formField,
-    {headers: {"Content-Type":"application/json", 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'}},
+    {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}},
     
     ).then((response) => {
       // console.log(response.data)
@@ -40,7 +42,7 @@ export default function FriendRequestsTab() {
   const decline_clicked = async(id) => {
     console.log("declined " + id)
     await axios.delete('http://127.0.0.1:8000/follows/'+ id + '/', {
-      headers: {'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'}
+      headers: {"Authorization": "Token " + token}
     }).then((response) => {
       console.log(response.data)
     })
@@ -56,7 +58,7 @@ export default function FriendRequestsTab() {
     if(!followingBack) {
       await axios.post('http://127.0.0.1:8000/authors/' + auth_id + '/followers/', {
       withCredentials:true}, 
-      {headers: {'Content-Type':'application/json', 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'}}
+      {headers: {'Content-Type':'application/json', "Authorization": "Token " + token}}
       ).then((response) => {
         console.log(followingBack)
         setFollowingBack(!followingBack);
@@ -66,8 +68,8 @@ export default function FriendRequestsTab() {
     //if user is already following back
     } else {
       //auth id = id of user that is losing the follower, the nnext id is of the user that is un be-friending
-      await axios.delete('http://127.0.0.1:8000/authors/'+ auth_id + '/followers/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6', {
-        headers: {'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'}
+      await axios.delete('http://127.0.0.1:8000/authors/'+ auth_id + '/followers/' + authorid, {
+        headers: {"Authorization": "Token " + token}
       }).then((response) => {
         console.log(followingBack)
         setFollowingBack(!followingBack);
@@ -81,7 +83,7 @@ export default function FriendRequestsTab() {
     async function getAllRequests() {
       const arr = [];
       await axios.get('http://127.0.0.1:8000/follows/incoming/', {
-        headers: {"Content-Type":"application/json", 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'},
+        headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
       }).then((response) => {
         for (let follow of response.data.items) {
           arr.push(follow)
@@ -94,13 +96,13 @@ export default function FriendRequestsTab() {
       })
     }
     getAllRequests()
-  }, []) //check what goes here TOO MANY GET REQUESTS WITH requests, cant leave blank mininmum requests
+  }, [requests]) //check what goes here TOO MANY GET REQUESTS WITH requests, cant leave blank mininmum requests
 
   useEffect(() => {
     async function getAcceptedRequests() {
       const accepted = [];
-      await axios.get('http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6/followers/', {
-        headers: {"Content-Type":"application/json", 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'},
+      await axios.get('http://127.0.0.1:8000/authors/' + authorid + '/followers/', {
+        headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
       }).then((response) => {
         for (let follower of response.data.items) {
           accepted.push(follower);

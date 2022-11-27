@@ -143,7 +143,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method:'post',
             withCredentials: true,
-            headers: {'Content-Type':'application/json', 'Authorization':'Token ab1a951ce6f7d34dbfd8b7698276372c0ea29db1'},
+            headers: {'Content-Type':'application/json', "Authorization": "Token " + token},
             url: 'http://127.0.0.1:8000/authors/22c4d5a1-06ae-42d1-9882-3dd5a9d5f5ab/followers/', //hard coded to show "malhi wants to follow harkirat on following any post"
             // data: formField_follow
         }).then((response) => {
