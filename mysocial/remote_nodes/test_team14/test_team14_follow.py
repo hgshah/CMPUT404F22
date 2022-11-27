@@ -35,8 +35,8 @@ class TestTeam14Follow(TestCase):
         redirection = './' if redirection is None else redirection
         os.system(f"python {redirection}manage.py cleartest")
         self.local = TestSession(('actor', 'actor'), 'http://127.0.0.1:8000')
-        # todo: clean up team14's db?
-        self.remote_id = str(uuid.UUID('00000000000000000000000000000005'))
+        # todo: make instructions for testing this one
+        self.remote_id = str(uuid.UUID('739252c2b11e4fe8bb96b57b939a8331'))
 
     def test_all(self):
         self.follow_flow_happy_path()
@@ -54,6 +54,11 @@ class TestTeam14Follow(TestCase):
         # local actor follows remote target
         response = self.local.session.post(f'{self.local.base}/authors/{self.remote_id}/followers/')
         content = response.content.decode('utf-8')
-        self.assertEqual(response.status_code, 200, content)
+        if response.status_code != 201:
+            print(content)
+        self.assertEqual(response.status_code, 201, content)
 
         # they have to accept it on their end >.>
+        # response = self.local.session.get(
+        #     f'{self.local.base}/authors/{self.remote_id}/followers/{self.local.author_id}')
+        # self.assertEqual(response.status_code, 200)

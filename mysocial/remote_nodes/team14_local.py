@@ -61,8 +61,7 @@ class Team14Local(LocalDefault):
                     'localUrl': f'{author_actor.get_url()}/followers/{author_target.get_id()}/',
                     'id': None
                 }  # <- GOOD
-            else:
-                print(f'{self}: post_local_follow_remote: {message}')
+        print(f'{self}: post_local_follow_remote: {response.content}')
         return response.status_code
 
     def get_all_author_jsons(self, params: dict):

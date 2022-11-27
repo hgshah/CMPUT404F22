@@ -508,7 +508,7 @@ class FollowersIndividualView(GenericAPIView):
                 return None, HttpResponseNotFound("User does not follow the following author on our end")
         else:
             # trust THEIR data
-            node_config = base.REMOTE_CONFIG.get(target.host)
+            node_config: NodeConfigBase = base.REMOTE_CONFIG.get(target.host)
             if node_config is None:
                 print(f"FollowersIndividualView: get: unknown host: {target.host}")
                 return None, HttpResponseNotFound()
