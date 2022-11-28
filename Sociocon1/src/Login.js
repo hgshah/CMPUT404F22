@@ -27,33 +27,48 @@ function Login() {
   // User Login info
   const database = [
     {
-      username: "hgshah",
-      password: "hgshah",
-
+      "username": "super",
+      "password": "super",
+      "is_staff": true,
+      "is_superuser": true
     },
     {
-      username: "hgshah1",
-      password: "hgshah1",
-
+      "username": "amanda6",
+      "password": "amanda6",
+      "is_staff": true,
+      "is_superuser": true
     },
     {
-      username: "amanda",
-      password: "amanda",
-
+      "username": "hsmalhi",
+      "password": "hsmalhi",
+      "is_staff": true,
+      "is_superuser": true
     },
     {
-      username: "allan",
-      password: "allan",
-
+      "username": "manuba",
+      "password": "manuba",
+      "is_staff": true,
+      "is_superuser": true
     },
     {
-      username: "john",
-      password: "john",
-
+      "username": "junhong1",
+      "password": "junhong1",
+      "is_staff": true,
+      "is_superuser": true
     },
     {
-      username: "harkirat",
-      password: "harkirat",
+      "username": "hgshah",
+      "password": "hgshah",
+      "is_staff": true,
+      "is_superuser": true
+    },
+    {
+      "username": "actor",
+      "password": "actor"
+    },
+    {
+      "username": "target",
+      "password": "target"
     }
   ];
 
@@ -80,7 +95,7 @@ function Login() {
             method:'post',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-            url: 'http://127.0.0.1:8000/tokens/',
+            url: 'https://socioecon.herokuapp.com/tokens/',
             data: formField_token,
         
     }).then((login_info) =>{
