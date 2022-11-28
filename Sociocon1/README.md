@@ -85,3 +85,7 @@ https://www.youtube.com/watch?v=30hNmn5TxiY
 https://www.youtube.com/watch?v=Ul3y1LXxzdU // router - react
 
 https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
+https://www.youtube.com/watch?v=HTSAJna3X8c
+link: https://contactmentor.com/login-form-react-js-code/
+https://bobbyhadz.com/blog/react-onclick-redirect
+https://www.youtube.com/watch?v=a8KruvMkEtY

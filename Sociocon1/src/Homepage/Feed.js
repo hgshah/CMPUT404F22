@@ -43,25 +43,7 @@ function Feed({}) {
   }, [])
 
 
-//   useEffect(() => {
-//     async function getAllComments(){
-//         try {
-//                 const p_comment = await axios({
-//                   method: "get",
-//                   withCredentials: true ,
-//                   headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
-//                   url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/de5b437f-5f88-4302-afaa-15182a4c643a/comments',
 
-//                 })
-//                 console.log(p_comment.data)
-//                 setComment(p_comment.data)
-//         }
-//         catch(error){
-//             console.log(error)
-//         }
-//     }
-//     getAllComments()
-// }, [])
   const navigate = useNavigate()
     // link: https://www.youtube.com/watch?v=aRYkCe6JcGM
     // author: https://www.youtube.com/c/GreatAdib
@@ -112,11 +94,8 @@ function Feed({}) {
       
 
       {/* Post*/}
-      {/* <Test/> */}
-      {/* <Post displayName = "Harsh Shah"  image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = "public" /> */}
-      {/* <Post displayName = "Elon Musk" text = {postMessage} image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar ="https://nypost.com/wp-content/uploads/sites/2/2022/05/elon-musk-1.jpg?quality=75&strip=all" visibility = "public" />
-      <Post displayName = "Virat_kohli" text = {postMessage} image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = "https://upload.wikimedia.org/wikipedia/commons/7/7e/Virat_Kohli.jpg" visibility = "public" />
-      <Post displayName = "Mr@Bean" text = {postMessage} image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = "https://m.media-amazon.com/images/M/MV5BMTg3NDUzOTc3MV5BMl5BanBnXkFtZTcwNjcxMDkxNw@@._V1_.jpg" visibility = "public" /> */}
+      
+ 
 
 
       {/* header*/}

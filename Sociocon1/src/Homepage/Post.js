@@ -39,17 +39,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const [likes, setLikes] = useState([])
     //const[p_post, setPost] = useState([]); 
     // link : https://www.youtube.com/watch?v=a8KruvMkEtY
-    function postlike(){
-        if (likeactive){
-            
-            setPostLikeactive(false)
-            setPostLike(like -1 )
-        }
-        else{
-            setPostLikeactive(true)
-            setPostLike( like +1 )
-        }
-    }
+    // author: https://www.youtube.com/@ahmedelgammudi
+    // license: https://creativecommons.org/
+   
     function handle() {
         alert("cant share right now")
     }
@@ -239,9 +231,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                                 value={updatetitle} 
                                 placeholder='Enter Title' 
                                 type = 'text'
-                                className='post_input'
                                 variant = 'outlined'
-                                label = "add title"
                                 size = "small"
                              />  
                             </div>  
@@ -250,10 +240,8 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             <input onChange={e => setPostBody(e.target.value)} 
                                 value={updatebody} 
                                 placeholder='Enter Body' 
-                                type = 'text'
-                                className='post_input'
+                                type = 'text' 
                                 variant = 'outlined'
-                                label = "add body"
                                 size = "small"
                              />
                             </div>
@@ -288,13 +276,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                                 {following ? "Following" : "Follow"}
                             </Button>
                             {/* hardcode */}
-                            {/* <input 
-                            onChange={e => setUserName(e.target.value)}
-                            value={userName} 
-                            placeholder='Enter post body' 
-                            type = "text"
-                            name = "description"
-                            /> */}
+                            
                         </span>
                     </h3>
                     
