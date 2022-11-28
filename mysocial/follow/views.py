@@ -1,6 +1,5 @@
 import logging
 
-import requests
 from django.db import IntegrityError
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
@@ -236,7 +235,12 @@ class FollowersView(APIView):
     @extend_schema(
         parameters=RemoteUtil.REMOTE_NODE_MULTIL_PARAMS,
         summary='get_all_followers',
-        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
+        tags=[
+            'follows',
+            RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+            RemoteUtil.TEAM14_CONNECTED,
+            RemoteUtil.TEAM7_CONNECTED
+        ],
         responses=inline_serializer(
             name='Followers',
             fields={
@@ -292,7 +296,12 @@ class FollowersView(APIView):
     @extend_schema(
         parameters=RemoteUtil.REMOTE_NODE_MULTIL_PARAMS,
         summary='create follow request (post followers)',
-        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG],
+        tags=[
+            'follows',
+            RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+            RemoteUtil.TEAM14_CONNECTED,
+            RemoteUtil.TEAM7_CONNECTED
+        ],
         request=inline_serializer(
             name='FollowRequestRequest',
             fields={
@@ -518,7 +527,12 @@ class FollowersIndividualView(GenericAPIView):
     @staticmethod
     @extend_schema(
         summary="get follower or check if follower",
-        tags=['follows', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=[
+            'follows',
+            RemoteUtil.REMOTE_IMPLEMENTED_TAG,
+            RemoteUtil.TEAM14_CONNECTED,
+            RemoteUtil.TEAM7_CONNECTED
+        ]
     )
     def get(request: Request, target_id: str, follower_id: str) -> HttpResponse:
         """
@@ -614,7 +628,6 @@ class FollowersIndividualView(GenericAPIView):
         tags=[
             'follows',
             RemoteUtil.REMOTE_IMPLEMENTED_TAG,
-            RemoteUtil.TEAM14_CONNECTED
         ],
         responses={
             200: OpenApiResponse(response=FollowRequestSerializer)
@@ -691,7 +704,10 @@ class RealFriendsView(GenericAPIView):
                 'items': AuthorSerializer(many=True)
             }
         ),
-        tags=['follows'],
+        tags=[
+            'follows',
+            RemoteUtil.REMOTE_WIP_TAG
+        ],
         summary='get_all_real_friends'
     )
     def get(request: Request, author_id: str = None) -> HttpResponse:
