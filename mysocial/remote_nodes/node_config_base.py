@@ -249,7 +249,7 @@ class NodeConfigBase:
 
         return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
-    def get_authors_posts(self, author_posts_path):
+    def get_authors_posts(self, request, author_posts_path):
         url = f'{self.get_base_url()}{author_posts_path}'
         response = requests.get(url = url, auth = (self.username, self.password))
         
