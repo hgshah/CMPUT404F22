@@ -36,6 +36,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const [like, setPostLike] = useState(1);
     const [likeactive, setPostLikeactive] = useState(false);
     const [comments, setComments] = useState([])
+    const [likes, setLikes] = useState([])
     //const[p_post, setPost] = useState([]); 
     // link : https://www.youtube.com/watch?v=a8KruvMkEtY
     function postlike(){
@@ -65,7 +66,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             data: formField
         }).then((response) =>{
             console.log(response.data)
-            navigate.push('/')
+            
         })
     }
 
@@ -86,7 +87,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             data: formField
         }).then((response) =>{
             console.log(response.data)
-            navigate.push('/')
+            
         })
     }
  
@@ -107,12 +108,14 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         }).then((response) =>{
             console.log(response.data)
             console.log(purl)
-            navigate.push('/')
+            
         })
     }
 
     const PostInfo_Likes = async () => {
         
+        Show_Likes()
+
         let formField12 = new FormData()
         formField12.append("type","like")
         formField12.append("object",purl)
@@ -127,8 +130,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         }).then((response) =>{
             console.log(response.data)
             console.log(purl)
-            navigate.push('/')
+           
         })
+        
     }
 
     const follow_clicked = async() => {
@@ -149,7 +153,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             // data: formField_follow
         }).then((response) => {
             console.log(response.data)
-            navigate.push('/')
+            
         })
     }
     function edit () {
@@ -173,7 +177,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         }).then((response) =>{
             console.log(response.data)
             console.log(purl)
-            navigate.push('/')
+            
         })
     }
 
@@ -195,8 +199,28 @@ function Post({displayName, title, description, text, image, avatar, visibility,
 
         })
     }
+    const Show_Likes = async () => {
+        
+        await axios({
+                method: "get",
+                withCredentials: true ,
+                headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+                url: purl + '/likes' ,
+            
+        }).then((response) =>{
+            
+            setLikes(response.data.length)
+        //    const newlike = []
+            
+        //     newlike.push({...response.data.items[0].comment})
+        //     const updatecom = Object.values(newcom[0]).join('')
+        //     setComments(updatecom)
 
-   
+
+        })
+    }
+
+
 
   return (
     <div className='post'>
@@ -294,9 +318,10 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                  <img className='post_content' src = {image} alt = " "/> 
                  <form>
                     <span>
-                        <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {like}  </Button>  &nbsp;&nbsp;&nbsp;
+                        <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {likes}  </Button>  &nbsp;&nbsp;&nbsp;
                         <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button> &nbsp;&nbsp;&nbsp;
                         <Button onClick = {Show_Comments} variant='contained' size = "small" endIcon= {<CommentIcon/>} > See Comments</Button>
+                        
                         
                     </span>
 
