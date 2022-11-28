@@ -14,3 +14,20 @@ class RemoteNode(models.Model):
     remote_username = models.CharField(max_length=100)
     remote_password = models.CharField(max_length=100)
     status = models.CharField(choices=NodeStatus.choices, default=NodeStatus.ACTIVE, max_length=30)
+
+    # prevent circular dependency
+    author_class = None
+
+    def author_name(self) -> str:
+        try:
+            author = RemoteNode.author_class.objects.get(node_detail=self.id)
+            return str(author)
+        except Exception:
+            return "Invalid node!"
+
+    def author_id(self) -> str:
+        try:
+            author = RemoteNode.author_class.objects.get(node_detail=self.id)
+            return author.get_id()
+        except Exception:
+            return "Invalid node!"
