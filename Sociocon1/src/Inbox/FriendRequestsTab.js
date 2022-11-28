@@ -135,9 +135,9 @@ export default function FriendRequestsTab() {
           ))
           }
           {acceptedRequests.map((acc) =>(
-            <div key={acc.id}>
+            <div key={acc.preferredName}>
               <p className='accepted_list'>
-                {acc.id}
+                {acc.preferredName} is following you
                 <span className='accepted_btn'>
                   <Button 
                   className='follow_back_btn' 
