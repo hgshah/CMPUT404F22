@@ -25,7 +25,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
     // const [userName, setUserName] = useState('');
-    // const[followButtonText, newFollowButtonText] = useState("Follow");
+    const[followButtonText, newFollowButtonText] = useState("Follow");
     const[following, setFollowing] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [updatetitle, setPostTitle] = useState('')
@@ -136,11 +136,11 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     }
 
     const follow_clicked = async() => {
-        // if (followButtonText == "Follow") {
-        //     newFollowButtonText("Following");
-        // } else {
-        //     newFollowButtonText("Follow")
-        // }
+        if (followButtonText == "Follow") {
+            newFollowButtonText("Following");
+        } else {
+            newFollowButtonText("Follow")
+        }
 
         //show the friend request is sent
         setFollowing(!following);
@@ -149,7 +149,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             method:'post',
             withCredentials: true,
             headers: {'Content-Type':'application/json', "Authorization": "Token " + token},
-            url: 'https://socioecon.herokuapp.com/authors/' + post_authorid + '/followers/', //hard coded to show "malhi wants to follow harkirat on following any post"
+            url: 'https://socioecon.herokuapp.com/authors/' + post_authorid + '/followers/',
             // data: formField_follow
         }).then((response) => {
             console.log(response.data)
@@ -220,6 +220,23 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         })
     }
 
+    useEffect(() => {
+        async function updateFollowBtn() {
+
+        // if(newFollowButtonText === "Follow") {
+            await axios.get('https://socioecon.herokuapp.com/authors/' + post_authorid + '/followers/' + authorid, {
+                headers: {"Content-Type":"application/json", "Authorization": "Token " + token}
+            }).then((response) => {
+                    setFollowing(!following);
+                    newFollowButtonText("Following")
+            })
+        // } else {
+        //     await axios.delete('https://socioecon.herokuapp.com/authors/')
+        // }
+    }
+    updateFollowBtn()
+    }, []) //something here newFollowButtonText
+
 
 
   return (
@@ -285,7 +302,8 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             className='follow_btn' 
                             onClick={follow_clicked}
                             style={{backgroundColor: following ? "rgb(211, 211, 211)" : "rgb(159, 185, 31)"}} >
-                                {following ? "Following" : "Follow"}
+                                {/* {following ? "Following" : "Follow"} */}
+                                {followButtonText}
                             </Button>
                             {/* hardcode */}
                             {/* <input 

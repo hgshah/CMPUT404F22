@@ -11,6 +11,7 @@ export default function FriendRequestsTab() {
   const [requests, setRequests] = useState([{}]);
   const [acceptedRequests, setAcceptedRequests] = useState([{}]);
   const [followingBack, setFollowingBack] = useState(false);
+  const [accButtonText, setAccButtonText] = useState("Follow Back")
   const navigate = useNavigate();
   const authorid = localStorage.getItem("authorid")
   const token = localStorage.getItem("token")
@@ -55,13 +56,15 @@ export default function FriendRequestsTab() {
   const followBackClicked = async(auth_id) => {
     //if user is not yet following back
     // console.log("un be friend " + auth_id)
-    if(!followingBack) {
+    // if(!followingBack) {
+    if (accButtonText === "Follow Back") {
       await axios.post('https://socioecon.herokuapp.com/authors/' + auth_id + '/followers/', {
       withCredentials:true}, 
       {headers: {'Content-Type':'application/json', "Authorization": "Token " + token}}
       ).then((response) => {
         console.log(followingBack)
         setFollowingBack(!followingBack);
+        setAccButtonText("Un-Befriend")
         console.log(followingBack)
         console.log(response.data)
     })
@@ -73,12 +76,14 @@ export default function FriendRequestsTab() {
       }).then((response) => {
         console.log(followingBack)
         setFollowingBack(!followingBack);
+        setAccButtonText('Follow Back')
         console.log(followingBack)
         console.log(response.data)
       })
     }
   }
 
+  //show all pending friend requests
   useEffect(() => {
     async function getAllRequests() {
       const arr = [];
@@ -96,23 +101,45 @@ export default function FriendRequestsTab() {
       })
     }
     getAllRequests()
-  }, [requests]) //check what goes here TOO MANY GET REQUESTS WITH requests, cant leave blank mininmum requests
+  }, []) //check what goes here TOO MANY GET REQUESTS WITH requests, cant leave blank mininmum requests
 
   useEffect(() => {
+    // update button to show "Follow Back" or "Un befriend"
+    async function updateAcceptedBtns(follower_id) {
+      //logged in user is a follower of follower_id
+      // await axios.get('https://socioecon.herokuapp.com/authors/' + follower_id + '/followers/' + authorid, {
+        //get real friends of authorid
+      await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/real-friends/', {
+        headers: {"Content-Type":"application/json", "Authorization": "Token " + token}
+      }).then((response) => {
+          setFollowingBack(!followingBack)
+          setAccButtonText("Un-Befriend")
+      })
+    }
+
+    // show all accepted friend requests
     async function getAcceptedRequests() {
       const accepted = [];
       await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/followers/', {
         headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
       }).then((response) => {
-        for (let follower of response.data.items) {
-          accepted.push(follower);
+        for (var acc_follower of response.data.items) {
+          accepted.push(acc_follower);
+          // console.log(acc_follower.id)
           // console.log(response.data.items)
+          updateAcceptedBtns(acc_follower.id);
         }
         setAcceptedRequests(accepted);
+        // updateAcceptedBtns(acc_follower.id);
       })
     }
-    getAcceptedRequests()
-  }, [acceptedRequests]) //accepted requests but send too many get
+
+    getAcceptedRequests();
+  }, []) //accepted requests but send too many get
+
+  // useEffect(() => {
+  //   async function get
+  // })
 
   return (
       <div className='FriendRequestsTab'>
@@ -136,14 +163,16 @@ export default function FriendRequestsTab() {
           }
           {acceptedRequests.map((acc) =>(
             <div key={acc.preferredName}>
+              {console.log(acc)}
               <p className='accepted_list'>
                 {acc.preferredName} is following you
                 <span className='accepted_btn'>
                   <Button 
                   className='follow_back_btn' 
                   onClick={() => followBackClicked(acc.id)}
-                  style={{backgroundColor: followingBack ? "red" : "rgb(159, 185, 31)"}}>
-                    {followingBack ? "Un-Befriend" : "Follow Back"}
+                  style={{backgroundColor: accButtonText === "Un-Befriend" ? "red" : "rgb(159, 185, 31)"}}>
+                    {/* {followingBack ? "Un-Befriend" : "Follow Back"} */}
+                    {accButtonText}
                   </Button>
                 </span>
               </p>
