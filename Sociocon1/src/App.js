@@ -17,8 +17,8 @@ function App() {
             License: https://creativecommons.org/choose/ */}
             
               <Routes>
-                <Route path = "/" element = {<Login/>} />
                 <Route path = "/login" element = {<Login/>} />
+                <Route path = "/" element = {<Login/>} />
                 <Route path = "/home" element = {<Home/>} />
                 <Route path = "/profile" element = {<Profile/>} />
                 <Route path = "/inbox" element = {<Inbox/>} />

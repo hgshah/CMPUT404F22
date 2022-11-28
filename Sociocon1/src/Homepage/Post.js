@@ -39,17 +39,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const [likes, setLikes] = useState([])
     //const[p_post, setPost] = useState([]); 
     // link : https://www.youtube.com/watch?v=a8KruvMkEtY
-    function postlike(){
-        if (likeactive){
-            
-            setPostLikeactive(false)
-            setPostLike(like -1 )
-        }
-        else{
-            setPostLikeactive(true)
-            setPostLike( like +1 )
-        }
-    }
+    // author: https://www.youtube.com/@ahmedelgammudi
+    // license: https://creativecommons.org/
+   
     function handle() {
         alert("cant share right now")
     }

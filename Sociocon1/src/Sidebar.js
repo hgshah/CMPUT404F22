@@ -23,7 +23,7 @@ function Sidebar(){
       <div className="list">
          <ul>
             <li> <a href="/login">  Login </a> </li>
-            <li> <a href="/">  Home </a> </li>
+            <li> <a href="/home">  Home </a> </li>
             <li> <a href="/profile">  Profile </a> </li>
             <li> <a href="/inbox">  Inbox </a> </li>
          </ul>

@@ -11,7 +11,11 @@ import Home from './Homepage/Home'
 import Postbox from './Homepage/Postbox';
 import { Construction, DataSaverOffTwoTone, LocalConvenienceStoreOutlined, ReceiptLongOutlined } from '@mui/icons-material';
 // link: https://contactmentor.com/login-form-react-js-code/
+// author: https://contactmentor.com/
+//license: https://contactmentor.com/
 //link :https://bobbyhadz.com/blog/react-onclick-redirect
+//author: https://bobbyhadz.com/
+// license: https://bobbyhadz.com/terms-and-conditions
 function Login() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -115,8 +119,8 @@ function Login() {
         // console.log(newinfo_authorid)
         setAuthorid(info_token_send)
         //link :https://www.youtube.com/watch?v=HTSAJna3X8c
-        //author: 
-        //license:
+        //author: https://www.youtube.com/@codingcomics
+        //license: https://creativecommons.org/
         console.log(info_token_send)
         localStorage.setItem("authorid", Object.values(info_authorid[0]).join(''))
         localStorage.setItem("token", Object.values(info_token[0]).join(''))
@@ -160,51 +164,7 @@ function Login() {
   };
 
 
-  // Generate JSX code for error message
-  // const renderErrorMessage = (name) =>
-  //   name === errorMessages.name && (
-  //     <div className="error">{errorMessages.message}</div>
-  //   );
 
-  // JSX code for login form
-  // const renderForm = (
-  //   <div className="form">
-  //     <form onSubmit={handleSubmit}>
-  //       <div className="input-container">
-  //         <label>Username </label>
-  //         <input type="text" name="uname" required />
-  //         {renderErrorMessage("uname")}
-  //       </div>
-  //       <div className="input-container">
-  //         <label>Password </label>
-  //         <input type="password" name="pass" required />
-  //         {renderErrorMessage("pass")}
-  //       </div>
-  //       <div className="button-container">
-  //           <input type="submit" />
-  //       </div>
-  //     </form>
-  //   </div>
-  // );
-//   <div className="app">
-//   <div className="login-form">
-//     <div className="title">Sign In</div>
-//     <div>
-     
-//             {
-//                 authorid1.map((autho) => {
-//                     return <p> {autho.author.id}</p>
-//                 })
-//             }
-      
-//     </div>
-//     {isSubmitted ? <div></div> : renderForm}
-    
-//   </div>
-
-  
-       
-// </div>
 
   return (
     <div className="form">
