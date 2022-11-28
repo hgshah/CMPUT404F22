@@ -41,6 +41,8 @@ function Feed({}) {
       }
       getAllPosts()
   }, [])
+
+
 //   useEffect(() => {
 //     async function getAllComments(){
 //         try {

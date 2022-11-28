@@ -55,7 +55,7 @@ function Postbox ({}) {
                 data: formField
             }).then((res) =>{
                 console.log(res.data)
-                
+                   
             })
             
         } else {
@@ -65,7 +65,7 @@ function Postbox ({}) {
             formField.append("visibility", visibility)
             await axios({
                 method: 'post',
-
+                
                 // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
                 // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
                 // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
