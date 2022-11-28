@@ -231,7 +231,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                                 value={updatetitle} 
                                 placeholder='Enter Title' 
                                 type = 'text'
+                                className='post_input'
                                 variant = 'outlined'
+                                label = "add title"
                                 size = "small"
                              />  
                             </div>  
@@ -240,8 +242,10 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             <input onChange={e => setPostBody(e.target.value)} 
                                 value={updatebody} 
                                 placeholder='Enter Body' 
-                                type = 'text' 
+                                type = 'text'
+                                className='post_input'
                                 variant = 'outlined'
+                                label = "add body"
                                 size = "small"
                              />
                             </div>
@@ -276,7 +280,13 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                                 {following ? "Following" : "Follow"}
                             </Button>
                             {/* hardcode */}
-                            
+                            {/* <input 
+                            onChange={e => setUserName(e.target.value)}
+                            value={userName} 
+                            placeholder='Enter post body' 
+                            type = "text"
+                            name = "description"
+                            /> */}
                         </span>
                     </h3>
                     
