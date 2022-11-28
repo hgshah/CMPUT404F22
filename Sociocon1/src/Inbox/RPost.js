@@ -4,8 +4,9 @@ function RPost(title, description) {
   return (
     <div>
             <div> 
-                {title}  <br> </br>    
-                {description}
+                Title
+                  <br> </br>    
+                
             </div>
     
     </div>

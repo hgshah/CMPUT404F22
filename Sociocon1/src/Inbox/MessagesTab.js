@@ -5,13 +5,13 @@ import axios from 'axios'
 import RPost from './RPost';
 import { render } from '@testing-library/react';
 import  ReactDOM from 'react-dom';
+import { Alert } from '@mui/material';
 export default function MessagesTab() {
   const [authorlist, setAuthorList] = useState([])
   const [post, setPost] = useState([])
   const [rempost, setRempost] = useState([])
   const authorid = localStorage.getItem("authorid")
   const token = localStorage.getItem("token")  
-  const autid = localStorage.getItem("id")
   const Show_AuthorList = async () => {
         
     await axios({
@@ -27,8 +27,9 @@ export default function MessagesTab() {
       for(let i = 0; i<34; i++){
        
        array.push(response.data.items[i])
-       array2.push(response.data.items[i])
-        
+       array2.push(response.data.items[i].id)
+       
+       
       }
       
       
@@ -52,8 +53,10 @@ const Show_PostList = async (rem) => {
           url: 'https://socioecon.herokuapp.com/authors/' + rem + '/posts' ,
       
   }).then((response) =>{
-      for(let i = 0; i<100; i++){
-        console.log(response.data.items[i].author.preferredName,response.data.items[i].title, response.data.items[i].title )
+      for(let i = 0; i<40; i++){
+        console.log("name: ", response.data.items[i].author.preferredName)
+        console.log("post title: ",response.data.items[i].title)
+        console.log("post descp: ", response.data.items[i].description)
       }
       
           
@@ -61,31 +64,28 @@ const Show_PostList = async (rem) => {
 
   })
 }
+function handle() {
+  alert("checking posts")
+}
 
   return (
     <div className='MessagesTab'>
      
         <button onClick={Show_AuthorList} >Get</button>
+        
+        
         {
             authorlist.map((dat) => { 
               return(
-                  console.log(dat.preferredName)
+                  
+                  <p> {dat.preferredName}<button onClick= {Show_PostList(dat.id)}> check posts</button></p>
                 // <RPost title = {dat.preferredName} description = {dat.id}/>
               )
             }
              
         
         )}
-        {
-            rempost.map((datt) => { 
-              return(
-                  Show_PostList(datt.id)
-                // <RPost title = {dat.preferredName} description = {dat.id}/>
-              )
-            }
-             
-        
-        )}
+       
         
         {/* <input value = {authorlist} /> */}
         
