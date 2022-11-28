@@ -14,18 +14,22 @@ import Comment from './Comment'
 import Test from '../Test';
 import Profile from "../Profile";
 import Login from '../Login';
+import Home from './Home'
 import {useNavigate, useParams} from 'react-router-dom'
-function Feed() {
+function Feed({}) {
     //const [posts, setPosts] = useState([]);
     const[p_post, setPost] = useState([]); 
     const[p_comment, setComment] = useState([]); 
+    const authorid = localStorage.getItem("authorid")
+    const token = localStorage.getItem("token")
+    const preferredName = localStorage.getItem("preferredName")
     // useEffect(() =>{
     //         setPosts()
     // }, [])
     useEffect(() => {
       async function getAllPosts(){
           try {
-                  const p_post = await axios.get("http://localhost:8000/posts/public/")
+                  const p_post = await axios.get("https://socioecon.herokuapp.com/posts/public/")
                   console.log(p_post.data)
                   setPost(p_post.data)
           }
@@ -37,25 +41,25 @@ function Feed() {
       }
       getAllPosts()
   }, [])
-  useEffect(() => {
-    async function getAllComments(){
-        try {
-                const p_comment = await axios({
-                  method: "get",
-                  withCredentials: true ,
-                  headers: { 'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
-                  url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/de5b437f-5f88-4302-afaa-15182a4c643a/comments',
+//   useEffect(() => {
+//     async function getAllComments(){
+//         try {
+//                 const p_comment = await axios({
+//                   method: "get",
+//                   withCredentials: true ,
+//                   headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+//                   url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/de5b437f-5f88-4302-afaa-15182a4c643a/comments',
 
-                })
-                console.log(p_comment.data)
-                setComment(p_comment.data)
-        }
-        catch(error){
-            console.log(error)
-        }
-    }
-    getAllComments()
-}, [])
+//                 })
+//                 console.log(p_comment.data)
+//                 setComment(p_comment.data)
+//         }
+//         catch(error){
+//             console.log(error)
+//         }
+//     }
+//     getAllComments()
+// }, [])
   const navigate = useNavigate()
     // link: https://www.youtube.com/watch?v=aRYkCe6JcGM
     // author: https://www.youtube.com/c/GreatAdib
@@ -76,11 +80,16 @@ function Feed() {
   return (
     <div className='feed'>
         <div className="feed_header">
-           <h2>Home </h2>
+           <h2>Home              
+            </h2>
+            <h3>
+              user:{preferredName} 
+            </h3>
+          
         </div>
         
       {/* header*/}
-      <Postbox />
+      <Postbox authorid = {authorid} />
       
       {
                         p_post.map((posts) => {
@@ -88,7 +97,7 @@ function Feed() {
                               
                                 <h2 >
                                   
-                                   <Post purl = {posts.url} title = {posts.title} description = {posts.description} displayName = "Harsh Shah"  image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = "public"/>
+                                   <Post post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = {posts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     

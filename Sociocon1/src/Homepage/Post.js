@@ -20,11 +20,12 @@ import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
 import EditPost from './EditPost';
-function Post({displayName, title, description, text, image, avatar, visibility, comments, contenttype, purl, token, authorid}) {
+function Post({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid}) {
     const[value, setValue] = useState(""); 
-
+    const authorid = localStorage.getItem("authorid")
+    const token = localStorage.getItem("token")
     // const [userName, setUserName] = useState('');
-    const[followButtonText, newFollowButtonText] = useState("Follow");
+    // const[followButtonText, newFollowButtonText] = useState("Follow");
     const[following, setFollowing] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [updatetitle, setPostTitle] = useState('')
@@ -34,7 +35,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     const [ContentType, setPostContentType] = useState('');
     const [like, setPostLike] = useState(1);
     const [likeactive, setPostLikeactive] = useState(false);
-    
+    const [comments, setComments] = useState([])
     //const[p_post, setPost] = useState([]); 
     // link : https://www.youtube.com/watch?v=a8KruvMkEtY
     function postlike(){
@@ -59,7 +60,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method: 'post',
             withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+            headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
             url: purl + '/comments' ,
             data: formField
         }).then((response) =>{
@@ -75,7 +76,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
             method: 'post',
             withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+            headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
             // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
@@ -99,7 +100,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'delete',
                 withCredentials: true ,
-                headers: { "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                headers: { "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl
                 
@@ -118,9 +119,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'post',
                 withCredentials: true ,
-                headers: {'Content-Type': 'application/json' , "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/inbox',
+                url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/inbox',
                 data: formField12
             
         }).then((response) =>{
@@ -131,25 +132,20 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     }
 
     const follow_clicked = async() => {
-        if (followButtonText == "Follow") {
-            newFollowButtonText("Following");
-        } else {
-            newFollowButtonText("Follow")
-        }
+        // if (followButtonText == "Follow") {
+        //     newFollowButtonText("Following");
+        // } else {
+        //     newFollowButtonText("Follow")
+        // }
 
         //show the friend request is sent
         setFollowing(!following);
-        // if (following == false) {
-        //     alert("Friend request sent")
-        // }
-
-        // let formField_follow = new FormData();
-        // formField_follow.append("actor", "actor")
+        console.log(post_authorid)
         await axios({
             method:'post',
             withCredentials: true,
-            headers: {'Content-Type':'application/json', 'Authorization':'Token 7dfbab16c928892276793397732be2f0d4f6835a'},
-            url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/followers/',
+            headers: {'Content-Type':'application/json', "Authorization": "Token " + token},
+            url: 'https://socioecon.herokuapp.com/authors/' + post_authorid + '/followers/', //hard coded to show "malhi wants to follow harkirat on following any post"
             // data: formField_follow
         }).then((response) => {
             console.log(response.data)
@@ -169,7 +165,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         await axios({
                 method:'put',
                 withCredentials: true ,
-                headers: {'Content-Type': 'application/json', "Authorization": "Token 7dfbab16c928892276793397732be2f0d4f6835a"},
+                headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl + '/share',
                 data: formField_share
@@ -180,6 +176,27 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             navigate.push('/')
         })
     }
+
+    const Show_Comments = async () => {
+        
+        await axios({
+                method: "get",
+                withCredentials: true ,
+                headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+                url: purl + '/comments' ,
+            
+        }).then((response) =>{
+           const newcom = []
+            
+            newcom.push({...response.data.items[0].comment})
+            const updatecom = Object.values(newcom[0]).join('')
+            setComments(updatecom)
+
+
+        })
+    }
+
+   
 
   return (
     <div className='post'>
@@ -243,8 +260,8 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             <Button 
                             className='follow_btn' 
                             onClick={follow_clicked}
-                            style={{backgroundColor: following ? "rgb(159, 185, 31)" : "aqua"}} >
-                                {followButtonText}
+                            style={{backgroundColor: following ? "rgb(211, 211, 211)" : "rgb(159, 185, 31)"}} >
+                                {following ? "Following" : "Follow"}
                             </Button>
                             {/* hardcode */}
                             {/* <input 
@@ -268,8 +285,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                     {/* <p>{text}</p> */}
                     {title} <br></br>
                     {description}
-                    {token}
-                    {authorid}
+ 
                     
 
 
@@ -279,11 +295,21 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                  <form>
                     <span>
                         <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {like}  </Button>  &nbsp;&nbsp;&nbsp;
-                        <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button>
+                        <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button> &nbsp;&nbsp;&nbsp;
+                        <Button onClick = {Show_Comments} variant='contained' size = "small" endIcon= {<CommentIcon/>} > See Comments</Button>
+                        
                     </span>
 
                     </form>
-
+                    <h5 >
+                        <ol style = {{listStyleType: 'upper-roman'}}>
+                            <li>
+                                {comments}
+                            </li>
+                        </ol>
+                    </h5>
+                   
+                    
                 <div className='post_footer'>
                  
 
@@ -323,6 +349,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             
                         </form> 
                         <Button onClick = {DeletePostInfo} variant = 'contained' endIcon = {<DeleteIcon/>} className = "postdel_button" type = "submit"> Delete</Button>
+                        
                     </div> 
                     {/* <div className='getcomments'>
                     <h4>

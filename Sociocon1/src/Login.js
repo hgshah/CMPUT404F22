@@ -6,6 +6,8 @@ import axios from 'axios'
 import "./Login.css"
 import { Avatar, Button, getAccordionDetailsUtilityClass, TextField} from '@mui/material';
 import Post from './Homepage/Post';
+import Feed from './Homepage/Feed';
+import Home from './Homepage/Home'
 import Postbox from './Homepage/Postbox';
 import { Construction, DataSaverOffTwoTone, LocalConvenienceStoreOutlined, ReceiptLongOutlined } from '@mui/icons-material';
 // link: https://contactmentor.com/login-form-react-js-code/
@@ -16,6 +18,7 @@ function Login() {
   const [token1, setToken] = useState('')
   const [authorid1, setAuthorid] = useState([])
   const navigateHome = () => {
+
     // 👇️ navigate to /
     navigate('/home');
   };
@@ -24,33 +27,48 @@ function Login() {
   // User Login info
   const database = [
     {
-      username: "hgshah",
-      password: "hgshah",
-
+      "username": "super",
+      "password": "super",
+      "is_staff": true,
+      "is_superuser": true
     },
     {
-      username: "hgshah1",
-      password: "hgshah1",
-
+      "username": "amanda6",
+      "password": "amanda6",
+      "is_staff": true,
+      "is_superuser": true
     },
     {
-      username: "amanda",
-      password: "amanda",
-
+      "username": "hsmalhi",
+      "password": "hsmalhi",
+      "is_staff": true,
+      "is_superuser": true
     },
     {
-      username: "allan",
-      password: "allan",
-
+      "username": "manuba",
+      "password": "manuba",
+      "is_staff": true,
+      "is_superuser": true
     },
     {
-      username: "john",
-      password: "john",
-
+      "username": "junhong1",
+      "password": "junhong1",
+      "is_staff": true,
+      "is_superuser": true
     },
     {
-      username: "harkirat",
-      password: "harkirat",
+      "username": "hgshah",
+      "password": "hgshah",
+      "is_staff": true,
+      "is_superuser": true
+    },
+    {
+      "username": "actor",
+      "password": "actor"
+    },
+    {
+      "username": "target",
+      "password": "target"
     }
   ];
 
@@ -77,22 +95,32 @@ function Login() {
             method:'post',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-            url: 'http://127.0.0.1:8000/tokens/',
+            url: 'https://socioecon.herokuapp.com/tokens/',
             data: formField_token,
         
     }).then((login_info) =>{
         
         
-        // const info_token = [];
-        // const info_authorid = [];
-        // info_token.push({...login_info.data.token})
-        // info_authorid.push({...login_info.data.author.id})
-        // const newinfo_token = Object.values(info_token[0]).join('')
-        // const newinfo_authorid = Object.values(info_authorid[0]).join('')
+         const info_token_send = [];
+         const info_token =[];
+         const info_authorid = [];
+         const info_preferredName = []
+         info_token_send.push({...login_info.data})
+         info_token.push({...login_info.data.token})
+         info_authorid.push({...login_info.data.author.id})
+         info_preferredName.push({...login_info.data.author.preferredName})
+         const newinfo_token = Object.values(info_token[0]).join('')
+         const newinfo_authorid = Object.values(info_authorid[0]).join('')
         // console.log(newinfo_token)
         // console.log(newinfo_authorid)
-        setAuthorid((authorid1) =>[login_info.data.author.id, ...authorid1])
-        console.log({authorid1})
+        setAuthorid(info_token_send)
+        //link :https://www.youtube.com/watch?v=HTSAJna3X8c
+        //author: 
+        //license:
+        console.log(info_token_send)
+        localStorage.setItem("authorid", Object.values(info_authorid[0]).join(''))
+        localStorage.setItem("token", Object.values(info_token[0]).join(''))
+        localStorage.setItem("preferredName", Object.values(info_preferredName[0]).join(''))
     })
     
 }
@@ -118,16 +146,10 @@ function Login() {
       } else {
         
         setIsSubmitted(true);
+        
         PostToken();
+        navigateHome();
         
-        
-        
-     
-      
-        
-          
-        // author_id = userData.authorid;
-        // token = userData.token;
         
       }
     } else {
@@ -139,41 +161,76 @@ function Login() {
 
 
   // Generate JSX code for error message
-  const renderErrorMessage = (name) =>
-    name === errorMessages.name && (
-      <div className="error">{errorMessages.message}</div>
-    );
+  // const renderErrorMessage = (name) =>
+  //   name === errorMessages.name && (
+  //     <div className="error">{errorMessages.message}</div>
+  //   );
 
   // JSX code for login form
-  const renderForm = (
+  // const renderForm = (
+  //   <div className="form">
+  //     <form onSubmit={handleSubmit}>
+  //       <div className="input-container">
+  //         <label>Username </label>
+  //         <input type="text" name="uname" required />
+  //         {renderErrorMessage("uname")}
+  //       </div>
+  //       <div className="input-container">
+  //         <label>Password </label>
+  //         <input type="password" name="pass" required />
+  //         {renderErrorMessage("pass")}
+  //       </div>
+  //       <div className="button-container">
+  //           <input type="submit" />
+  //       </div>
+  //     </form>
+  //   </div>
+  // );
+//   <div className="app">
+//   <div className="login-form">
+//     <div className="title">Sign In</div>
+//     <div>
+     
+//             {
+//                 authorid1.map((autho) => {
+//                     return <p> {autho.author.id}</p>
+//                 })
+//             }
+      
+//     </div>
+//     {isSubmitted ? <div></div> : renderForm}
+    
+//   </div>
+
+  
+       
+// </div>
+
+  return (
     <div className="form">
-      <form onSubmit={handleSubmit}>
+      <form >
         <div className="input-container">
           <label>Username </label>
           <input type="text" name="uname" required />
-          {renderErrorMessage("uname")}
+          
         </div>
         <div className="input-container">
-          <label>Password </label>
-          <input type="password" name="pass" required />
-          {renderErrorMessage("pass")}
-        </div>
-        <div className="button-container">
-            <input type="submit" />
+            <label>Password </label>
+            <input type="password" name="pass" required />
+            <button onClick = {handleSubmit} > Submit </button>
+            {isSubmitted}
+            
+                {
+                    authorid1.map((autho) => {
+                        return <p>  {autho.author.id} 
+                                
+                        </p>
+                    })
+                }
         </div>
       </form>
     </div>
-  );
 
-  return (
-    <div className="app">
-      <div className="login-form">
-        <div className="title">Sign In</div>
-        {isSubmitted ? <div></div> : renderForm}
-        
-      </div>
-           
-    </div>
   );
 }
 export default Login
