@@ -124,7 +124,7 @@ class AuthorSerializer(serializers.ModelSerializer):
                 author.host = host  # force a set even if field was not given
 
                 # special processing for team7
-                if node_config.team_metadata_tag == 'team7':
+                if node_config.team_metadata_tag == 'team7' and 'id' in data:
                     author_id = data['id']
                     entry = f'{BaseUtil.get_http_or_https()}{node_config.domain}/service/authors/{author_id}'
                     setattr(author, 'url', entry)
