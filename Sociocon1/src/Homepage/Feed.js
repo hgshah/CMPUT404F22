@@ -97,7 +97,7 @@ function Feed({}) {
                               
                                 <h2 >
                                   
-                                   <Post purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = {posts.visibility}/>
+                                   <Post post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g" avatar = {profilepic} visibility = {posts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     
