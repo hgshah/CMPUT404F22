@@ -471,11 +471,6 @@ class FollowersIndividualView(GenericAPIView):
         """Helper function to getting a follow regardless of local or remote"""
         author: Author = request.user
 
-        if not (author.is_authenticated_node or author.get_id()
-                == str(target_id) or author.get_id()
-                == str(follower_id)):
-            return None, HttpResponseForbidden()
-
         try:
             target = Author.get_author(official_id=target_id)
         except Follow.DoesNotExist:

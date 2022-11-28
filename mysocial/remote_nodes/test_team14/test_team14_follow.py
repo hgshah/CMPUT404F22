@@ -40,6 +40,7 @@ class TestTeam14Follow(TestCase):
 
     def test_all(self):
         self.follow_flow_happy_path()
+        self.check_if_follow()
 
     def follow_flow_happy_path(self):
         # local actor checks if they already requested remote target (404)
@@ -58,7 +59,10 @@ class TestTeam14Follow(TestCase):
             print(content)
         self.assertEqual(response.status_code, 201, content)
 
-        # they have to accept it on their end >.>
-        # response = self.local.session.get(
-        #     f'{self.local.base}/authors/{self.remote_id}/followers/{self.local.author_id}')
-        # self.assertEqual(response.status_code, 200)
+        # they have to accept it on their end >.>, so there's nothing here
+
+    def check_if_follow(self):
+        # this is the case when they accept it on their end
+        response = self.local.session.get(
+            f'{self.local.base}/authors/{self.remote_id}/followers/{self.local.author_id}')
+        self.assertEqual(response.status_code, 200)

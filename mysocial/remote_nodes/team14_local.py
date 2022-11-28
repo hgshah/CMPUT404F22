@@ -9,6 +9,8 @@ from rest_framework import status
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from common.base_util import BaseUtil
+from follow.models import Follow
+from follow.serializers.follow_serializer import FollowRequestSerializer
 from remote_nodes.local_default import LocalDefault
 from post.serializer import PostSerializer
 from rest_framework import status
@@ -42,7 +44,6 @@ class Team14Local(LocalDefault):
         "visibility": "visibility",
         "unlisted": "unlisted"
     }
-
 
     def get_base_url(self):
         return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}/api'
@@ -86,6 +87,37 @@ class Team14Local(LocalDefault):
         print(f'{self}: post_local_follow_remote: {response.content}')
         return response.status_code
 
+    def get_remote_follow(self, target: Author, follower: Author) -> Follow:
+        """
+        Make call to remote node to get a follow object or request
+
+        Returns a Follow object if there is one;
+        Returns None if cannot be found
+        """
+        url = f'{target.get_url()}/followers/{follower.get_id()}'
+        response = requests.get(url, auth=(self.username, self.password))
+        if 200 <= response.status_code < 300:
+            follow_json = json.loads(response.content)
+            if 'message' not in follow_json or follow_json['message'] != 'follower indeed':
+                print(f'{self}: get_remote_follow: unknown message: {follow_json}')
+                return None
+
+            follow_serializer = FollowRequestSerializer(data={
+                'actor': AuthorSerializer(follower).data,
+                'object': AuthorSerializer(target).data,
+                'hasAccepted': True,  # team14 returns a message that says follower indeed if you're a follower
+                'localUrl': url,
+                'id': None
+            })
+            if not follow_serializer.is_valid():
+                for err in follow_serializer.errors:
+                    print(f'{self}: get_remote_follow: serialization error: {err}')
+                return None
+            return follow_serializer.validated_data
+        else:
+            print(f'{self}: get_follow_request: get failed: {response.status_code}')
+            return None
+
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""
         url = f'{self.get_base_url()}/authors/'
@@ -115,7 +147,8 @@ class Team14Local(LocalDefault):
         try:
             response = requests.get(url, auth=(self.username, self.password))
             if response.status_code < 200 or response.status_code > 300:
-                return Response("Failed to get author's  post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response("Failed to get author's  post from remote server",
+                                status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         except Exception as e:
             return Response(f"Failed to get author's post from remote server, error: {e}",
@@ -157,12 +190,14 @@ class Team14Local(LocalDefault):
         url = f'{target_author_url}inbox/'
 
         data = self.convert_post_in_inbox(data)
-        response = requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+        response = requests.post(url=url, data=json.dumps(data), auth=(self.username, self.password),
+                                 headers={'content-type': 'application/json'})
 
         if response.status_code < 200 or response.status_code > 300:
-            return Response(f"Failed to get post from remote server, error {json.loads(response.content)}", status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        return Response("Successfully sent to remote inbox!", status = status.HTTP_200_OK)
+            return Response(f"Failed to get post from remote server, error {json.loads(response.content)}",
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response("Successfully sent to remote inbox!", status=status.HTTP_200_OK)
 
     def convert_team14_post(self, url, post_data):
         post_data["url"] = url
@@ -172,7 +207,7 @@ class Team14Local(LocalDefault):
             return serializer.data
         else:
             return serializer.errors
-    
+
     def convert_post_in_inbox(self, data):
         inbox_post = {
             "type": "post",
@@ -184,9 +219,8 @@ class Team14Local(LocalDefault):
                 }
             }
         }
-        
+
         inbox_post['post']['id'] = data['id']
         inbox_post['post']['author']['id'] = data['author']['id']
         inbox_post['post']['author']['url'] = data['author']['url']
         return inbox_post
-        

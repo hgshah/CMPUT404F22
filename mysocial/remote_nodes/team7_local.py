@@ -151,21 +151,20 @@ class Team7Local(LocalDefault):
         url = f'{target.get_url()}/followers/{follower.get_id()}'
         response = requests.get(url, auth=(self.username, self.password))
         if 200 <= response.status_code < 300:
-            follow_json = json.loads(response.content)
             follow_serializer = FollowRequestSerializer(data={
                 'actor': AuthorSerializer(follower).data,
                 'object': AuthorSerializer(target).data,
                 'hasAccepted': True,  # team7 does not have follow request, you get followed immediately somehow
-                'localUrl': f'{follower.get_url()}/followers/{target.get_id()}/',
+                'localUrl': url,
                 'id': None
             })
             if not follow_serializer.is_valid():
                 for err in follow_serializer.errors:
-                    print(f'NodeConfigBase: get_remote_follow: serialization error: {err}')
+                    print(f'{self}: get_remote_follow: serialization error: {err}')
                 return None
             return follow_serializer.validated_data
         else:
-            print(f'NodeConfigBase: get_follow_request: get failed: {response.status_code}')
+            print(f'{self}: get_follow_request: get failed: {response.status_code}')
             return None
 
     def get_authors_posts(self, request, author_post_path: str):
