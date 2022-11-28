@@ -21,7 +21,7 @@ export default function FriendRequestsTab() {
     let formField = new FormData();
     formField.append("hasAccepted",true)
 
-    await axios.put('http://127.0.0.1:8000/follows/'+ id + '/', formField,
+    await axios.put('https://socioecon.herokuapp.com/follows/'+ id + '/', formField,
     {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}},
     
     ).then((response) => {
@@ -41,7 +41,7 @@ export default function FriendRequestsTab() {
   //remove from requests
   const decline_clicked = async(id) => {
     console.log("declined " + id)
-    await axios.delete('http://127.0.0.1:8000/follows/'+ id + '/', {
+    await axios.delete('https://socioecon.herokuapp.com/follows/'+ id + '/', {
       headers: {"Authorization": "Token " + token}
     }).then((response) => {
       console.log(response.data)
@@ -56,7 +56,7 @@ export default function FriendRequestsTab() {
     //if user is not yet following back
     // console.log("un be friend " + auth_id)
     if(!followingBack) {
-      await axios.post('http://127.0.0.1:8000/authors/' + auth_id + '/followers/', {
+      await axios.post('https://socioecon.herokuapp.com/authors/' + auth_id + '/followers/', {
       withCredentials:true}, 
       {headers: {'Content-Type':'application/json', "Authorization": "Token " + token}}
       ).then((response) => {
@@ -68,7 +68,7 @@ export default function FriendRequestsTab() {
     //if user is already following back
     } else {
       //auth id = id of user that is losing the follower, the nnext id is of the user that is un be-friending
-      await axios.delete('http://127.0.0.1:8000/authors/'+ auth_id + '/followers/' + authorid, {
+      await axios.delete('https://socioecon.herokuapp.com/authors/'+ auth_id + '/followers/' + authorid, {
         headers: {"Authorization": "Token " + token}
       }).then((response) => {
         console.log(followingBack)
@@ -82,7 +82,7 @@ export default function FriendRequestsTab() {
   useEffect(() => {
     async function getAllRequests() {
       const arr = [];
-      await axios.get('http://127.0.0.1:8000/follows/incoming/', {
+      await axios.get('https://socioecon.herokuapp.com/follows/incoming/', {
         headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
       }).then((response) => {
         for (let follow of response.data.items) {
@@ -101,7 +101,7 @@ export default function FriendRequestsTab() {
   useEffect(() => {
     async function getAcceptedRequests() {
       const accepted = [];
-      await axios.get('http://127.0.0.1:8000/authors/' + authorid + '/followers/', {
+      await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/followers/', {
         headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
       }).then((response) => {
         for (let follower of response.data.items) {
