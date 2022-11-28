@@ -187,7 +187,7 @@ class Team14Local(LocalDefault):
     def send_to_remote_inbox(self, data, target_author_url):
         if target_author_url is None:
             return 404
-        url = f'{target_author_url}inbox/'
+        url = f'{target_author_url}/inbox/'
 
         data = self.convert_post_in_inbox(data)
         response = requests.post(url=url, data=json.dumps(data), auth=(self.username, self.password),
