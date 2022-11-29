@@ -1,10 +1,13 @@
+import json
+
 from rest_framework.test import APITestCase
 from rest_framework import status
-from post.models import Post, Visibility
-from authors.models import Author
-from django.utils import timezone
+from post.models import Visibility
+from authors.models.author import Author
 import logging, uuid
-import datetime
+from common.test_helper import TestHelper
+from follow.models import Follow
+from inbox.models import Inbox
 
 logger = logging.getLogger("mylogger")
 #pymike00, October 29, https://www.youtube.com/watch?v=1FqxfnlQPi8&ab_channel=pymike00
@@ -18,26 +21,12 @@ class PostTestCase(APITestCase):
     }
     
     def setUp(self) -> None:
-        author1_data = {
-            "username": "user1",
-            "email": "user1@gmail.com",
-            "password": "1234567",
-            "display_name": "display_name",
-            "github": "https://github.com/crouton/",
-            "host": "www.crouton.net"
-        }
-        author2_data = {
-            "username": "user2",
-            "email": "user2@gmail.com",
-            "password": "1234567",
-            "display_name": "display_name",
-            "host": "www.crouton.net"
-        }
-        self.author1 = Author.objects.create_user(**author1_data)
-        self.author2 = Author.objects.create_user(**author2_data)
-        self.existing_post = Post.objects.create(author = self.author1, title = "test", description = "test", published = datetime.datetime.now(tz=timezone.utc))
-        self.private_post = Post.objects.create(author = self.author1, title = "test", description = "test", published = datetime.datetime.now(tz=timezone.utc), visibility = Visibility.FRIENDS)
-        self.author2_post = Post.objects.create(author = self.author2, title = "test2", description = "test2", published = datetime.datetime.now(tz=timezone.utc))
+        self.author1 =  TestHelper.create_author(username = "author1", other_args = {"host": "127.0.0.1:8000"})
+        self.author2 = TestHelper.create_author(username = "author2", other_args = {"host": "127.0.0.1:8000"})
+        self.existing_post = TestHelper.create_post(author = self.author1)
+        self.private_post = TestHelper.create_post(author = self.author1, other_args = {"visibility": Visibility.FRIENDS}) 
+        self.author2_post = TestHelper.create_post(author = self.author2)
+        self.client.force_login(self.author1)
 
     # GET posts/public
     def test_get_all_public_posts(self):
@@ -51,7 +40,7 @@ class PostTestCase(APITestCase):
     # GET /authors/{AUTHOR_UUID}/posts?page={INT}&size={INT}
     def test_get_posts_by_author(self):
         # author 1 should have 2 created posts
-        request = f"/authors/{self.author1.official_id}/posts/?page={1}&size={2}"
+        request = f"/authors/{self.author1.get_id()}/posts/?page={1}&size={2}"
 
         response = self.client.get(request)
 
@@ -73,7 +62,7 @@ class PostTestCase(APITestCase):
 
         response = self.client.post(request, self.CREATE_POST_PAYLOAD)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(str(self.author1.official_id) in response.data["author"]["id"])
+        self.assertEqual(self.author1.get_id(), response.data["author"]["id"])
 
     # GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     def test_get_specific_post(self):
@@ -90,7 +79,7 @@ class PostTestCase(APITestCase):
 
         response = self.client.delete(request)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
     
     #POST /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     def test_update_post(self):
@@ -112,12 +101,28 @@ class PostTestCase(APITestCase):
 
         response = self.client.put(request, self.CREATE_POST_PAYLOAD)
 
-        self.assertEqual(response.data["id"], self.get_expected_official_id(new_uuid))
+        self.assertEqual(response.data["id"], str(new_uuid))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
     
     def get_expected_official_id(self, post_id):
         return f"http://{self.author1.host}/{Author.URL_PATH}/{self.author1.official_id}/posts/{post_id}"
+    
+    # sharing a post adds that post to your local followers
+    def test_share_post_sends_local_followers(self):
+        Follow.objects.create(
+            actor=self.author2.get_url(),
+            target=self.author1.get_url(),
+            has_accepted=True)
+
+        self.client.force_login(self.author1)
+
+        request = f"/authors/{self.author1.official_id}/posts/{self.existing_post.official_id}/share"
+        response = self.client.put(request)
+        follower_inbox = Inbox.objects.get(author = self.author2)
+        inbox_item = json.loads(follower_inbox.items[0])
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(inbox_item.get('id'), self.existing_post.get_id())
 
 class PostFailTestCase(APITestCase):
     CREATE_POST_PAYLOAD = {
@@ -143,7 +148,7 @@ class PostFailTestCase(APITestCase):
         }
         self.author1 = Author.objects.create_user(**author1_data)
         self.author2 = Author.objects.create_user(**author2_data)
-        self.existing_post = Post.objects.create(author = self.author1, title = "test", description = "test", published = datetime.datetime.now(tz=timezone.utc))
+        self.existing_post = TestHelper.create_post(author = self.author1) 
 
     # Updating a post as a different user
     def test_modify_as_different_user(self):
@@ -163,6 +168,8 @@ class PostFailTestCase(APITestCase):
         response = self.client.delete(request)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
 
 
 

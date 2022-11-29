@@ -1,0 +1,59 @@
+.FriendRequestsTab {
+    font-size: 20px;
+    margin-left: 1%;
+    
+}
+
+.request_btns {
+    float: right;
+    margin-right: 1%;
+}
+
+.accepted_btn {
+    float: right;
+    margin-right: 1%;
+}
+
+.request_btns .accept_btn {
+    background-color: rgb(159, 185, 31);
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+    text-transform: capitalize;
+}
+
+.request_btns .decline_btn {
+    background-color: rgb(211, 211, 211);
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+    text-transform: capitalize;
+}
+
+.accepted_btn .follow_back_btn {
+    background-color: rgb(159, 185, 31);
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+    text-transform: capitalize;
+}
+
+.request_btns .accept_btn:hover {
+    background-color: rgba(159, 185, 31, 0.693);
+}
+
+.request_btns .decline_btn:hover {
+    background-color: rgba(211, 211, 211, 0.616);
+}
+
+.accepted_btn .follow_back_btn:hover {
+    background-color: rgba(211, 211, 211, 0.616);
+}
+
+.request_list {
+    margin-bottom: 5%;
+}
+
+.accepted_list {
+    margin-bottom: 5%;
+}

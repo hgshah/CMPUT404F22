@@ -13,10 +13,10 @@ class AuthorManager(BaseUserManager):
     def _helper_create_user(self, email: str, password: str, **kwargs):
         email = self.normalize_email(email)
         try:
-            kwargs['host'] = kwargs['host'].rstrip('/')
             user = self.model(email=email, password=password, **kwargs)
             user.set_password(password)  # encrypts the password
             user.save()
+
             return user
         except Exception as e:
             logger.info(e)

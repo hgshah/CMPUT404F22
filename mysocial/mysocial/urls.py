@@ -15,11 +15,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+
+from remote_nodes.remote_util import RemoteUtil
+
+# one time script after settings.py
+# has to be called last to prevent circular dependency error
+RemoteUtil.setup()
 
 urlpatterns = [
-    path('authors/', include('authors.urls')),
+    path('', include('authors.urls')),
     path('admin/', admin.site.urls),
     path('', include('post.urls')),
     path('', include('comment.urls')),
     path('', include('follow.urls')),
+    path('', include('tokens.urls')),
+    path('', include('inbox.urls')),
+    path('', include('likes.urls')),
+    # DOCUMENTATION
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]

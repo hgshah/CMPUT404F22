@@ -1,23 +1,52 @@
 # CMPUT404F22
+
 hgshah
 amanda6
 hsmalhi
 manuba
 junhong1
 
+## Setup
+
 Before you start:
 Start your virtual env!
 pip install -r requirements.txt
 
-Switching to PostgresDB (MACOS)
+## Running locally
+
+Due to the project's structure, we only support running this server in two ports: `8000` (default) and `8080`
+
+To run locally in the `8000` port:
+
+```bash
+python manage.py runserver
+# If things don't work, try
+python manage.py runserver --settings mysocial.settings.local
+```
+
+Note: I tested this out. I find it weird how it works without the mysocial.settings.local key in bash for windows (which
+behaves more closely to Unix) but does not work in windows powershell (running Pycharm django runserver). If omitting
+the settings key causes an error, try adding it.
+
+To run locally in the `8080` port:
+
+```bash
+python manage.py runserver 8080
+# If things don't work, try...
+python manage.py runserver --settings mysocial.settings.local 8080
+```
+
+**Note**: the **port** argument should always be last.
+
+## Switching to PostgresDB (MACOS)
 https://daily-dev-tips.com/posts/installing-postgresql-on-a-mac-with-homebrew/
 Installing postgres
 
 1. brew update
-
 2. brew install postgresql
 
 To start the database:
+
 3. brew services start postgresql
 
 4. psql postgres
@@ -42,14 +71,11 @@ brew services start postgresql
 To stop the database:
 brew services stop postgresql
 
-You must run the postgres database as you're running the server!
-
 Windows Instruction:
 
 1. pip install -r requirements.txt
 
-2. Download postgres through here https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
-password = password, port = 5432
+2. Download postgres through here https://www.enterprisedb.com/downloads/postgres-postgresql-downloads password = password, port = 5432
 
 3. Add the postgres path here: https://blog.sqlbackupandftp.com/setting-windows-path-for-postgres-tools
 
@@ -67,36 +93,45 @@ password = password, port = 5432
 
 10. ALTER ROLE mysocialuser CREATEDB;
 
-11.
-CREATE SCHEMA public;
-GRANT ALL ON SCHEMA public TO mysocialuser;
-GRANT ALL ON SCHEMA public TO public;
+11. CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO mysocialuser; GRANT ALL ON SCHEMA public TO public;
 
 12. \q to exit out of psql
 
-13. Continue from step 8
+Continue from step 8
 
-To Run the Server 
-python manage.py migrate --settings mysocial.settings.local
-python manage.py runserver --settings mysocial.settings.local
+## Mirror instance
 
-References:
-Amanda
-https://stackoverflow.com/questions/5255913/kwargs-in-django
-https://stackoverflow.com/questions/3805958/how-to-delete-a-record-in-django-models
-https://stackoverflow.com/questions/12615154/how-to-get-the-currently-logged-in-users-user-id-in-django
-https://stackoverflow.com/questions/31173324/django-rest-framework-update-field
-https://stackoverflow.com/questions/43859053/django-rest-framework-assertionerror-fix-your-url-conf-or-set-the-lookup-fi
-https://stackoverflow.com/questions/62381855/how-to-update-model-objects-only-one-field-data-when-doing-serializer-save
-https://stackoverflow.com/questions/35024781/create-or-update-with-put-in-django-rest-framework
-https://stackoverflow.com/questions/1496346/passing-a-list-of-kwargs
-https://stackoverflow.com/questions/70878647/login-to-django-admin-via-requests
-https://www.youtube.com/watch?v=1FqxfnlQPi8&ab_channel=pymike00
-https://stackoverflow.com/questions/44604686/how-to-test-a-model-that-has-a-foreign-key-in-django
-https://stackoverflow.com/questions/18622007/runtimewarning-datetimefield-received-a-naive-datetime
-https://stackoverflow.com/questions/16416172/how-can-i-modify-procfile-to-run-gunicorn-process-in-a-non-standard-folder-on-he
-https://stackoverflow.com/questions/12615154/how-to-get-the-currently-logged-in-users-user-id-in-django
-https://www.youtube.com/watch?v=5d8AQFF0Ot0&t=689s&ab_channel=CodeAura
-https://www.linkedin.com/pulse/migrating-my-django-app-database-postgresql-onheroku-jovanta-pelawi/
-https://stackoverflow.com/questions/68265591/why-it-shows-unknown-command-collectstatic-when-i-try-to-collect-static
-https://stackoverflow.com/questions/15128135/setting-debug-false-causes-500-error#:~:text=If%20you%20are%20having%20a,in%20any%20web%20error%20logs.
+This is a setup on how to run another Django server in a different port
+
+### Postgres
+
+These instructions are in Windows! Inside `psql`:
+
+1. `CREATE DATABASE mysocialdb_mirror;`
+2. `\connect mysocialdb_mirror`
+3. `ALTER ROLE mysocialuser CREATEDB;`
+   - Note: if you followed the initial step of making a database, you should have mysocialuser already
+4. `GRANT ALL ON SCHEMA public TO mysocialuser; GRANT ALL ON SCHEMA public TO public;`
+   - Schema public already exists!
+
+### Migration
+
+Migration is slightly different!
+
+```bash
+python manage.py migrate --settings mysocial.settings.local_mirror
+```
+
+### Running your mirror server
+
+Then, to run your mirror server:
+
+```bash
+python manage.py runserver --settings mysocial.settings.local_mirror 8080
+```
+
+Note:
+- The port 8080 matters because that's the node we want to connect to based on NODE_CREDENTIALS. See RemoteUtils.py.
+- The port number being the last argument matters, though!
+
+You must run the postgres database as you're running the server!

@@ -4,11 +4,12 @@ POST /authors/{AUTHOR_UUID}/posts/
 {
     "title": "test",
     "description": "test",
-    "visibility": friend,
+    "visibility": "public",
     "source": "sourceurl",
     "origin": "originURL",
-    "contentType": text/plain,
-    "unlisted": false
+    "contentType": "text/plain",
+    "unlisted": "False",
+    "categories": ["test"]
 }
 
 TO GET POSTS BY AN AUTHOR:
@@ -133,9 +134,39 @@ REAL FRIENDS
 ### GET ALL REAL FRIENDS
 ```GET /authors/{AUTHOR_UUID}/real-friends/```
 
+----------------------------------------
+REMOTE-NODE (testing for external users)
+=========================================
+### TEST BASIC AUTH
+<!-- todo(turnip): change domain when we have actual domain! -->
+GET http://username:password@www.sociocon.herokuapp.com/remote-node/
+
+--------------------------
+LOGIN
+==========================
+### LOGIN
+Request (withCredentials = true):
+```POST /tokens/
+{
+    "username": "username",
+    "password": "password"
+}
+```
+
+Response:
+```
+{
+    "type": "token",
+    "token": "TOKEN",
+    "author": { /*author object*/ }
+}
+```
+
 ----------------------------------------------------
 FRONTEND GUIDE ON HOW TO ACCEPT FRIEND REQUESTS
 ====================================================
+
+For updated details, look at Socioecon: http://127.0.0.1:8080/api/schema/redoc/#tag/follows
 
 User B wants to follow User A.
 
@@ -181,9 +212,9 @@ Note 1: This endpoint assumes that these are follow requests only for the logged
 
 3.A. If User A wants to accept the follow request.
 ```
-PUT /follows/<FOLLOW_UUID>/
+PUT /authors/{USER_A_ID}/followers/{USER_B_ID}/
 {
-    "has_accepted": true, # <- User A has to explicitly say, yeah, I accept this request
+    "hasAccepted": true, # <- User A has to explicitly say, yeah, I accept this request
 }
 ```
 
@@ -191,7 +222,7 @@ Note: PUT only works one-way. It cannot make a follower unfollow or decline a re
 You have to DELETE.
 
 3.B. If User A wants to decline the follow request.
-```DELETE /follows/<FOLLOW_UUID>/```
+```DELETE /authors/{USER_A_ID}/followers/{USER_B_ID}/```
 
 4. User B now follows User A. To check:
 
@@ -214,3 +245,15 @@ This returns:
 4.B. The follow request is now gone for User B if you look at the follow request endpoint
 ```GET /follows/outgoing/```
 Note: not really in the user story
+
+----------------------------------------------------
+FRONTEND GUIDE ON LOGGING IN
+====================================================
+
+1. Check out the login endpoint aka tokens_create: https://potato-oomfie.herokuapp.com/api/schema/redoc/#tag/tokens/operation/tokens_create
+- Grab the token field from this entry
+- Save the author entry here so you know which author the token belongs to
+    - You might want to use something like local storage to save it. Check out redux!
+
+2. When you make an auth request, add the Token in the header like:
+`Authorization: Token THE_TOKEN_YOU_GOT_HERE`
