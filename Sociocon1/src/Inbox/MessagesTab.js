@@ -57,6 +57,7 @@ const Show_PostList = async (rem) => {
         console.log("name: ", response.data.items[i].author.preferredName)
         console.log("post title: ",response.data.items[i].title)
         console.log("post descp: ", response.data.items[i].description)
+        
       }
       
           
