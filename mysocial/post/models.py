@@ -29,6 +29,7 @@ class Post(models.Model):
     categories = ArrayField(models.CharField(max_length = 30), default=list)
     published = models.DateTimeField(default=datetime.now)
     description = models.CharField(max_length=500, blank=True)
+    content = models.TextField(default = "", blank = True)
     unlisted = models.BooleanField(default=False)
 
     # comments
