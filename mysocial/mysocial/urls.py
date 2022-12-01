@@ -27,7 +27,11 @@ RemoteUtil.setup()
 urlpatterns = [
     path('', include('authors.urls')),
     path('admin/', admin.site.urls),
+    path('profile/', views.index, name='index'),
     path('', views.index, name='index'),
+    path('home/', views.index, name='index'),
+    path('inbox/', views.index, name='index'),
+    path('login/', views.index, name='index'),
     path('', include('post.urls')),
     path('', include('comment.urls')),
     path('', include('follow.urls')),
