@@ -110,6 +110,7 @@ class TestHelper:
             "visibility": Visibility.PUBLIC,
             "source": "sourceurl",
             "categories": ["test"],
+            "content": "",
             "origin": "originURL",
             "contentType": ContentType.PLAIN,
             "unlisted": "False",

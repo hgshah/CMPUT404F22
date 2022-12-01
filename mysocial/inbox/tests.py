@@ -31,17 +31,17 @@ class InboxTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_add_post_to_inbox(self):
-        ## create a post 
-        author2_post = self.create_post()
-
         # add that post to author1's inbox 
+
+        self.client.force_login(self.author1)
         author1_inbox = Inbox.objects.get(author = self.author1)
         self.assertEqual(len(author1_inbox.items), 0)
 
+
         request = f"/authors/{self.author1.official_id}/inbox"
         response = self.client.post(request, self.author2_post, format = "json")
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         author1_inbox = Inbox.objects.get(author = self.author1)
         self.assertEqual(len(author1_inbox.items), 1)
 

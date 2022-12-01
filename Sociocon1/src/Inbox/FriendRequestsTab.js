@@ -107,9 +107,9 @@ export default function FriendRequestsTab() {
     // update button to show "Follow Back" or "Un befriend"
     async function updateAcceptedBtns(follower_id) {
       //logged in user is a follower of follower_id
-      // await axios.get('https://socioecon.herokuapp.com/authors/' + follower_id + '/followers/' + authorid, {
+      await axios.get('https://socioecon.herokuapp.com/authors/' + follower_id + '/followers/' + authorid, {
         //get real friends of authorid
-      await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/real-friends/', {
+      // await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/real-friends/', {
         headers: {"Content-Type":"application/json", "Authorization": "Token " + token}
       }).then((response) => {
           setFollowingBack(!followingBack)
