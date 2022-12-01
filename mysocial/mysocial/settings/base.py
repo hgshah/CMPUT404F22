@@ -89,7 +89,7 @@ ROOT_URLCONF = 'mysocial.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'staticfiles/')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -157,8 +157,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 django_on_heroku.settings(locals())
-
-
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles/static')]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 CORS_ALLOW_CREDENTIALS = True
 
 # later if the above causes issue
