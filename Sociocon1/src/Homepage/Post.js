@@ -82,7 +82,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             
         })
     }
- 
+    
    
     const navigate = useNavigate()
     
