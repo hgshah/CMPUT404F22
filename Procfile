@@ -1,2 +1,2 @@
-release: python mysocial/manage.py migrate --settings mysocial.settings.production
+release: ./release.sh
 web: gunicorn --pythonpath mysocial mysocial.wsgi
