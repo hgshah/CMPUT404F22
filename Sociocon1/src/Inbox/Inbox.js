@@ -42,6 +42,7 @@ export default function Inbox() {
     return (
     <div>
         <Sidebar/>
+        
         <div
         
         className="Inbox">
