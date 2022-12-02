@@ -53,7 +53,8 @@ const Show_PostList = async (rem) => {
           url: 'https://socioecon.herokuapp.com/authors/' + rem + '/posts' ,
       
   }).then((response) =>{
-      for(let i = 0; i<40; i++){
+      for(let i = 0; i<=response.data.items.length; i++){
+        console.log(response.data.items[i])
         console.log("name: ", response.data.items[i].author.preferredName)
         console.log("post title: ",response.data.items[i].title)
         console.log("post descp: ", response.data.items[i].description)
