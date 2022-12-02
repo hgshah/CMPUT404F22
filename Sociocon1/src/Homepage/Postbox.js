@@ -124,7 +124,7 @@ function Postbox ({}) {
                 type = "text"
                 name = "title"
                 />
-                <br></br>
+                
                 
                 
                 <label for="set-visibility"></label>
@@ -146,7 +146,7 @@ function Postbox ({}) {
                 type = "text"
                 name = "description"
                 
-                />
+                /> <br></br>
                 CommonMark: <input name="contenttype" value="CommonMark" type="radio"/>
             </div>
 

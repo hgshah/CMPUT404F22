@@ -89,3 +89,4 @@ https://www.youtube.com/watch?v=HTSAJna3X8c
 link: https://contactmentor.com/login-form-react-js-code/
 https://bobbyhadz.com/blog/react-onclick-redirect
 https://www.youtube.com/watch?v=a8KruvMkEtY
+https://masteringjs.io/tutorials/axios/headers // header in .get
