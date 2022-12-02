@@ -135,3 +135,20 @@ Note:
 - The port number being the last argument matters, though!
 
 You must run the postgres database as you're running the server!
+
+### Deploy both React and Django locally in one url
+
+Try either commands:
+
+```bash
+bash local.sh
+````
+
+```bash
+source local.sh
+```
+
+```bash
+./local.sh
+```
+
