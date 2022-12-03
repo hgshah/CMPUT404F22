@@ -188,6 +188,7 @@ CORS_ALLOW_HEADERS = default_headers + (
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'host',  # special header for team12
 )
 
 CORS_EXPOSE_HEADERS = [

@@ -60,11 +60,14 @@ class Team7Local(LocalDefault):
                                     auth=(self.username, self.password))
         """
         self.origin = f'{BaseUtil.get_http_or_https()}{base.CURRENT_DOMAIN}'
-        self.headers = {
-            'Origin': self.origin,
-        }
 
         super().__init__()
+
+    @property
+    def headers(self):
+        return {
+            'Origin': self.origin,
+        }
 
     def get_base_url(self):
         return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}/service'

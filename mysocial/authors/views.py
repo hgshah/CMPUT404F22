@@ -39,7 +39,8 @@ class AuthorView(GenericViewSet):
         tags=["authors",
               RemoteUtil.REMOTE_IMPLEMENTED_TAG,
               RemoteUtil.TEAM14_CONNECTED,
-              RemoteUtil.TEAM7_CONNECTED
+              RemoteUtil.TEAM7_CONNECTED,
+              RemoteUtil.TEAM12_CONNECTED,
               ]
     )
     @action(detail=True, methods=['get'], url_name='retrieve_all')
@@ -110,7 +111,8 @@ class AuthorView(GenericViewSet):
             "authors",
             RemoteUtil.REMOTE_IMPLEMENTED_TAG,
             RemoteUtil.TEAM14_CONNECTED,
-            RemoteUtil.TEAM7_CONNECTED
+            RemoteUtil.TEAM7_CONNECTED,
+            RemoteUtil.TEAM12_CONNECTED,
         ]
     )
     def retrieve(request: Request, author_id: str) -> HttpResponse:
@@ -187,7 +189,8 @@ class RemoteNodeView(GenericAPIView):
             "remote debug",
             RemoteUtil.REMOTE_IMPLEMENTED_TAG,
             RemoteUtil.TEAM14_CONNECTED,
-            RemoteUtil.TEAM7_CONNECTED
+            RemoteUtil.TEAM7_CONNECTED,
+            RemoteUtil.TEAM12_CONNECTED,
         ],
         summary="Check node connection",
     )
