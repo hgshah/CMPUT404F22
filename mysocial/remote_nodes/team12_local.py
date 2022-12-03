@@ -17,38 +17,17 @@ from remote_nodes.local_default import LocalDefault
 
 
 class Team7Local(LocalDefault):
-    domain = '127.0.0.1:8007'
+    domain = '127.0.0.1:8012'
     username = 'team7_local'
     team_metadata_tag = 'team7'
 
     """Mapping: remote <-> local"""
     remote_author_fields = {
         'id': 'official_id',
-        # WARNING: DO NOT TRUST THEIR URL!!!
-        'displayName': 'display_name',
+        # todo: map username to username too?
+        'username': 'display_name',
         'github': 'github',
-        'profileImage': 'profile_image'
-    }
-
-    post_remote_fields = {
-        "type": "type",
-        '_id': 'official_id',
-        'url': 'url',
-        "title": "title",
-        "source": "source",
-        "origin": "origin",
-        "description": "description",
-        "contentType": "contentType",
-        "author": "author",
-        "created_at": "published",
-        "visibility": "visibility",
-        "unlisted": "unlisted",
-        "categories": "categories",
-        "count": "count",
-        "comments": "comments",
-        "visibility": "visibility",
-        "unlisted": "unlisted",
-        "published": "published",
+        'profile_image': 'profile_image'
     }
 
     def __init__(self):
@@ -59,26 +38,30 @@ class Team7Local(LocalDefault):
                                     headers=self.headers,
                                     auth=(self.username, self.password))
         """
-        self.origin = f'{BaseUtil.get_http_or_https()}{base.CURRENT_DOMAIN}'
-        self.headers = {
-            'Origin': self.origin,
-        }
+        self.bearer_token = None
 
         super().__init__()
-
-    def get_base_url(self):
-        return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}/service'
 
     @classmethod
     def create_node_credentials(cls):
         """This is for local testing"""
         return {
             cls.domain: {
-                'username': 'team7_local',
-                'password': 'team7_local',
+                'username': 'team10_local@mail.com',
+                'password': 'team10_local',
                 'remote_username': 'local_default',
                 'remote_password': 'local_default',
             }
+        }
+
+    @property
+    def headers(self):
+        """
+        Use like:
+            response = requests.get(url, headers=self.headers)
+        """
+        return {
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc4NTE1Nzg2LCJpYXQiOjE2Njk4NzU3ODYsImp0aSI6ImRjZDVjNzVmZThiODQxNTFiZjVlMTY4Y2QxNTMyNTA4IiwidXNlcl9lbWFpbCI6InRlYW0xMEBtYWlsLmNvbSJ9.szjZU1nF4vIenkWxA_IiJ8rOMM7m2ow1qZgzciKGO-k'
         }
 
     def get_all_author_jsons(self, params: dict):
@@ -89,7 +72,7 @@ class Team7Local(LocalDefault):
             url += '?' + query_param
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, headers=self.headers)
         except ConnectionError as e:
             print(f"{self.__class__.username}: url ({url}) Connection error: {e}")
             return None
@@ -110,6 +93,7 @@ class Team7Local(LocalDefault):
         return None
 
     def get_author_via_url(self, author_url: str) -> Author:
+        raise NotImplementedError()
         response = requests.get(author_url)  # no password
 
         if response.status_code == 200:
@@ -123,81 +107,3 @@ class Team7Local(LocalDefault):
             print(f'{self} GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
 
         return None
-
-    def post_local_follow_remote(self, author_actor: Author, author_target: Author) -> dict:
-        url = f'{author_target.get_url()}/followers/{author_actor.get_id()}'
-        response = requests.put(url,
-                                auth=(self.username, self.password),
-                                headers=self.headers)
-        if 200 <= response.status_code < 300:
-            return {
-                'type': 'follow',
-                'actor': {'url': author_actor.get_url()},
-                'object': {'url': author_target.get_url()},
-                'hasAccepted': False,
-                'localUrl': f'{author_actor.get_url()}/followers/{author_target.get_id()}/',
-                'id': None
-            }  # <- GOOD
-        print(f'{self}: post_local_follow_remote: {response.content}')
-        return response.status_code
-
-    def get_remote_follow(self, target: Author, follower: Author) -> Follow:
-        """
-        Make call to remote node to get a follow object or request
-
-        Returns a Follow object if there is one;
-        Returns None if cannot be found
-        """
-        url = f'{target.get_url()}/followers/{follower.get_id()}'
-        response = requests.get(url, auth=(self.username, self.password))
-        if 200 <= response.status_code < 300:
-            follow_serializer = FollowRequestSerializer(data={
-                'actor': AuthorSerializer(follower).data,
-                'object': AuthorSerializer(target).data,
-                'hasAccepted': True,  # team7 does not have follow request, you get followed immediately somehow
-                'localUrl': url,
-                'id': None
-            })
-            if not follow_serializer.is_valid():
-                for err in follow_serializer.errors:
-                    print(f'{self}: get_remote_follow: serialization error: {err}')
-                return None
-            return follow_serializer.validated_data
-        else:
-            print(f'{self}: get_follow_request: get failed: {response.status_code}')
-            return None
-
-    def get_authors_posts(self, request, author_post_path: str):
-        url = f'{self.get_base_url()}{author_post_path}'
-
-        try:
-            response = requests.get(url, auth=(self.username, self.password))
-            if response.status_code < 200 or response.status_code > 300:
-                return Response("Failed to get author's  post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        except Exception as e:
-            return Response(f"Failed to get author's post from remote server, error: {e}",
-                            status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        data = []
-
-        post_data = json.loads(response.content.decode('utf-8'))
-        for key, value in post_data.items():
-            data.append(self.convert_team7_post(url, value))
-
-        data, err = PaginationHelper.paginate_serialized_data(request, data)
-
-        if err is not None:
-            return Response(err, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
-
-
-    def convert_team7_post(self, url, post_data):
-        post_data["url"] = url
-
-        serializer = PostSerializer(data=post_data)
-        if serializer.is_valid():
-            return serializer.data
-        else:
-            return serializer.errors

@@ -17,4 +17,5 @@ cd ..
 
 # .keep!
 touch mysocial/mysocial/staticfiles/.keep
+touch mysocial/mysocial/staticfiles/static/loadbearing_file.txt
 python mysocial/manage.py runserver # might run into issue inside python env
