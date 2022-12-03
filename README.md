@@ -6,6 +6,11 @@ hsmalhi
 manuba
 junhong1
 
+## Link to other documentations
+- [API Reddoc](https://socioecon.herokuapp.com/api/schema/redoc/)
+- [API Swagger](https://socioecon.herokuapp.com/api/schema/swagger-ui/)
+- [Onboarding for external teams](https://github.com/hgshah/cmput404-project/blob/staging/docs/remote_teams_onboarding.md)
+
 ## Setup
 
 Before you start:
@@ -135,3 +140,20 @@ Note:
 - The port number being the last argument matters, though!
 
 You must run the postgres database as you're running the server!
+
+### Deploy both React and Django locally in one url
+
+Try either commands:
+
+```bash
+bash local.sh
+````
+
+```bash
+source local.sh
+```
+
+```bash
+./local.sh
+```
+

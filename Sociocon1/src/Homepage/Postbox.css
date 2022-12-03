@@ -15,6 +15,7 @@
     font-size: 20px;
     border:none;
 }
+
 .postbox_button{
     background-color: var(--home-color) !important;
     border: none !important;

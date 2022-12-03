@@ -13,9 +13,10 @@ POST_SERIALIZER_EXAMPLE = {
     "type": "post",
     "title": "mytitle",
     "id": "aa292f41-90b2-4b0f-af4e-fc4cdfaabcc4",
-    "source": "",
-    "origin": "",
+    "source": "www.default.com",
+    "origin": "www.default.com",
     "description": "mydesc",
+    "content": "",
     "contentType": "text/plain",
     "author": {
         "type": "author",
@@ -109,7 +110,7 @@ class PostSerializer(serializers.ModelSerializer):
                     elif remote_field == 'author':
                         author = Author.get_author(official_id=data['author']['id'], should_do_recursively=True)
                         setattr(post, local_field, author)
-                    elif remote_field == 'source' or remote_field == 'origin':
+                    elif remote_field == 'source' or remote_field == 'origin' or remote_field == 'content':
                         if not data[remote_field]:
                             continue
                     else:
@@ -123,7 +124,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('type', 'title', 'id', 'source', 'origin','description','contentType',  'author', 'categories', 'count', 'comments', 'published', 'visibility', 'unlisted', 'url')
+        fields = ('type', 'title', 'id', 'source', 'origin','description','contentType', 'content', 'author', 'categories', 'count', 'comments', 'published', 'visibility', 'unlisted', 'url')
 
 class CreatePostSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
@@ -131,7 +132,7 @@ class CreatePostSerializer(serializers.ModelSerializer):
         return post
     class Meta:
         model = Post
-        fields = ('title', 'description','visibility','source', 'origin', 'categories', 'contentType', 'unlisted')
+        fields = ('title', 'description','visibility','source', 'origin', 'categories', 'content', 'contentType', 'unlisted')
 
 class SharePostSerializer(serializers.ModelSerializer):
     class Meta:
@@ -173,6 +174,7 @@ class InboxPostSerializer(serializers.ModelSerializer):
     contentType = serializers.ChoiceField(ContentType)
     author = serializers.JSONField()
     categories = serializers.ListField(default = [])
+    content = serializers.CharField(allow_blank = True, default = "")
     count = serializers.IntegerField()
     comments = serializers.CharField()
     published = serializers.CharField()
@@ -182,4 +184,4 @@ class InboxPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('type', 'title', 'id', 'source', 'origin', 'description', 'contentType',  'author', 'categories', 'count', 'comments', 'published', 'visibility', 'unlisted', 'url')
+        fields = ('type', 'title', 'id', 'source', 'origin', 'description', 'content', 'contentType',  'author', 'categories', 'count', 'comments', 'published', 'visibility', 'unlisted', 'url')

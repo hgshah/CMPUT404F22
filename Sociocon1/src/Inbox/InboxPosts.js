@@ -3,9 +3,9 @@
 // license: https://www.apache.org/licenses/LICENSE-2.0
 import React from 'react'
 import {useState, useEffect} from 'react';
-import "./Post.css";
+import "./InboxPosts.css";
 import List from '@mui/material/List';
-import Comment from './Comment';
+import Comment from '../Homepage/Comment';
 import {useNavigate, useParams} from 'react-router-dom'
 import { Avatar, Button, TextField} from '@mui/material';
 import profilepic from "../profilepic.jpeg";
@@ -19,8 +19,8 @@ import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
-import EditPost from './EditPost';
-function Post({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid}) {
+import EditPost from '../Homepage/EditPost';
+function InboxPosts({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
@@ -104,28 +104,28 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         })
     }
 
-    const PostInfo_Likes = async () => {
+    // const PostInfo_Likes = async () => {
         
-        Show_Likes()
+    //     Show_Likes()
 
-        let formField12 = new FormData()
-        formField12.append("type","like")
-        formField12.append("object",purl)
-        await axios({
-                method:'post',
-                withCredentials: true ,
-                headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
-                // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/inbox',
-                data: formField12
+    //     let formField12 = new FormData()
+    //     formField12.append("type","like")
+    //     formField12.append("object",purl)
+    //     await axios({
+    //             method:'post',
+    //             withCredentials: true ,
+    //             headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
+    //             // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
+    //             url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/inbox',
+    //             data: formField12
             
-        }).then((response) =>{
-            console.log(response.data)
-            console.log(purl)
+    //     }).then((response) =>{
+    //         console.log(response.data)
+    //         console.log(purl)
            
-        })
+    //     })
         
-    }
+    // }
 
     const follow_clicked = async() => {
         if (followButtonText == "Follow") {
@@ -319,16 +319,16 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                     {/* <p>{text}</p> */}
                     {title} <br></br>
                     {description}
-                    
+                    {purl}
                     
 
 
                 </div>
                 
-                 <img width = "300px" className='post_content' src = {image} alt = " "/> 
+                 <img className='post_content' src = {image} alt = " "/> 
                  <form>
                     <span>
-                        <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {likes}  </Button>  &nbsp;&nbsp;&nbsp;
+                        <Button onClick={Show_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {likes}  </Button>  &nbsp;&nbsp;&nbsp;
                         <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button> &nbsp;&nbsp;&nbsp;
                         <Button onClick = {Show_Comments} variant='contained' size = "small" endIcon= {<CommentIcon/>} > See Comments</Button>
                         
@@ -405,4 +405,4 @@ function Post({displayName, title, description, text, image, avatar, visibility,
   )
 }
 
-export default Post
+export default InboxPosts
