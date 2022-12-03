@@ -197,6 +197,14 @@ The workflow for deploying to staging is:
 2. If you want to push your changes to heroku, you push your changes to production by running the git
    command `git push production current-branch:master`.
 
+Reference:
+```bash
+git remote add production https://git.heroku.com/socioecon.git
+git checkout staging
+git pull origin staging
+git push production staging:master
+```
+
 ## Adding another team to our server
 
 As a case study, we're gonna pretend that we're adding Team14 to our server.
