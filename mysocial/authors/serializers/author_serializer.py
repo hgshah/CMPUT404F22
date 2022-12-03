@@ -44,6 +44,18 @@ class AuthorSerializer(serializers.ModelSerializer):
     host = serializers.SerializerMethodField('get_host')
     preferredName = serializers.SerializerMethodField('get_preferred_name')
 
+    SPECIAL_SHOULD_TRUST_LOCAL_TAG = 'should_trust_local'
+
+    # check node_config_base.py for duplicate; can't ref due to circular dependency
+    CHANGEABLE_FIELDS = {
+        'displayName': 'display_name',
+        'github': 'github',
+        'profileImage': 'profile_image',
+        'email': 'email',
+        'username': 'username',
+        'password': 'password',
+    }
+
     @staticmethod
     def get_type(model: Author) -> str:
         return model.get_serializer_field_name()
@@ -71,14 +83,18 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data: dict) -> Author:
         """
-        Does not work with remote Author
+        Converts the give author url to an author, either remote or local.
+
+        If data contains a True boolean SPECIAL_SHOULD_TRUST_LOCAL_TAG, the local author's fields will be
+        overwritten. This saves the author automatically.
+
         :param data:
         :return: Access serializers.validated_data for deserialized version of the json converted to Author
         """
 
         for required_field in AuthorSerializer.Meta.required_fields:
             if required_field not in data:
-                raise serializers.ValidationError(f'AuthorSerializer: missing field: {required_field}')
+                raise serializers.ValidationError({required_field: 'missing field'})
 
         url = data['url']
         # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
@@ -89,13 +105,29 @@ class AuthorSerializer(serializers.ModelSerializer):
                 local_id = pathlib.PurePath(path).name
                 # deserialize a local author
                 author = Author.objects.get(official_id=local_id)
+
+                # trust the fields given
+                should_trust = bool(data.get(AuthorSerializer.SPECIAL_SHOULD_TRUST_LOCAL_TAG))
+                if should_trust:
+                    for client_field, server_field in AuthorSerializer.CHANGEABLE_FIELDS.items():
+                        if client_field in data:
+                            if server_field == 'password':
+                                author.set_password(data[client_field])
+                            else:
+                                setattr(author, server_field, data[client_field])
+
+                    # saving for should trust
+                    try:
+                        author.save()
+                    except Exception as e:
+                        raise serializers.ValidationError({'non_field_errors': str(e)})
             else:
                 # deserialize a remote author; it's missing some stuff so check with is_local()
                 author = Author()
                 node_config = base.REMOTE_CONFIG.get(host)
                 if node_config is None:
                     print(f"AuthorSerializer: Host not found: {host}")
-                    raise serializers.ValidationError(f"AuthorSerializer: Host not found: {host}")
+                    raise serializers.ValidationError({host: 'missing field'})
                 remote_fields: dict = node_config.remote_author_fields
 
                 for remote_field, local_field in remote_fields.items():
@@ -130,7 +162,7 @@ class AuthorSerializer(serializers.ModelSerializer):
                     setattr(author, 'url', entry)
         except Exception as e:
             print(f"AuthorSerializer: failed serializing: {e}")
-            raise serializers.ValidationError(f"AuthorSerializer: failed serializing: {e}")
+            raise serializers.ValidationError({'non_field_errors': str(e)})
 
         return author
 
