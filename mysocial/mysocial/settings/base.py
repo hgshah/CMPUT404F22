@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '8zox7ox(g#^5%*))!ywyjs1c9k3zwzpkefc1t$3r3ej19(20b*'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'socioecon.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'socioecon.herokuapp.com', 'true-friends-404.herokuapp.com']
 
 
 # Application definition
@@ -167,6 +167,11 @@ CORS_ALLOWED_ORIGINS = [
     'http://192.168.0.50:3000',  # for network
     'http://localhost:8000',  # for localhost (Development)
     'http://192.168.0.50:8000',  # for network (Development)
+     'https://true-friends-404.herokuapp.com', # team 12
+]
+
+CORS_ORIGIN_WHITELIST = [
+     'https://true-friends-404.herokuapp.com' #team 12
 ]
 
 # from https://stackoverflow.com/a/72249293/17836168
