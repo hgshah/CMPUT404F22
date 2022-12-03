@@ -265,3 +265,7 @@ class NodeConfigBase:
     def get_comments_for_post(self, comments_path):
         url = f'{self.get_base_url()}{comments_path}'
         return requests.get(url = url, auth = (self.username, self.password))
+    
+    def create_comment_on_post(self, comments_path, data):
+        url = f'{self.get_base_url()}{comments_path}'
+        return requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})

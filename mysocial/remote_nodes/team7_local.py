@@ -194,7 +194,9 @@ class Team7Local(LocalDefault):
             return Response(err, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
-
+    
+    def create_comment_on_post(self, comments_path, data):
+        return Response(status = status.HTTP_501_NOT_IMPLEMENTED)
 
     def convert_team7_post(self, url, post_data):
         post_data["url"] = url

@@ -108,3 +108,18 @@ class FollowUtil:
             return False
         except Exception as e:
             logger.error(f"FollowUtil: are_real_friends: unknown error: {e}")
+    
+    @staticmethod
+    def get_following_authors(actor: Author):
+        following_ids = Follow.objects.values_list('target', flat=True).filter(actor=actor.get_url(), has_accepted=True)
+
+        author_list = []
+        for author_url in following_ids:
+            author, err = AuthorUtil.from_author_url_to_author(author_url)
+            if err is None:
+                author_list.append(author)
+            else:
+                print(f"get_followers: Failed getting author from url {author_url} with error: {err}")
+
+        return author_list
+
