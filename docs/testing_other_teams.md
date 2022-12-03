@@ -120,7 +120,7 @@ Take the access field from the curl request you did and put it in the header. To
 
 ```curl
 curl --location --request GET 'http://127.0.0.1:8012/api/auth/test/' \
---header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc4NjY1NDQwLCJpYXQiOjE2NzAwMjU0NDAsImp0aSI6ImY2MWJiNjhkZTRkYzRiOGI4N2U2YjI4ZTI4OWYxYjAwIiwidXNlcl9lbWFpbCI6InRlYW0xMEBtYWlsLmNvbSJ9.mqXSlOlsle8oJxS3UpnjnB4Pws_YrfgKvvyTbdcW_Kg'
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc4NjY1MjM4LCJpYXQiOjE2NzAwMjUyMzgsImp0aSI6IjgzMjJlNzBkYzc5ZjQ2M2I5MTliNWM1ODc4MDRmMmUwIiwidXNlcl9lbWFpbCI6InRlYW0xMEBtYWlsLmNvbSJ9.w_oGofHb1e-XkBKz0GwMgQPiuRmWosTMJ1Q91S8SX6A'
 ```
 
 The response should look like:

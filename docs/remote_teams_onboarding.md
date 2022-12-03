@@ -74,6 +74,7 @@ After that, our local server can call your local server using:
 
 This assumes that:
 - team12 (your) server is running at http://127.0.0.1:8012
+  - you can run your server in a different port using `python manage.py runserver 8012`
 - team10 (our) server is running at http://127.0.0.1:8000 or http://127.0.0.1:8080
 
 Contact us on discord if this is not feasible.
