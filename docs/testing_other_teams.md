@@ -4,6 +4,8 @@ This guide is for local setup.
 
 ## Team 14
 
+Repo: https://github.com/zarifmahfuz/project-socialdistribution
+
 ### Setup
 
 Follow their setup: https://github.com/zarifmahfuz/project-socialdistribution#setup
@@ -44,6 +46,8 @@ As a sanity check, try to connect to their endpoint as a node.
 
 ## Team 7
 
+Repo: https://github.com/irriss-nn/group-cmput404-project
+
 ### Setup
 
 1. First, you gotta install MongoDB: https://www.mongodb.com/try/download/community. Just choose all the default
@@ -80,6 +84,8 @@ curl -u team10:pot8os_are_tasty -H 'Origin: https://socioecon.herokuapp.com' htt
 ```
 
 ## Team 12
+
+Repo: https://github.com/bconklinua/404-group
 
 ### Setup
 

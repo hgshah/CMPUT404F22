@@ -11,6 +11,7 @@ import EditIcon from '@mui/icons-material/Edit';
 export default function ActivityTab() {
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
+    const image = localStorage.getItem("image")
     const[p_inbox, setInbox] = useState([]); 
     useEffect(() => {
         async function getAllInbox(){
@@ -46,7 +47,7 @@ export default function ActivityTab() {
                               
                                 <p>
                                   
-                                  <InboxPosts purl = {iposts.url} title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = "https://media4.giphy.com/media/vfsAZnqDvoHzUpMPY4/giphy.gif?cid=ecf05e478e7oied3gzz2a9dc79boelr3sh93cvcn5ghfntm0&rid=giphy.gif&ct=g"  visibility = {iposts.visibility}/>
+                                  <InboxPosts purl = {iposts.url} title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content}  visibility = {iposts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     

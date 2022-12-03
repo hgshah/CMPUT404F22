@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 class AuthorView(GenericViewSet):
     # removes the extra outer array enveloping the real request return structure
     pagination_class = None
+    serializer_class = AuthorSerializer
 
     def get_queryset(self):
         return None
@@ -192,7 +193,7 @@ class AuthorView(GenericViewSet):
             author_dict[AuthorSerializer.SPECIAL_SHOULD_TRUST_LOCAL_TAG] = True
             author_deserializer = AuthorSerializer(data=author_dict)
             if not author_deserializer.is_valid():
-                print('AuthorSerializer: put: author serializer invalid when it shouldn\'t')
+                print(f'AuthorSerializer: put: {str(author_deserializer.errors)}')
                 return HttpResponseBadRequest(str(author_deserializer.errors))
             serializer = AuthorSerializer(author_deserializer.validated_data)
             return Response(serializer.data)
