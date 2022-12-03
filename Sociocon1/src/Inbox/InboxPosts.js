@@ -320,12 +320,12 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                     {title} <br></br>
                     {description}
                     {purl}
-                    
+                    <img width = "300px"  src = {image} /> 
 
 
                 </div>
                 
-                 <img className='post_content' src = {image} alt = " "/> 
+                 
                  <form>
                     <span>
                         <Button onClick={Show_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {likes}  </Button>  &nbsp;&nbsp;&nbsp;
