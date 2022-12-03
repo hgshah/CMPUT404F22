@@ -31,7 +31,11 @@ class NodeConfigBase:
     team_metadata_tag = 'default'
     author_serializer = AuthorSerializer
 
-    """Mapping: remote to local"""
+    """
+    Mapping: remote to local
+    
+    Check author_serializer.py for duplicate; can't ref due to circular dependency
+    """
     remote_author_fields = {
         'id': 'official_id',
         'url': 'url',

@@ -15,11 +15,14 @@ function Postbox ({}) {
     const [title, setPostTitle] = useState('');
     const [description, setPostBody] = useState('');
     const [visibility, setPostVisibility] = useState('');
-    const [postImage, setPostImage] = useState('');
+    // const [postImage, setPostImage] = useState('');
     const [pimage, setPimage] = useState('');
+    const [commonMark, setCommonMark] = useState('');
+    const [base, setBase] = useState('');
     const navigate = useNavigate()
     const authorid = localStorage.getItem("authorid")
-    // const handleClick = () => {
+    const ibase64 = localStorage.getItem("image")
+     // const handleClick = () => {
     //     //  "message" stores input field value
     //     setPostMessage(postMessage);
 
@@ -29,7 +32,7 @@ function Postbox ({}) {
     // author: https://stackoverflow.com/
     // license:  https://creativecommons.org/licenses/by-sa/4.0/
     const[value, setValue] = useState(""); 
-  
+    
     // link: https://www.youtube.com/watch?v=xtQ74HKTOwY
     // author: https://www.youtube.com/c/GreatAdib
     //license: https://creativecommons.org/
@@ -43,7 +46,8 @@ function Postbox ({}) {
             formField.append("title", title)
             formField.append("description", description)
             formField.append("visibility", visibility)
-            formField.append("contentType", postImage)
+            formField.append("contentType", commonMark)
+            formField.append("content", ibase64)
             await axios({
                 method: 'post',
 
@@ -60,12 +64,15 @@ function Postbox ({}) {
                    
             })
             
-        } else {
+        } 
+        else {
+
                 let formField = new FormData()
             formField.append("title", title)
             formField.append("description", description)
             formField.append("visibility", visibility)
-            formField.append("contentType", postImage)
+            formField.append("contentType", commonMark)
+            formField.append("content", ibase64)
             await axios({
                 method: 'post',
                 
@@ -85,16 +92,22 @@ function Postbox ({}) {
         }
         
     }
+    let pb64
     //link:https://www.youtube.com/watch?v=qmr9NCYjueM
     // author: https://www.youtube.com/@Nhonohyolmo
     // license: https://creativecommons.org/
     const uploadImage =async (e) => {
-         console.log(e.target.files)
+         //console.log(e.target.files)
          const pimage = e.target.files[0]
          const base64 =await toB64(pimage)
-         console.log(base64)
+         pb64 =await toB64(pimage)
+         //console.log(base64)
+         
+         localStorage.setItem("image", base64)
          setPimage(base64)
+         
     }   
+  
     const toB64 = (pimage) => {
             return new Promise ((resolve,reject)=>{
                 const filereader = new FileReader();
@@ -125,8 +138,6 @@ function Postbox ({}) {
                 name = "title"
                 />
                 
-                
-                
                 <label for="set-visibility"></label>
                 {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
                        author: https://developer.mozilla.org/en-US/
@@ -147,7 +158,18 @@ function Postbox ({}) {
                 name = "description"
                 
                 /> <br></br>
-                CommonMark: <input name="contenttype" value="CommonMark" type="radio"/>
+                <label for="set-contentType"></label>
+                {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
+                       author: https://developer.mozilla.org/en-US/
+                       License: https://creativecommons.org/licenses/by-sa/4.0/*/}
+                <select value={commonMark} onChange={e => setCommonMark(e.target.value)} name="contentType" id="ContentType">
+                    <option  value="" >choose contentType--</option>
+                    <option  value="text/plain">text/plain</option>
+                    <option value = "text/markdown">text/markdown</option>
+                    <option value = "image/png;base64">image/png;base64</option>
+                    <option value = "image/jpeg;base64">image/jpeg;base64</option>
+                </select>
+                
             </div>
 
             {/* <input value={postImage} onchange = {e => setPostImage(e.target.value)} className="postbox_inputimage" placeholder='Enter a image url' type = "text" /> <br></br> */}

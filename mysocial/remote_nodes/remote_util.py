@@ -15,6 +15,8 @@ from remote_nodes.local_mirror import LocalMirror
 from remote_nodes.macewan import MacEwan
 from remote_nodes.potato_oomfie import PotatoOomfie
 from remote_nodes.socioecon import Socioecon
+from remote_nodes.team12_local import Team12Local
+from remote_nodes.team12_main import Team12Main
 from remote_nodes.team14_local import Team14Local
 from remote_nodes.team14_main import Team14Main
 from remote_nodes.team7_local import Team7Local
@@ -37,6 +39,7 @@ class RemoteUtil:
     REMOTE_WIP_TAG = 'remote wip'
     TEAM14_CONNECTED = 'team14 connected'
     TEAM7_CONNECTED = 'team7 connected'
+    TEAM12_CONNECTED = 'team12 connected'
 
     REMOTE_NODE_SINGLE_PARAMS = [
         OpenApiParameter(name=NODE_TARGET_QUERY_PARAM, location=OpenApiParameter.QUERY,
@@ -52,9 +55,10 @@ class RemoteUtil:
         Setup all remote node configs and logic
         """
         if '127.0.0.1' in base.CURRENT_DOMAIN:
-            connected_node_classes = (LocalDefault, LocalMirror, Team14Local, Team7Local)
+            connected_node_classes = (LocalDefault, LocalMirror, Team14Local, Team7Local, Team12Local)
         else:
-            connected_node_classes = (TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Team14Main, Socioecon, Team7Main)
+            connected_node_classes = (TurnipOomfie, PotatoOomfie, UAlberta,
+                                      MacEwan, Team14Main, Socioecon, Team7Main, Team12Main)
 
         # special remote node configs if you're running locally
         # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
