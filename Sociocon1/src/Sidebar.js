@@ -10,7 +10,7 @@ import LogoIcon from "@mui/icons-material/Psychology";
 import HomeIcon from "@mui/icons-material/Home"
 import ProfileIcon from '@mui/icons-material/Person2';
 import InboxIcon from "@mui/icons-material/Mail";
-
+import LoginIcon from '@mui/icons-material/Login';
 import { Button } from '@mui/material';
 function Sidebar(){
    
@@ -21,12 +21,14 @@ function Sidebar(){
       
       <LogoIcon className="sidebar_logoicon"  /> 
       <div className="list">
-         <ul>
-            <li> <a href="/login">  Login </a> </li>
-            <li> <a href="/home">  Home </a> </li>
-            <li> <a href="/profile">  Profile </a> </li>
-            <li> <a href="/inbox">  Inbox </a> </li>
-         </ul>
+         
+             <a href="/login"> <LoginIcon/> Login </a> <br></br>
+             <a href="/home"> <HomeIcon/> Home </a> <br></br>
+             <a href="/profile"> <ProfileIcon/> Profile </a> <br></br>
+             <a href="/inbox"> <InboxIcon/> Inbox </a> 
+         
+            
+         
 
       </div>
       

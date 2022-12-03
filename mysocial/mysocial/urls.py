@@ -16,7 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-
+from . import views
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from remote_nodes.remote_util import RemoteUtil
 
 # one time script after settings.py
@@ -37,4 +38,12 @@ urlpatterns = [
     # Optional UI:
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    # FRONTEND
+    path('profile/', views.index, name='index'),
+    path('', views.index, name='index'),
+    path('home/', views.index, name='index'),
+    path('inbox/', views.index, name='index'),
+    path('login/', views.index, name='index'),
 ]
+
+urlpatterns += staticfiles_urlpatterns()
