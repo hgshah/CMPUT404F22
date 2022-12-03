@@ -32,7 +32,7 @@ function Postbox ({}) {
     // author: https://stackoverflow.com/
     // license:  https://creativecommons.org/licenses/by-sa/4.0/
     const[value, setValue] = useState(""); 
-  
+    
     // link: https://www.youtube.com/watch?v=xtQ74HKTOwY
     // author: https://www.youtube.com/c/GreatAdib
     //license: https://creativecommons.org/
@@ -50,7 +50,7 @@ function Postbox ({}) {
             formField.append("content", ibase64)
             await axios({
                 method: 'post',
-                
+
                 // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
                 // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
                 // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
@@ -64,8 +64,9 @@ function Postbox ({}) {
                    
             })
             
-        } else {
-            
+        } 
+        else {
+
                 let formField = new FormData()
             formField.append("title", title)
             formField.append("description", description)
