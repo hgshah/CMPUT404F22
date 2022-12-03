@@ -132,7 +132,7 @@ class CreatePostSerializer(serializers.ModelSerializer):
         return post
     class Meta:
         model = Post
-        fields = ('title', 'description','visibility','source', 'origin', 'categories', 'contentType', 'unlisted')
+        fields = ('title', 'description','visibility','source', 'origin', 'categories', 'content', 'contentType', 'unlisted')
 
 class SharePostSerializer(serializers.ModelSerializer):
     class Meta:

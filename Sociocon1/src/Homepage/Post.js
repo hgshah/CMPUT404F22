@@ -325,7 +325,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
 
                 </div>
                 
-                 <img className='post_content' src = {image} alt = " "/> 
+                 <img width = "300px" className='post_content' src = {image} alt = " "/> 
                  <form>
                     <span>
                         <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {likes}  </Button>  &nbsp;&nbsp;&nbsp;

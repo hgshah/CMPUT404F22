@@ -80,7 +80,7 @@ function handle() {
             authorlist.map((dat) => { 
               return(
                   
-                  <p> {dat.preferredName}<button onClick= {Show_PostList(dat.id)}> check posts</button></p>
+                  <p> {dat.preferredName} <button>Check posts</button></p>
                 // <RPost title = {dat.preferredName} description = {dat.id}/>
               )
             }
