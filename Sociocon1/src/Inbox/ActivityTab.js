@@ -47,7 +47,7 @@ export default function ActivityTab() {
                               
                                 <p>
                                   
-                                  <InboxPosts  title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content}  visibility = {iposts.visibility}/>
+                                  <InboxPosts purl = {iposts.url} title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content}  visibility = {iposts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     
