@@ -266,7 +266,7 @@ class CreationPostView(GenericAPIView):
             #local -> local
             if target_author.is_local():
                 author = Author.get_author(kwargs['author_id'])
-                posts = Post.objects.filter(author = author).order_by('-published')
+                posts = Post.objects.filter(author = author, unlisted = False).order_by('-published')
                 serializer = PostSerializer(posts, many = True)
                 data = serializer.data
                 data, err = PaginationHelper.paginate_serialized_data(request, data)
