@@ -64,6 +64,17 @@ class PostTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.author1.get_id(), response.data["author"]["id"])
 
+
+    def test_create_post_blank_title_and_description(self):
+        self.client.force_login(self.author1)
+        request = f"/authors/{self.author1.official_id}/posts/"
+        payload = {
+        }
+
+        response = self.client.post(request, payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.author1.get_id(), response.data["author"]["id"])
+
     # GET /authors/{AUTHOR_UUID}/posts/{POST_UUID}
     def test_get_specific_post(self):
         request = f"/authors/{self.author1.official_id}/posts/{self.existing_post.official_id}/"
@@ -123,6 +134,8 @@ class PostTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(inbox_item.get('id'), self.existing_post.get_id())
+    
+
 
 class PostFailTestCase(APITestCase):
     CREATE_POST_PAYLOAD = {

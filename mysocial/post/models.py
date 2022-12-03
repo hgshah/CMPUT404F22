@@ -23,12 +23,12 @@ class ContentType(models.TextChoices):
 class Post(models.Model):
     type = "post"
     official_id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False)
-    title = models.CharField(max_length=500)
+    title = models.CharField(max_length=500, blank = True)
     source = models.CharField(max_length=500, default = "www.default.com")
     origin = models.CharField(max_length=500, default = "www.default.com")
     categories = ArrayField(models.CharField(max_length = 30), default=list)
     published = models.DateTimeField(default=datetime.now)
-    description = models.CharField(max_length=500, blank=True)
+    description = models.CharField(max_length=500, blank = True)
     content = models.TextField(default = "", blank = True)
     unlisted = models.BooleanField(default=False)
 
