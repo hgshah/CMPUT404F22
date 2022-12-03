@@ -88,11 +88,13 @@ curl -u team10:pot8os_are_tasty -H 'Origin: https://socioecon.herokuapp.com' htt
 3. Run the server at port 8012: `python manage.py runserver 8012` just to make sure it runs. Check
    out `http://127.0.0.1:8012/login`
 4. Create an account using `python manage.py createsuperuser` with the following credentials
-    - email: team10_local@mail.com
-    - username: team10_local
-    - password: team10_local
+    - email: local_default@mail.com
+    - username: local_default
+    - password: local_default
 
 ### Sanity check
+
+#### CURL test
 
 To test their local server, first, we try to obtain a token:
 
@@ -127,3 +129,8 @@ The response should look like:
 authenticated
 ```
 
+#### Server-to-server check
+
+1. Run our server at port 8000 and run team12's server at port 8012.
+2. Login as admin in our server
+3. Check http://127.0.0.1/8000/authors/, check if local_default is in there
