@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 class AuthorView(GenericViewSet):
     # removes the extra outer array enveloping the real request return structure
     pagination_class = None
+    serializer_class = AuthorSerializer
 
     def get_queryset(self):
         return None
