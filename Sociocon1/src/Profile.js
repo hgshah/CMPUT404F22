@@ -7,12 +7,18 @@ import Postbox from './Homepage/Postbox'
 function Profile() {
   return (
     
-    <div className='profile'>
+    <div>
       <Sidebar/>
+      <div className='profile'>
+        <div className='profileHeader'>
+          <h1>Profile</h1>
+        </div>
+
+      </div>
       
-      <h6> This is profile page</h6>
+      {/* <h6> This is profile page</h6>
       <input value = "First Name" />
-      <input value = "Last Name" />
+      <input value = "Last Name" /> */}
       
     </div>
   )
