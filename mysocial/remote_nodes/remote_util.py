@@ -39,6 +39,7 @@ class RemoteUtil:
     REMOTE_WIP_TAG = 'remote wip'
     TEAM14_CONNECTED = 'team14 connected'
     TEAM7_CONNECTED = 'team7 connected'
+    TEAM12_CONNECTED = 'team12 connected'
 
     REMOTE_NODE_SINGLE_PARAMS = [
         OpenApiParameter(name=NODE_TARGET_QUERY_PARAM, location=OpenApiParameter.QUERY,
