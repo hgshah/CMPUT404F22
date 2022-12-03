@@ -2,29 +2,20 @@ import json
 import urllib.parse
 
 import requests
-from rest_framework import status
-from rest_framework.response import Response
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
-from common.base_util import BaseUtil
-from common.pagination_helper import PaginationHelper
-from follow.models import Follow
-from follow.serializers.follow_serializer import FollowRequestSerializer
-from mysocial.settings import base
-from post.serializer import PostSerializer
 from remote_nodes.local_default import LocalDefault
 
 
-class Team7Local(LocalDefault):
+class Team12Local(LocalDefault):
     domain = '127.0.0.1:8012'
-    username = 'team7_local'
-    team_metadata_tag = 'team7'
+    username = 'team12_local'
+    team_metadata_tag = 'team12'
 
     """Mapping: remote <-> local"""
     remote_author_fields = {
         'id': 'official_id',
-        # todo: map username to username too?
         'username': 'display_name',
         'github': 'github',
         'profile_image': 'profile_image'
@@ -47,21 +38,45 @@ class Team7Local(LocalDefault):
         """This is for local testing"""
         return {
             cls.domain: {
-                'username': 'team10_local@mail.com',
-                'password': 'team10_local',
-                'remote_username': 'local_default',
+                'username': cls.username,
+                'password': 'team12_local',
+                'remote_username': 'local_default@mail.com',
                 'remote_password': 'local_default',
             }
         }
 
-    @property
-    def headers(self):
+    def get_headers(self):
         """
         Use like:
             response = requests.get(url, headers=self.headers)
         """
+        if self.bearer_token is None:
+            try:
+                payload = json.dumps({
+                    "email": self.username,
+                    "password": self.password
+                })
+                headers = {
+                    'Content-Type': 'application/json'
+                }
+                response = requests.post(
+                    f'{self.get_base_url()}/api/auth/token/obtain/',
+                    data=payload,
+                    headers=headers)
+                if response.status_code == 200:
+                    response_json: dict = json.loads(response.text)
+                    self.bearer_token = response_json.get('access')
+            except ConnectionError as err:
+                print(f'{self}: headers: connection error: the other server at {self.get_base_url()} may not be up or '
+                      f'too slow to respond')
+            except Exception as e:
+                print(f'{self}: headers: unknown error: {e}')
+
+        if self.bearer_token is None:
+            print(f'{self}: headers: bearer token still empty')
+
         return {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc4NTE1Nzg2LCJpYXQiOjE2Njk4NzU3ODYsImp0aSI6ImRjZDVjNzVmZThiODQxNTFiZjVlMTY4Y2QxNTMyNTA4IiwidXNlcl9lbWFpbCI6InRlYW0xMEBtYWlsLmNvbSJ9.szjZU1nF4vIenkWxA_IiJ8rOMM7m2ow1qZgzciKGO-k'
+            'Authorization': f'Bearer {self.bearer_token}'
         }
 
     def get_all_author_jsons(self, params: dict):
@@ -72,29 +87,20 @@ class Team7Local(LocalDefault):
             url += '?' + query_param
 
         try:
-            response = requests.get(url, headers=self.headers)
-        except ConnectionError as e:
-            print(f"{self.__class__.username}: url ({url}) Connection error: {e}")
+            response = requests.get(url, headers=self.get_headers())
+        except ConnectionError:
+            print(f'Connection error: {self}')
             return None
         except Exception as e:
-            print(f"{self.__class__.username}: Unknown err: {e}")
+            print(f"NodeConfigBase: Unknown err: {str(e)}")
             return None
 
         if response.status_code == 200:
-            author_json = json.loads(response.content.decode('utf-8'))
-            author_list = []
-            for raw_author in author_json['items']:
-                raw_author['url'] = url  # since we don't trust their url; this works
-                author_deserializer = AuthorSerializer(data=raw_author)
-                if author_deserializer.is_valid():
-                    author = author_deserializer.validated_data
-                    author_list.append(AuthorSerializer(author).data)
-            return author_list
+            return AuthorSerializer.deserializer_author_list(response.content.decode('utf-8'))
         return None
 
     def get_author_via_url(self, author_url: str) -> Author:
-        raise NotImplementedError()
-        response = requests.get(author_url)  # no password
+        response = requests.get(author_url, headers=self.get_headers())
 
         if response.status_code == 200:
             author_json = json.loads(response.content.decode('utf-8'))

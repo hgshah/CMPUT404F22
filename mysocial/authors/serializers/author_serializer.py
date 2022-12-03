@@ -76,9 +76,21 @@ class AuthorSerializer(serializers.ModelSerializer):
         :return: Access serializers.validated_data for deserialized version of the json converted to Author
         """
 
-        for required_field in AuthorSerializer.Meta.required_fields:
-            if required_field not in data:
-                raise serializers.ValidationError(f'AuthorSerializer: missing field: {required_field}')
+        # validation, we need url!!!
+        if 'url' not in data:
+            # try to get url via host
+            if 'host' in data and 'id' in data:
+                host = data['host']
+                # there's a better solution but since this is a one-off, I won't do that
+                if '127.0.0.1' in base.CURRENT_DOMAIN and host == 'https://true-friends-404.herokuapp.com':
+                    host = '127.0.0.1:8012'
+                    data['host'] = host
+
+                author_id = data['id']
+                data['url'] = f'{BaseUtil.get_http_or_https()}{host}/authors/{author_id}'
+
+            if 'url' not in data:
+                raise serializers.ValidationError(f'AuthorSerializer: missing field: url')
 
         url = data['url']
         # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
@@ -128,6 +140,10 @@ class AuthorSerializer(serializers.ModelSerializer):
                     author_id = data['id']
                     entry = f'{BaseUtil.get_http_or_https()}{node_config.domain}/service/authors/{author_id}'
                     setattr(author, 'url', entry)
+
+                # special processing for team12
+                if node_config.team_metadata_tag == 'team12':
+                    setattr(author, 'url', data['url'])
         except Exception as e:
             print(f"AuthorSerializer: failed serializing: {e}")
             raise serializers.ValidationError(f"AuthorSerializer: failed serializing: {e}")
@@ -137,9 +153,6 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ('type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage', 'preferredName')
-
-        # custom fields
-        required_fields = ('url',)
 
     @classmethod
     def deserializer_author_list(cls, response_json: str):
