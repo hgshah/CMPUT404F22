@@ -1,0 +1,24 @@
+.info{
+    flex: 0.8;
+    border-right: 1px solid var(--home-background);
+    min-width: fit-content;
+    overflow-y:scroll;
+}
+
+.profileHeader {
+    position: sticky;
+    text-align: center;
+    /* border: 2px solid lavender; */
+}
+
+h1 {
+    border: 2px solid lavender;
+}
+
+.profilePicture {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border:rgb(159, 185, 31);
+}
