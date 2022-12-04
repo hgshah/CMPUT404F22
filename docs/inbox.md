@@ -76,7 +76,7 @@ Every field is required!
 
 PS I can only validate that the general JSON body is correct, not the author JSON so please make sure the author object is correct before sending it to our inbox!
 
-Create a comment: `POST authors/{AUTHOR_ID}/posts/{POST_ID/comments
+Create a comment: `POST authors/{AUTHOR_ID}/posts/{POST_ID/comments`
 ```python
 {
     "comment": "this is my comment",
