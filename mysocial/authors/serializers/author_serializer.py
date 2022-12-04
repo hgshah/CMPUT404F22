@@ -101,9 +101,13 @@ class AuthorSerializer(serializers.ModelSerializer):
                 if '127.0.0.1' in base.CURRENT_DOMAIN and host == 'https://true-friends-404.herokuapp.com':
                     host = '127.0.0.1:8012'
                     data['host'] = host
+                elif 'true-friends-404.herokuapp.com' in host:
+                    host = 'true-friends-404.herokuapp.com'
+                    data['host'] = host
 
                 author_id = data['id']
                 data['url'] = f'{BaseUtil.get_http_or_https()}{host}/authors/{author_id}'
+                data_url = data['url']
 
             if 'url' not in data:
                 raise serializers.ValidationError({'url': 'missing_field'})
