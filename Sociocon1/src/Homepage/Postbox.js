@@ -7,7 +7,7 @@ import axios from 'axios'
 import "./Postbox.css"
 import { Avatar} from '@mui/material';
 import {useNavigate} from 'react-router-dom'
-import profilepic from "../profilepic.jpeg"
+import profilepic from "../MyProfile/profilepic.jpeg"
 import { upload } from '@testing-library/user-event/dist/upload';
 
 
