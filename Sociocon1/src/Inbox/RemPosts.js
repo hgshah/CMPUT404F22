@@ -45,7 +45,7 @@ export default function RemPosts() {
         {
                         rp_inbox.map((iposts) => {
                             return (
-                              
+                            
                                 <p>
                                   
                                   <InboxPosts title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content}  visibility = {iposts.visibility}/>
