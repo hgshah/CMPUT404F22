@@ -5,10 +5,12 @@ import axios from 'axios'
 import RPost from './RPost';
 import { render } from '@testing-library/react';
 import  ReactDOM from 'react-dom';
-import { Alert } from '@mui/material';
+import { Alert, TextField } from '@mui/material';
 export default function MessagesTab() {
   const [authorlist, setAuthorList] = useState([])
   const [post, setPost] = useState([])
+  const [remid, setRemid] = useState('')
+  const [remauthid, setAuthorid] = useState('')
   const [rempost, setRempost] = useState([])
   const authorid = localStorage.getItem("authorid")
   const token = localStorage.getItem("token")  
@@ -44,6 +46,7 @@ export default function MessagesTab() {
 }
 
 
+
 const Show_PostList = async (rem) => {
         
   await axios({
@@ -53,11 +56,14 @@ const Show_PostList = async (rem) => {
           url: 'https://socioecon.herokuapp.com/authors/' + rem + '/posts' ,
       
   }).then((response) =>{
+      const remlist = []
       for(let i = 0; i<=response.data.items.length; i++){
-        console.log(response.data.items[i])
-        console.log("name: ", response.data.items[i].author.preferredName)
-        console.log("post title: ",response.data.items[i].title)
-        console.log("post descp: ", response.data.items[i].description)
+
+        
+        
+        // console.log("name: ", response.data.items[i].author.preferredName)
+        // console.log("post title: ",response.data.items[i].title)
+        // console.log("post descp: ", response.data.items[i].description)
         
       }
       
@@ -74,13 +80,21 @@ function handle() {
     <div className='MessagesTab'>
      
         <button onClick={Show_AuthorList} >Get</button>
+        <input 
+                        onChange={e => setRemid(e.target.value)} 
+                        value={remid} 
+                        placeholder='Enter authorid' 
+                        type = "text"
+                        name = "rempost"
+                />
+                <button onClick = {localStorage.setItem("rempostid", remid)}> Search</button>
         
         
         {
             authorlist.map((dat) => { 
               return(
                   
-                  <p> {dat.preferredName} <button>Check posts</button></p>
+                  <p> {dat.preferredName} <input value = {dat.id}/></p>
                 // <RPost title = {dat.preferredName} description = {dat.id}/>
               )
             }

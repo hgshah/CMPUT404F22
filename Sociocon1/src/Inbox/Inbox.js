@@ -9,7 +9,7 @@ import FriendRequestsTab from "./FriendRequestsTab";
 import MessagesTab from "./MessagesTab";
 import TabDesc from "./TabDesc";
 import Tabs from "./Tabs";
-
+import RemPosts from "./RemPosts"
 
 // const tabList = [
 //     {
@@ -54,6 +54,7 @@ export default function Inbox() {
                 <TabDesc id="activity" title="Activity" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
                 <TabDesc id="requests" title="Friend Requests" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
                 <TabDesc id="messages" title="Messages" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
+                <TabDesc id="remposts" title="RemPosts" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
                 {/* <li className={currentTab === "activity" ? "current" : ""}
                 onClick={handleActivityTab}>Activity</li>
                 <li className={currentTab === "requests" ? "current" : ""}
@@ -72,6 +73,9 @@ export default function Inbox() {
                 </Tabs>
                 <Tabs id="messages" currentTab={currentTab}>
                     <MessagesTab />
+                </Tabs>
+                <Tabs id="remposts" currentTab={currentTab}>
+                    <RemPosts/>
                 </Tabs>
                 {/* {currentTab === "activity" ? <ActivityTab /> : ""}
                 {currentTab === "requests" ? <FriendRequestsTab /> : ""}

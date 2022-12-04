@@ -12,7 +12,7 @@ import Avatar from '@mui/material/Avatar';
 import Post from './Post'
 import axios from 'axios'
 import Typography from '@mui/material/Typography';
-import profilepic from "../profilepic.jpeg";
+import profilepic from "../MyProfile/profilepic.jpeg";
 function Comment({comment}) {
   return (
     <div className='Comments_get'>

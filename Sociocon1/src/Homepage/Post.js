@@ -8,10 +8,12 @@ import List from '@mui/material/List';
 import Comment from './Comment';
 import {useNavigate, useParams} from 'react-router-dom'
 import { Avatar, Button, TextField} from '@mui/material';
-import profilepic from "../profilepic.jpeg";
+import profilepic from "../MyProfile/profilepic.jpeg";
 import CommentIcon from '@mui/icons-material/ModeComment';
 import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
+import ReactDom from 'react-dom'
+import ReactMarkdown from 'react-markdown'
 import DeleteIcon from '@mui/icons-material/Delete';
 import LikeIcon from '@mui/icons-material/FavoriteBorder';
 import EditIcon from '@mui/icons-material/Edit';
@@ -317,8 +319,12 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 <div className = "post_headerdis">
                     
                     {/* <p>{text}</p> */}
-                    {title} <br></br>
-                    {description}
+                    <h5>
+                    {title} 
+                    
+                    </h5>
+                    
+                    <ReactMarkdown>{description}</ReactMarkdown>
                     
                     
 

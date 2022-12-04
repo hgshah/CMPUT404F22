@@ -14,7 +14,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import { Button } from '@mui/material';
 function Sidebar(){
    
-    return (
+   return (
  <div className = "sidebar">
     {/* Sidebar option*/}
       
