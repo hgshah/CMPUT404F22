@@ -7,7 +7,6 @@ import "./Feed.css"
 import Postbox from './Postbox'
 import { Avatar, Button, TextField} from '@mui/material';
 import Post from './Post'
-import profilepic from "../MyProfile/profilepic.jpeg";
 import Inbox from "../Inbox/Inbox";
 import axios from 'axios'
 import Comment from './Comment'
@@ -84,7 +83,7 @@ function Feed({}) {
                               
                                 <h2 >
                                   
-                                   <Post post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = {posts.content} avatar = {profilepic} visibility = {posts.visibility}/>
+                                   <Post post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = {posts.content}  visibility = {posts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     

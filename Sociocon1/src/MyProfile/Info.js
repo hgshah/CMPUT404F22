@@ -1,8 +1,7 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import "./Info.css"
-// import 'antd/dist/antd.css';
-import { Avatar } from 'antd';
+
 import {InputText} from 'primereact/inputtext';
 import { Button, Dialog } from '@mui/material';
 import { flattenOptionGroups } from '@mui/base';

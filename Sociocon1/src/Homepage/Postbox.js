@@ -8,7 +8,6 @@ import "./Postbox.css"
 import { Avatar} from '@mui/material';
 import {useNavigate} from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
-import profilepic from "../profilepic.jpeg"
 import { upload } from '@testing-library/user-event/dist/upload';
 
 
@@ -210,7 +209,7 @@ function Postbox ({}) {
         <form> 
             
             <div className="postbox_input">
-                <Avatar sr  c = {profilepic} />
+                {/* <Avatar src = {profilepic} /> */}
                 
                 <input 
                 onChange={e => setPostTitle(e.target.value)} 
