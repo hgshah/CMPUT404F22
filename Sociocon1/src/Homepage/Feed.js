@@ -14,6 +14,8 @@ import Comment from './Comment'
 import Test from '../Test';
 import Profile from "../Profile";
 import Login from '../Login';
+import ReactDom from 'react-dom'
+import ReactMarkdown from 'react-markdown'
 import Home from './Home'
 import {useNavigate, useParams} from 'react-router-dom'
 function Feed({}) {
