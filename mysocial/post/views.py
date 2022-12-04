@@ -266,7 +266,7 @@ class CreationPostView(GenericAPIView):
             #local -> local
             if target_author.is_local():
                 author = Author.get_author(kwargs['author_id'])
-                posts = Post.objects.filter(author = author).order_by('-published')
+                posts = Post.objects.filter(author = author, unlisted = False).order_by('-published')
                 serializer = PostSerializer(posts, many = True)
                 data = serializer.data
                 data, err = PaginationHelper.paginate_serialized_data(request, data)
@@ -346,7 +346,6 @@ class CreationPostView(GenericAPIView):
         except Exception as e:
             logger.info(e)
             return HttpResponseNotFound()
-
 class SharePostView(GenericAPIView):
     serializer_class = SharePostSerializer
     @extend_schema(
@@ -408,3 +407,42 @@ class SharePostView(GenericAPIView):
 
             return Response("Successfully added to all followers inbox", status = status.HTTP_200_OK)
 
+
+class FollowingPostView(GenericAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.all()
+
+    @extend_schema(
+        responses=PostSerializerList,
+        summary="post_get_authors_following_posts",
+        tags=["post", "follows"]
+    )
+    @action(detail=True, methods=['get'], url_name='post_get_authors_following_post')
+    def get(self, request, *args, **kwargs):
+        try:
+            requesting_author = Author.get_author(kwargs['author_id'])
+        except:
+            return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+        followed_authors = FollowUtil.get_following_authors(requesting_author)
+        posts = []
+
+        # these authors could be local or remote
+        for followed_author in followed_authors:
+            if followed_author.is_local():
+                authors_posts = Post.objects.filter(author = followed_author, unlisted = False).order_by('-published')
+                serializer = PostSerializer(authors_posts, many=True)
+                posts = posts + serializer.data
+            else:
+                try:
+                    node_config = base.REMOTE_CONFIG.get(followed_author.host)
+                    authors_posts_path = f'/authors/{followed_author.get_id()}/posts/'
+                    response = node_config.get_authors_posts(request, authors_posts_path)
+
+                    posts = posts + response.data['items']
+                except Exception as e:
+                    continue
+
+        return Response(posts, status = status.HTTP_200_OK)

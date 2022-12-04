@@ -64,3 +64,115 @@ class TestAuthorView(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+
+    def test_put_author_successful(self):
+        user = self.users[7]
+        self.client.force_login(user)
+        response = self.client.put(
+            f'/{Author.URL_PATH}/{user.official_id}/',
+            data={
+                'displayName': 'new display name',
+                'github': 'https://github.com/protractor',
+                'email': 'bird@mail.com',
+                'profileImage': 'crouton.jpg',
+                'username': 'catcatcat',
+                'password': 'dogdogdog'
+            },
+            content_type='application/json',
+        )
+        output_data = {
+            "type": "author",
+            "id": user.get_id(),
+            "url": f"http://{base.CURRENT_DOMAIN}/authors/{user.official_id}",
+            "host": user.host,
+            "displayName": 'new display name',
+            "github": 'https://github.com/protractor',
+            "profileImage": 'crouton.jpg',
+        }
+
+        self.assertEqual(response.status_code, 200)
+        for key, value in output_data.items():
+            self.assertEqual(response.data[key], value)
+
+        # deeper tests
+        author = Author.objects.get(official_id=user.official_id)
+        self.assertEqual('catcatcat', author.username)
+        self.assertEqual('bird@mail.com', author.email)
+        self.assertTrue(author.check_password('dogdogdog'))
+
+    def test_put_author_not_found(self):
+        user = self.users[7]
+        self.client.logout()
+        response = self.client.put(
+            f'/{Author.URL_PATH}/{user.official_id}/',
+            data={
+                'displayName': 'new display name',
+                'github': 'https://github.com/protractor',
+                'email': 'bird@mail.com',
+                'profileImage': 'crouton.jpg',
+                'username': 'catcatcat',
+                'password': 'dogdogdog'
+            },
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_put_author_forbidden(self):
+        user = self.users[7]
+        self.client.force_login(self.users[6])
+        response = self.client.put(
+            f'/{Author.URL_PATH}/{user.official_id}/',
+            data={
+                'displayName': 'new display name',
+                'github': 'https://github.com/protractor',
+                'email': 'bird@mail.com',
+                'profileImage': 'crouton.jpg',
+                'username': 'catcatcat',
+                'password': 'dogdogdog'
+            },
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_put_author_extra(self):
+        user = self.users[7]
+        self.client.force_login(user)
+
+        output_data: dict = {
+            'id': user.get_id(),
+            'url': user.get_url(),
+            'host': user.host
+        }
+
+        response = self.client.put(
+            f'/{Author.URL_PATH}/{user.official_id}/',
+            data={
+                'id': 'WRONG',
+                'official_id': 'WRONG',
+                'url': 'WRONG',
+                'host': 'WRONG',
+            },
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        for key, value in output_data.items():
+            self.assertEqual(response.data[key], value)
+
+    def test_put_author_non_unique(self):
+        user = self.users[7]
+        mirror_user = self.users[9]
+        self.client.force_login(user)
+
+        for field in ('username',):
+            response = self.client.put(
+                f'/{Author.URL_PATH}/{user.official_id}/',
+                data={
+                    field: getattr(mirror_user, field),
+                },
+                content_type='application/json',
+            )
+
+            self.assertEqual(response.status_code, 400)

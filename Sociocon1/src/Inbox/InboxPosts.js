@@ -8,7 +8,7 @@ import List from '@mui/material/List';
 import Comment from '../Homepage/Comment';
 import {useNavigate, useParams} from 'react-router-dom'
 import { Avatar, Button, TextField} from '@mui/material';
-import profilepic from "../MyProfile/profilepic.jpeg";
+import profilepic from "../profilepic.jpeg";
 import CommentIcon from '@mui/icons-material/ModeComment';
 import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
@@ -320,12 +320,12 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                     {title} <br></br>
                     {description}
                     {purl}
-                    
+                    <img width = "300px"  src = {image} /> 
 
 
                 </div>
                 
-                 <img className='post_content' src = {image} alt = " "/> 
+                 
                  <form>
                     <span>
                         <Button onClick={Show_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {likes}  </Button>  &nbsp;&nbsp;&nbsp;

@@ -317,7 +317,11 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 <div className = "post_headerdis">
                     
                     {/* <p>{text}</p> */}
-                    {title} <br></br>
+                    <h5>
+                    {title} 
+                    
+                    </h5>
+                    
                     {description}
                     
                     

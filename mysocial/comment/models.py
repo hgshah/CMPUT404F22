@@ -8,7 +8,7 @@ class ContentType(models.TextChoices):
 
 class Comment(models.Model):
     type = "comment"
-    author = models.ForeignKey('authors.Author', on_delete = models.CASCADE)
+    author = models.JSONField()
     post = models.ForeignKey('post.Post', on_delete=models.CASCADE)
     comment = models.CharField(max_length=500)
     contentType = models.CharField(choices=ContentType.choices, default = ContentType.PLAIN, max_length = 20)
