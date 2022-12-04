@@ -1,23 +1,20 @@
 import React from 'react'
-import "./styles/ActivityTab.css"
-import FriendRequestsTab from './FriendRequestsTab'
-import Comment from '../Homepage/Comment'
+import "./styles/RemPosts.css"
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import InboxPosts from './InboxPosts'
-import { Avatar, Button, TextField } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-
-export default function ActivityTab() {
-    const authorid = localStorage.getItem("authorid")
+import { TextField } from '@mui/material'
+export default function RemPosts() {
+    const [remid, setRemid] = useState('')
+    const [rp_inbox, setRPInbox] = useState([])
     const token = localStorage.getItem("token")
-    const image = localStorage.getItem("image")
-    const[p_inbox, setInbox] = useState([]); 
+    const rempostid = localStorage.getItem("rempostid")
+
     useEffect(() => {
         async function getAllInbox(){
             try {
                     const p_inbox = await axios.get(
-                        "https://socioecon.herokuapp.com/authors/" + authorid + "/inbox ",
+                        "https://socioecon.herokuapp.com/authors/" + rempostid + "/posts ",
                     
                         {headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token}},
                         
@@ -28,7 +25,7 @@ export default function ActivityTab() {
                            ipost.push(p_inbox.data.items[i])
                         }
                     console.log(ipost)
-                    setInbox(ipost)
+                    setRPInbox(ipost)
             }
             
             catch(error){
@@ -38,16 +35,20 @@ export default function ActivityTab() {
         }
         getAllInbox()
     }, [])
-    return (
-        <div className='ActivityTab'>
-            <div>
-            {
-                        p_inbox.map((iposts) => {
+   
+
+  return (
+    <div className='RemPosts'>
+        
+        
+        <div className='footer'>
+        {
+                        rp_inbox.map((iposts) => {
                             return (
-                              
+                            
                                 <p>
                                   
-                                  <InboxPosts purl = {iposts.url} title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content}  visibility = {iposts.visibility}/>
+                                  <InboxPosts title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content}  visibility = {iposts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     
@@ -56,7 +57,11 @@ export default function ActivityTab() {
                             )
                         })
                     }
-            </div>
+       
         </div>
-    )
+        
+       
+    </div>
+  )
 }
+

@@ -7,7 +7,7 @@ import axios from 'axios'
 import "./Postbox.css"
 import { Avatar} from '@mui/material';
 import {useNavigate} from 'react-router-dom'
-import profilepic from "../profilepic.jpeg"
+import profilepic from "../MyProfile/profilepic.jpeg"
 import { upload } from '@testing-library/user-event/dist/upload';
 
 
@@ -41,53 +41,108 @@ function Postbox ({}) {
 // author:
 // license:
         if(visibility === "Friends"){
-            console.log({visibility})
-            let formField = new FormData()
-            formField.append("title", title)
-            formField.append("description", description)
-            formField.append("visibility", visibility)
-            formField.append("contentType", commonMark)
-            formField.append("content", ibase64)
-            await axios({
-                method: 'post',
-
-                // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-                // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                
-                // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
-                url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
-
-                data: formField
-            }).then((res) =>{
-                console.log(res.data)
-                   
+            if (commonMark === "text/markdown" || commonMark === "text/plain"){
+                localStorage.removeItem("image")
+                let formField = new FormData()
+                formField.append("title", title)
+                formField.append("visibility", visibility)
+                formField.append("contentType", commonMark)
+                formField.append("content", description)
+                await axios({
+                    method: 'post',
+                    
+                    // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
+                    // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                    // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                    
+                    // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+                    url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
+    
+                    data: formField
+                }).then((res) =>{
+                    console.log(res.data)
+                    
             })
+            }
+            else {
+                    
+                    let formField = new FormData()
+                    formField.append("title", title)
+                    formField.append("description", description)
+                    formField.append("visibility", visibility)
+                    formField.append("contentType", commonMark)
+                    formField.append("content", ibase64)
+                    await axios({
+                        method: 'post',
+                        
+                        // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
+                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                        
+                        // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+                        url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
+
+                        data: formField
+                    }).then((res) =>{
+                        console.log(res.data)
+                        
+                })
+            }
+
             
         } 
+        
         else {
 
+            if (commonMark === "text/markdown" || commonMark==="text/plain"){
+                localStorage.removeItem("image")
                 let formField = new FormData()
-            formField.append("title", title)
-            formField.append("description", description)
-            formField.append("visibility", visibility)
-            formField.append("contentType", commonMark)
-            formField.append("content", ibase64)
-            await axios({
-                method: 'post',
-                
-                // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-                // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                
-                // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
-                url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
+                formField.append("title", title)
+                formField.append("visibility", visibility)
+                formField.append("contentType", commonMark)
+                formField.append("content", description)
+                await axios({
+                    method: 'post',
+                    
+                    // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
+                    // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                    // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                    
+                    // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+                    url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
+    
+                    data: formField
+                }).then((res) =>{
+                    console.log(res.data)
+                    
+            })
+            }
+            else {
+                    
+                    let formField = new FormData()
+                    formField.append("title", title)
+                    formField.append("description", description)
+                    formField.append("visibility", visibility)
+                    formField.append("contentType", commonMark)
+                    formField.append("content", ibase64)
+                    await axios({
+                        method: 'post',
+                        
+                        // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
+                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                        
+                        // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+                        url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
 
-                data: formField
-            }).then((res) =>{
-                console.log(res.data)
+                        data: formField
+                    }).then((res) =>{
+                        console.log(res.data)
+                        
+                })
+            }
+
                 
-        })
 
         }
         
@@ -102,8 +157,12 @@ function Postbox ({}) {
          const base64 =await toB64(pimage)
          pb64 =await toB64(pimage)
          //console.log(base64)
+         if (pimage === null){
+            localStorage.removeItem("image")
+         }else{
+            localStorage.setItem("image", base64)
+         }
          
-         localStorage.setItem("image", base64)
          setPimage(base64)
          
     }   
@@ -129,7 +188,6 @@ function Postbox ({}) {
             <div className="postbox_input">
                 <Avatar sr  c = {profilepic} />
                 
-    
                 <input 
                 onChange={e => setPostTitle(e.target.value)} 
                 value={title} 

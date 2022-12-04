@@ -44,7 +44,7 @@ class Author(AbstractUser):
     host = models.TextField(blank=True)
     display_name = models.TextField(blank=True)
     github = models.TextField(blank=True)
-    profile_image = models.ImageField(blank=True)
+    profile_image = models.TextField(default="", blank=True)
     node_detail = models.ForeignKey(RemoteNode, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = AuthorManager()

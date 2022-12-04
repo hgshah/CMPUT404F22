@@ -8,7 +8,7 @@ import List from '@mui/material/List';
 import Comment from './Comment';
 import {useNavigate, useParams} from 'react-router-dom'
 import { Avatar, Button, TextField} from '@mui/material';
-import profilepic from "../profilepic.jpeg";
+import profilepic from "../MyProfile/profilepic.jpeg";
 import CommentIcon from '@mui/icons-material/ModeComment';
 import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
@@ -317,7 +317,11 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 <div className = "post_headerdis">
                     
                     {/* <p>{text}</p> */}
-                    {title} <br></br>
+                    <h5>
+                    {title} 
+                    
+                    </h5>
+                    
                     {description}
                     
                     
