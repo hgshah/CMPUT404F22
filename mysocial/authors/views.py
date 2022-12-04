@@ -158,7 +158,7 @@ class AuthorView(GenericViewSet):
         responses=AuthorSerializer,
         summary="Update author profile",
         request=inline_serializer(
-            name='Author',
+            name='Author PUT',
             fields={
                 'displayName': serializers.CharField(),
                 'github': serializers.CharField(),
@@ -173,6 +173,8 @@ class AuthorView(GenericViewSet):
     def update_profile(request: Request, author_id: str) -> HttpResponse:
         """
         Update author profile.
+
+        **IT SAYS ALL FIELDS ARE REQUIRED BUT IT'S NOT!!!**
 
         This endpoint has special properties:
         - Only for local use

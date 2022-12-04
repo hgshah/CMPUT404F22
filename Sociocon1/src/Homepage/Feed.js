@@ -7,12 +7,12 @@ import "./Feed.css"
 import Postbox from './Postbox'
 import { Avatar, Button, TextField} from '@mui/material';
 import Post from './Post'
-import profilepic from "../profilepic.jpeg";
+import profilepic from "../MyProfile/profilepic.jpeg";
 import Inbox from "../Inbox/Inbox";
 import axios from 'axios'
 import Comment from './Comment'
 import Test from '../Test';
-import Profile from "../Profile";
+import Profile from "../MyProfile/Profile";
 import Login from '../Login';
 import ReactDom from 'react-dom'
 import ReactMarkdown from 'react-markdown'

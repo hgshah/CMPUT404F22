@@ -5,7 +5,7 @@ import Sidebar from './Sidebar';
 import Feed from './Homepage/Feed';
 import News from './News';
 import Login from './Login';
-import Profile from './Profile';
+import Profile from './MyProfile/Profile';
 import Inbox from './Inbox/Inbox';
 function App() {
   return (
