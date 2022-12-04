@@ -126,7 +126,7 @@ export default function Info() {
                 <br></br>
                 <img className='profilePicture' src={profilePic} onClick={() => setCropImage(true)}/>
                 <br></br>
-                <InputText 
+                <InputText
                 type="file"
                 accept='/image/*'
                 onChange={(e)=>{changeProfilePic(e)}}/>
