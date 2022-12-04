@@ -8,12 +8,12 @@
 .profileHeader {
     position: sticky;
     text-align: center;
-    /* border: 2px solid lavender; */
+    border: 5px solid lavender;
 }
 
-h1 {
-    border: 2px solid lavender;
-}
+/* h1 {
+    border: 5px solid lavender;
+} */
 
 .profilePicture {
     width: 200px;

@@ -1,16 +1,18 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import "./Info.css"
+import { appBarClasses, Avatar, Button, TextField, Dialog} from '@mui/material';
 // import 'antd/dist/antd.css';
-import { Avatar } from 'antd';
 import {InputText} from 'primereact/inputtext';
-import { Button, Dialog } from '@mui/material';
 import { flattenOptionGroups } from '@mui/base';
 import { green } from '@mui/material/colors';
 
 
 export default function Info() {
 
+    const [followerCount, setFollowerCount] = useState()
+    const [followingCount, setFollowingCount] = useState()
+    const [realFriendCount, setRealFriendCount] = useState()
     const [profilePic, setProfilePic] = useState("")
     const [cropImage, setCropImage] = useState("")
     const [profile, setProfile] = useState([])
@@ -24,16 +26,23 @@ export default function Info() {
 
     let pb64
     const changeProfilePic = async(e) => {
+        console.log("E: ", e)
         const pic = e.target.files[0];
+        console.log("PIC: ", pic)
         const base64 = await toB64(pic)
+        console.log("b64: ", base64)
         pb64 = await toB64(pic)
+        console.log("pb64: ", pb64)
         // console.log(typeof pic.type.substring(0,5))
         //check if it is an image
-        if (pic && pic.type.substring(0,5) === 'image') {
-            localStorage.setItem("image", base64)
-            setProfilePic(base64)
+        if (pic === null) {
+            localStorage.removeItem("image")
             // console.log(pic)
+        } else {
+            localStorage.setItem("image", base64)
+            // localStorage.setItem("image", pic)
         }
+        setProfilePic(base64)
 
         let formField = new FormData();
         formField.append("profileImage",ibase64)
@@ -41,21 +50,26 @@ export default function Info() {
         // const profile_picture = {profileImage:ibase64}
         // console.log(ibase64)
         // console.log(typeof ibase64)
-        await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', formField,
+        await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:pic.name},
         // await axios.put('http://127.0.0.1:8000//authors/' + authorid + '/', formField,
         {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
         ).then((response) => {
-            console.log(response)
+            console.log("RESPONSE: ", response)
+
+        }).catch((error) => {
+            console.log("ERROR: ", error.response)
         })
     }
 
     const toB64 = (pimage) => {
+        // console.log("PIMAGE: ",pimage)
         return new Promise ((resolve,reject)=>{
             const filereader = new FileReader();
             filereader.readAsDataURL(pimage)
-            filereader.onload = (()=>{
+
+            filereader.onload = ()=>{
                 resolve(filereader.result)
-            })
+            }
             filereader.onerror = ((error)=>{
                 reject(error)   
             })
@@ -80,10 +94,27 @@ export default function Info() {
             await axios.get('https://socioecon.herokuapp.com/authors/self/', {
                 headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
             }).then((response) => {
-                // console.log(response.data.profileImage)
+                //if "" then put default pic
+                
+                // setProfilePic(response.data.profileImage)
+                console.log(response.data.profileImage)
             })
         }
+
+        async function getFollowerCount() {
+            await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/followers/', 
+            {headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+        }).then((response) => {
+            setFollowerCount(response.data.items.length)
+        })
+        }
+
+        async function getFollowingCount() {
+            
+        }
+        
         getProfilePic()
+        getFollowerCount()
     }, [])
 
     return (
@@ -101,9 +132,21 @@ export default function Info() {
                 onChange={(e)=>{changeProfilePic(e)}}/>
 
                 <h2 className='showUsername'>
-                    <br></br>{preferredName}
+                    {preferredName}
                 </h2>
+            </div>
 
+            <div className='socials'>
+                <table>
+                    <tr>
+                        <th>Followers</th>
+                        <th>Following</th>
+                        <th>Real Friends</th>
+                    </tr>
+                    <tr>
+                        <th>{followerCount}</th>
+                    </tr>
+                </table>
             </div>
 
         </div>

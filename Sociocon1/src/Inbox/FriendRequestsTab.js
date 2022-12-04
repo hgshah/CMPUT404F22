@@ -93,7 +93,7 @@ export default function FriendRequestsTab() {
         for (let follow of response.data.items) {
           arr.push(follow)
           // console.log(response.data.items)
-          // console.log(follow)
+          // console.log("FOLLOW: ", follow)
         }
         setRequests(arr)
         // console.log(setRequests)
