@@ -477,54 +477,6 @@ class FollowersIndividualView(GenericAPIView):
     def get_serializer_class(self):
         return FollowRequestSerializer
 
-    def get_follow(request: Request, target_id: str, follower_id: str) -> (Follow, HttpResponse):
-        """Helper function to getting a follow regardless of local or remote"""
-        author: Author = request.user
-
-        try:
-            target = Author.get_author(official_id=target_id)
-        except Follow.DoesNotExist:
-            return None, HttpResponseNotFound("User not exist on our end")
-        except Exception as e:
-            print(f"FollowersIndividualView: {e}")
-            return None, HttpResponseNotFound("User not exist on our end")
-
-        try:
-            follower = Author.get_author(official_id=follower_id)
-        except Follow.DoesNotExist:
-            return None, HttpResponseNotFound(
-                "The given follower does not seem to exist as a user in any connected nodes")
-        except Exception as e:
-            print(f"FollowersIndividualView: {e}")
-            return None, HttpResponseNotFound("The given follower does not seem to exist as a user")
-
-        if target.is_local():
-            # trust our data
-            try:
-                follow = Follow.objects.get(target=target.get_url(), actor=follower.get_url())
-
-                if follow.get_author_target() != request.user and not follow.has_accepted:
-                    return None, HttpResponseNotFound("User does not follow the following author on our end")
-
-                return follow, None
-            except Follow.DoesNotExist:
-                return None, HttpResponseNotFound("User does not follow the following author on our end")
-            except Exception as e:
-                print(f"FollowersIndividualView: {e}")
-                return None, HttpResponseNotFound("User does not follow the following author on our end")
-        else:
-            # trust THEIR data
-            node_config: NodeConfigBase = base.REMOTE_CONFIG.get(target.host)
-            if node_config is None:
-                print(f"FollowersIndividualView: get: unknown host: {target.host}")
-                return None, HttpResponseNotFound()
-
-            follow = node_config.get_remote_follow(target, follower)
-            if follow is None:
-                return None, HttpResponseNotFound("User does not follow the following author on our end")
-
-            return follow, None
-
     @staticmethod
     @extend_schema(
         summary="get follower or check if follower",
@@ -555,7 +507,7 @@ class FollowersIndividualView(GenericAPIView):
         PR with example: https://github.com/hgshah/cmput404-project/pull/99
         More details about the fields returned at: https://github.com/hgshah/cmput404-project/blob/staging/mysocial/follow/serializers/follow_serializer.py
         """
-        follow, error_response = FollowersIndividualView.get_follow(request, target_id, follower_id)
+        follow, error_response = FollowUtil.get_follow_object(request, target_id, follower_id)
         if follow is None:
             return error_response
 
@@ -598,7 +550,7 @@ class FollowersIndividualView(GenericAPIView):
         if not request.user.is_authenticated:
             return Response(401)
 
-        follow, error_response = FollowersIndividualView.get_follow(request, target_id, follower_id)
+        follow, error_response = FollowUtil.get_follow_object(request, target_id, follower_id)
         if follow is None:
             return error_response
         follow: Follow = follow  # type hint
@@ -653,7 +605,7 @@ class FollowersIndividualView(GenericAPIView):
         if not request.user.is_authenticated:
             return Response(401)
 
-        follow, error_response = FollowersIndividualView.get_follow(request, target_id, follower_id)
+        follow, error_response = FollowUtil.get_follow_object(request, target_id, follower_id)
         if follow is None:
             return error_response
         follow: Follow = follow  # type hint
@@ -746,7 +698,7 @@ class RealFriendsView(GenericAPIView):
             user = Author.objects.get(official_id=author_id)
         except Author.DoesNotExist:
             return HttpResponseNotFound()
-        friends = FollowUtil.get_real_friends(actor=user)
+        friends = FollowUtil.get_real_friends(target=user)
         serializers = AuthorSerializer(friends, many=True)
         data, err = PaginationHelper.paginate_serialized_data(request, serializers.data)
         if err is not None:
