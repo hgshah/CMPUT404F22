@@ -16,3 +16,12 @@ class BaseUtil:
             return 'http://'
         else:
             return 'https://'
+
+    @staticmethod
+    def transform_host(host: str):
+        if 'true-friends-404.herokuapp.com' in host:
+            if '127.0.0.1' in base.CURRENT_DOMAIN:
+                return '127.0.0.1:8012'
+            else:
+                return 'true-friends-404.herokuapp.com'
+        return host

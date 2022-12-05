@@ -5,6 +5,8 @@ import requests
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
+from authors.util import AuthorUtil
+from common.base_util import BaseUtil
 from mysocial.settings import base
 from remote_nodes.local_default import LocalDefault
 from remote_nodes.node_config_base import NodeConfigBase
@@ -99,23 +101,28 @@ class Team12Local(LocalDefault):
         response = requests.get(url, headers=self.get_headers())
         if response.status_code == 200:
             response_json = json.loads(response.text)
-            # team12 oddities
-            if 'posts' in response_json:
-                print('Team12 local returns weird for followers. If this appears in prod: uh-oh!')
-                return []
-
-            # clean up process
+            author_list = []
             for author_data in response_json:
-                _, host, path, _, _, _ = urllib.parse.urlparse(author_data['host'])
-                node_config: NodeConfigBase = base.REMOTE_CONFIG.get(host)
-                if node_config is None:
-                    data_host = author_data['host']
-                    print(f"AuthorSerializer: Host not found: {host} for {data_host}")
+                data_host = author_data.get('sender_host')
+                if data_host is None:
                     continue
 
-                author_data['url'] = node_config.convert_to_valid_author_url(author_data['sender_id'])
+                _, host, path, _, _, _ = urllib.parse.urlparse(data_host)
+                host = BaseUtil.transform_host(host)
+                node_config: NodeConfigBase = base.REMOTE_CONFIG.get(host)
+                if node_config is None:
+                    print(f"{self}: get_all_followers: Host not found: {host} for {data_host}")
+                    continue
 
-            return AuthorSerializer.deserializer_author_list(response_json)
+                author_url = node_config.convert_to_valid_author_url(author_data['sender_id'])
+                author, err = AuthorUtil.from_author_url_to_author(author_url)
+                if err is not None:
+                    print(f"{self}: get_all_followers: failed to get author via url: {err}")
+                    continue
+
+                author_list.append(AuthorSerializer(author).data)
+
+            return author_list
         return None
 
     def get_all_author_jsons(self, params: dict):

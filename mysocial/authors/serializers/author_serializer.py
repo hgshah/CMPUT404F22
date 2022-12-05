@@ -194,7 +194,13 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     @classmethod
     def deserializer_author_list(cls, response_json: str):
-        author_json = json.loads(response_json)
+        if isinstance(response_json, str):
+            author_json = json.loads(response_json)
+        elif isinstance(response_json, dict) or isinstance(response_json, list):
+            author_json = response_json
+        else:
+            print(f'AuthorSerializer: deserializer_author_list: unknown type ({type(response_json)}): {str(response_json)}')
+            return []
 
         if isinstance(author_json, dict):
             author_json = author_json.get('items')
