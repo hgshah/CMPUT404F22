@@ -140,7 +140,7 @@ class Team7Local(LocalDefault):
                 'type': 'follow',
                 'actor': {'url': author_actor.get_url()},
                 'object': {'url': author_target.get_url()},
-                'hasAccepted': False,
+                'hasAccepted': True,
                 'localUrl': f'{author_actor.get_url()}/followers/{author_target.get_id()}/',
                 'id': None
             }  # <- GOOD

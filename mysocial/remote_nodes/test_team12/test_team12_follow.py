@@ -46,28 +46,22 @@ class TestTeam12Follow(TestCase):
         self.follow_flow_happy_path()
 
     def follow_flow_happy_path(self):
-        # basic: get authors
-        response = self.local.session.get(
-            f'{self.local.base}/authors/{self.remote_id}/followers/')
-
-        return
-        # local actor checks if they already requested remote target (404)
+        # sanity check; can i even connect?
         try:
             response = self.local.session.get(
-                f'{self.local.base}/authors/{self.remote_id}/followers/{self.local.author_id}')
-            self.assertEqual(response.status_code, 404)
+                f'{self.local.base}/authors/{self.remote_id}/followers/')
+            self.assertEqual(response.status_code, 200)
         except ConnectionError as err:
             print("8000 and 8080 servers were not detected. Please run them before running this test.")
             raise err
 
         # local actor follows remote target
         response = self.local.session.post(f'{self.local.base}/authors/{self.remote_id}/followers/')
-        content = response.content.decode('utf-8')
         if response.status_code != 201:
-            print(content)
-        self.assertEqual(response.status_code, 201, content)
+            print(response.text)
+        # self.assertEqual(response.status_code, 201, response.text)
 
         # they have to accept it on their end >.>
-        response = self.local.session.get(
-            f'{self.local.base}/authors/{self.remote_id}/followers/{self.local.author_id}')
-        self.assertEqual(response.status_code, 200)
+        # response = self.local.session.get(
+        #     f'{self.local.base}/authors/{self.remote_id}/followers/{self.local.author_id}')
+        # self.assertEqual(response.status_code, 200)

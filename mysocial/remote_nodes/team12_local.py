@@ -7,6 +7,8 @@ from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from authors.util import AuthorUtil
 from common.base_util import BaseUtil
+from follow.models import Follow
+from follow.serializers.follow_serializer import FollowRequestSerializer
 from mysocial.settings import base
 from remote_nodes.local_default import LocalDefault
 from remote_nodes.node_config_base import NodeConfigBase
@@ -123,7 +125,57 @@ class Team12Local(LocalDefault):
                 author_list.append(AuthorSerializer(author).data)
 
             return author_list
-        return None
+        return []
+
+    def get_remote_follow(self, target: Author, follower: Author) -> Follow:
+        """
+        Make call to remote node to get a follow object or request
+
+        Returns a Follow object if there is one;
+        Returns None if cannot be found
+        """
+        follower_list = self.get_all_followers(target)
+        is_found = False
+        for author in follower_list:
+            if author.get_url() == follower.get_url():
+                is_found = True
+                break
+
+        if is_found:
+            follow_serializer = FollowRequestSerializer(data={
+                'actor': AuthorSerializer(follower).data,
+                'object': AuthorSerializer(target).data,
+                'hasAccepted': True,
+                'localUrl': f'{BaseUtil.get_http_or_https()}{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{target.get_id()}/followers/{follower.get_url()}',
+                'id': None
+            })
+            if not follow_serializer.is_valid():
+                for err in follow_serializer.errors:
+                    print(f'{self}: get_remote_follow: serialization error: {err}')
+                return None
+            return follow_serializer.validated_data
+        else:
+            return None
+
+    def post_local_follow_remote(self, author_actor: Author, author_target: Author) -> dict:
+        """Make call to remote node to follow"""
+        # friendrequest/from_external/<int:network_id>/<uuid:snd_uuid>/<str:snd_username>/send/<uuid:rec_uuid>/
+        snd_uuid = author_actor.get_id()
+        snd_username = author_actor.username
+        rec_uuid = author_target.get_id()
+        url = f'{self.get_base_url()}/friendrequest/from_external/10/{snd_uuid}/{snd_username}/send/{rec_uuid}/'
+        response = requests.post(url, headers=self.get_headers())
+        if 200 <= response.status_code < 300:
+            return {
+                'type': 'follow',
+                'actor': {'url': author_actor.get_url()},
+                'object': {'url': author_target.get_url()},
+                'hasAccepted': True,
+                'localUrl': f'{BaseUtil.get_http_or_https()}{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{author_target.get_id()}/followers/{author_actor.get_url()}',
+                'id': None
+            }  # <- GOOD
+        print(f"{self}: post_local_follow_remote: remote server response: Code ({response.status_code}): {response.text}")
+        return response.status_code
 
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""
