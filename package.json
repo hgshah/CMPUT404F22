@@ -21,6 +21,7 @@
     "react-avatar-edit": "^1.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
+    "react-markdown": "^8.0.4",
     "react-router-dom": "^6.4.2",
     "react-scripts": "5.0.1",
     "reactjs-popup": "^2.0.5",

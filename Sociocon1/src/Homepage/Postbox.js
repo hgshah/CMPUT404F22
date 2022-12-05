@@ -7,7 +7,7 @@ import axios from 'axios'
 import "./Postbox.css"
 import { Avatar} from '@mui/material';
 import {useNavigate} from 'react-router-dom'
-// import profilepic from "../MyProfile/profilepic.jpeg"
+// import ReactMarkdown from 'react-markdown'
 import { upload } from '@testing-library/user-event/dist/upload';
 
 
@@ -18,6 +18,7 @@ function Postbox ({}) {
     // const [postImage, setPostImage] = useState('');
     const [pimage, setPimage] = useState('');
     const [commonMark, setCommonMark] = useState('');
+    const [url, setUrl] = useState('');
     const [base, setBase] = useState('');
     const navigate = useNavigate()
     const authorid = localStorage.getItem("authorid")
@@ -97,7 +98,7 @@ function Postbox ({}) {
         
         else {
 
-            if (commonMark === "text/markdown" || commonMark==="text/plain"){
+            if ((commonMark === "text/markdown" && url ==="url") ){
                 localStorage.removeItem("image")
                 let formField = new FormData()
                 formField.append("title", title)
@@ -119,6 +120,28 @@ function Postbox ({}) {
                     console.log(res.data)
                     
             })
+            } else if(commonMark === "text/markdown" || commonMark==="text/plain"){
+                let formField = new FormData()
+                    formField.append("title", title)
+                    formField.append("description", description)
+                    formField.append("visibility", visibility)
+                    formField.append("contentType", commonMark)
+                    
+                    await axios({
+                        method: 'post',
+                        
+                        // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
+                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+                        
+                        // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+                        url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
+
+                        data: formField
+                    }).then((res) =>{
+                        console.log(res.data)
+                        
+                })
             }
             else {
                     
@@ -160,7 +183,7 @@ function Postbox ({}) {
          const pimage = e.target.files[0]
          const base64 =await toB64(pimage)
          pb64 =await toB64(pimage)
-         //console.log(base64)
+         console.log(base64)
          if (pimage === null){
             localStorage.removeItem("image")
          }else{
@@ -205,7 +228,7 @@ function Postbox ({}) {
         <form> 
             
             <div className="postbox_input">
-                <Avatar src = {profilePic} />
+                {/* <Avatar src = {profilepic} /> */}
                 
                 <input 
                 onChange={e => setPostTitle(e.target.value)} 
@@ -235,10 +258,18 @@ function Postbox ({}) {
                 name = "description"
                 
                 /> <br></br>
+                
+                <select value={url} onChange={e => setUrl(e.target.value)} name="contentType" id="ContentType">
+                    <option  value="" >select if url--</option>
+                    <option  value="url">url</option>
+                </select>
                 <label for="set-contentType"></label>
                 {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
                        author: https://developer.mozilla.org/en-US/
                        License: https://creativecommons.org/licenses/by-sa/4.0/*/}
+
+                
+
                 <select value={commonMark} onChange={e => setCommonMark(e.target.value)} name="contentType" id="ContentType">
                     <option  value="" >choose contentType--</option>
                     <option  value="text/plain">text/plain</option>
