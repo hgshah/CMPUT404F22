@@ -8,7 +8,6 @@ from urllib.parse import urlparse
 from mysocial.settings import base
 import pathlib
 
-
 POST_SERIALIZER_EXAMPLE = {
     "type": "post",
     "title": "mytitle",
@@ -46,7 +45,6 @@ POST_SERIALIZER_EXAMPLE = {
 class PostSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
-    count = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
@@ -66,9 +64,6 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_comments(self, obj):
         return f"{self.get_url(obj)}/comments"
-    
-    def get_count(self, obj):
-        return Comment.objects.filter(post=obj).count()
     
     @extend_schema_field(list[str])
     def get_categories(self, obj):
