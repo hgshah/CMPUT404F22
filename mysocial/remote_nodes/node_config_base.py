@@ -13,6 +13,7 @@ from authors.serializers.author_serializer import AuthorSerializer
 from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestSerializer
 from common.base_util import BaseUtil
+import base64
 
 
 class NodeConfigBase:
@@ -272,3 +273,12 @@ class NodeConfigBase:
     def create_comment_on_post(self, comments_path, data):
         url = f'{self.get_base_url()}{comments_path}'
         return requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+
+    def get_image_post(self, image_path):
+        url = f'{self.get_base_url()}{image_path}'
+        response =  requests.get(url = url, auth = (self.username, self.password))
+
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to get image post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        return Response(response.content, status = status.HTTP_200_OK, content_type= response.headers['Content-Type'])

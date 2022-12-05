@@ -100,13 +100,24 @@ class PostSerializer(serializers.ModelSerializer):
                 post_remote_fields: dict = node_config.post_remote_fields
    
                 for remote_field, local_field in post_remote_fields.items():
+                    contentType = None
+
                     if remote_field not in data:
                         continue
                     elif remote_field == 'author':
                         author = Author.get_author(official_id=data['author']['id'], should_do_recursively=True)
                         setattr(post, local_field, author)
-                    elif remote_field == 'source' or remote_field == 'origin' or remote_field == 'content':
+                    elif remote_field == 'source' or remote_field == 'origin':
                         if not data[remote_field]:
+                            continue
+                    elif remote_field == 'content_type' or remote_field == 'contentType':
+                        contentType = data[remote_field]
+                        setattr(post, local_field, data[remote_field])
+                    elif remote_field == 'content':
+                        if contentType == ContentType.EMBEDDED_JPEG or contentType == ContentType.EMBEDDED_PNG:
+                            corrected_content = f'data:{contentType},{data[remote_field]}'
+                            setattr(post, local_field, corrected_content)
+                        else:
                             continue
                     else:
                         setattr(post, local_field, data[remote_field])

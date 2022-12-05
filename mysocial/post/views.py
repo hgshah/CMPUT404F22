@@ -17,6 +17,8 @@ from mysocial.settings import base
 from remote_nodes.remote_util import RemoteUtil
 import json
 from common.post_helper import PostHelper
+import base64
+from post.custom_renderers import JPEGRenderer, PNGRenderer
 
 logger = logging.getLogger("mylogger")
 
@@ -42,7 +44,7 @@ class PostView(GenericAPIView):
     @extend_schema(
         summary = "post_get_post_by_id",
         responses = PostSerializer,
-        tags=['post', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=['post', RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='post_get_post_by_id')
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
@@ -72,7 +74,6 @@ class PostView(GenericAPIView):
 
             # local -> remote
             else:
-                print(target_author.host)
                 node_config = base.REMOTE_CONFIG.get(target_author.host) 
                 return node_config.get_post_by_post_id(request.path)
 
@@ -251,7 +252,7 @@ class CreationPostView(GenericAPIView):
     @extend_schema(
         responses=PostSerializerList,
         summary="post_get_authors_posts",
-        tags=["post", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=["post", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED, RemoteUtil.TEAM7_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='post_get_author_posts')
     def get(self, request, *args, **kwargs):
@@ -468,3 +469,60 @@ class FollowingPostView(GenericAPIView):
                     continue
 
         return Response(posts, status = status.HTTP_200_OK)
+
+
+class ImagePostView(GenericAPIView):
+    renderer_classes = [JPEGRenderer, PNGRenderer]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.all()
+
+    @extend_schema(
+        responses=PostSerializerList,
+        summary="post_get_image_post",
+        tags=["post",]
+    )
+    @action(detail=True, methods=['get'], url_name='post_get_image_post')
+    def get(self, request, *args, **kwargs):
+        node: Author = request.user
+        if not node.is_authenticated:
+            return HttpResponseNotFound()
+        
+        if node.is_authenticated_user:
+            try:
+                target_author = Author.get_author(kwargs['author_id'])
+            except:
+                return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+            #local -> local
+            if target_author.is_local():
+                try:
+                    post = Post.objects.get(official_id=kwargs['post_id'])
+                    if not post.content:
+                        return Response("This is not an image post", status = status.HTTP_400_BAD_REQUEST) 
+                    
+                    header, data = post.content.split(';base64,')
+                    imgdata = base64.b64decode(data)
+                    return Response(imgdata, status = status.HTTP_200_OK, content_type= post.contentType)
+
+                except Exception as e:
+                    print(e)
+                    return HttpResponseNotFound()
+            else:
+                node_config = base.REMOTE_CONFIG.get(target_author.host) 
+                response = node_config.get_image_post(request.path)
+                return response
+
+
+        # remote -> local
+        if request.user.is_authenticated_node:
+            post = Post.objects.get(official_id=kwargs['post_id'])
+            if not post.content:
+                return Response("This is not an image post", status = status.HTTP_400_BAD_REQUEST) 
+            
+            header, data = post.content.split(';base64,')
+            imgdata = base64.b64decode(data)
+
+            return Response(imgdata, status = status.HTTP_200_OK, content_type= post.contentType)
+
