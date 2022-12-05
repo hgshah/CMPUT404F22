@@ -42,7 +42,8 @@ class Team14Local(LocalDefault):
         "author": "author",
         "created_at": "published",
         "visibility": "visibility",
-        "unlisted": "unlisted"
+        "unlisted": "unlisted",
+        "content": "content"
     }
 
     def get_base_url(self):

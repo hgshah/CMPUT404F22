@@ -8,12 +8,12 @@
 .profileHeader {
     position: sticky;
     text-align: center;
-    /* border: 2px solid lavender; */
+    border: 5px solid lavender;
 }
 
-h1 {
-    border: 2px solid lavender;
-}
+/* h1 {
+    border: 5px solid lavender;
+} */
 
 .profilePicture {
     width: 200px;
@@ -21,4 +21,71 @@ h1 {
     border-radius: 50%;
     object-fit: cover;
     border:rgb(159, 185, 31);
+}
+
+.display_socials {
+    text-align: center;
+    width: 100%;
+}
+
+.showUsername {
+    margin-top: 10px;
+}
+
+table {
+    border: 2px solid;
+    margin-top: 20px;
+    font-size: large;
+}
+
+.editUsername {
+    color: rgb(159, 185, 31);
+    padding-left: 10px;
+}
+
+body.active-modal {
+    overflow-y: hidden;
+}
+
+.edit_modal .overlay {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+}
+
+.overlay {
+    background: rgba(49,49,49,0.8);
+}
+
+.edit_content {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1.4;
+    background: #f1f1f1;
+    padding: 14px 28px;
+    border-radius: 3px;
+    max-width: 600px;
+    min-width: 300px;
+}
+
+.user_github {
+    font-size: 17px;
+    color: rgb(105, 104, 104);
+    margin-bottom: 15px;
+    margin-top: 10px;
+}
+
+.profileHeader .delete_pp {
+    background-color: rgb(255, 0, 0);
+    color: black;
+}
+
+.profileHeader .delete_pp:hover {
+    background-color: rgba(255, 0, 0, 0.346);
 }

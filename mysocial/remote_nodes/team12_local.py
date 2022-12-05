@@ -2,14 +2,18 @@ import json
 import urllib.parse
 
 import requests
+from rest_framework import status
+from rest_framework.response import Response
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from authors.util import AuthorUtil
 from common.base_util import BaseUtil
+from common.pagination_helper import PaginationHelper
 from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestSerializer
 from mysocial.settings import base
+from post.serializer import PostSerializer
 from remote_nodes.local_default import LocalDefault
 from remote_nodes.node_config_base import NodeConfigBase
 
@@ -25,6 +29,22 @@ class Team12Local(LocalDefault):
         'username': 'display_name',
         'github': 'github',
         'profile_image': 'profile_image'
+    }
+
+    post_remote_fields = {
+        'id': 'official_id',
+        'url': 'url',
+        "title": "title",
+        "source": "source",
+        "origin": "origin",
+        "description": "description",
+        "contentType": "contentType",
+        "image_url": "content",
+        "author": "author",
+        "categories": "categories",
+        "published": "published",
+        "visibility": "visibility",
+        "unlisted": "unlisted"
     }
 
     def __init__(self):
@@ -72,6 +92,7 @@ class Team12Local(LocalDefault):
                 if response.status_code == 200:
                     response_json: dict = json.loads(response.text)
                     self.bearer_token = response_json.get('access')
+
             except ConnectionError as err:
                 print(f'{self}: headers: connection error: the other server at {self.get_base_url()} may not be up or '
                       f'too slow to respond')
@@ -253,3 +274,56 @@ class Team12Local(LocalDefault):
             print(f'{self} GetAuthorViaUrl: AuthorSerializer: ', serializer.errors)
 
         return None
+
+    def get_authors_posts(self, request, author_posts_path):
+        url = f'{self.get_base_url()}{author_posts_path}'
+
+        try:
+            response = requests.get(url, headers=self.get_headers())
+            if response.status_code < 200 or response.status_code > 300:
+                return Response("Failed to get author's  post from remote server",
+                                status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except Exception as e:
+            return Response(f"Failed to get author's post from remote server, error: {e}",
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        data = []
+        post_data = json.loads(response.content.decode('utf-8'))
+
+        for post in post_data:
+            data.append(self.convert_team12_post(url, post))
+
+        data, err = PaginationHelper.paginate_serialized_data(request, data)
+
+        if err is not None:
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
+
+    def get_post_by_post_id(self, post_url):
+        url = f'{self.get_base_url()}{post_url}'
+
+        try:
+            response = requests.get(url, headers=self.get_headers())
+
+            if response.status_code < 200 or response.status_code > 300:
+                return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except Exception as e:
+            return Response(f"Failed to get author's post from remote server, error: {e}",
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        post_data = json.loads(response.content.decode('utf-8'))
+
+        post = self.convert_team12_post(url, post_data)
+        return Response(post, status=status.HTTP_200_OK)
+
+    def convert_team12_post(self, url, post):
+        post["url"] = url
+
+        serializer = PostSerializer(data=post)
+        if serializer.is_valid():
+            return serializer.data
+        else:
+            return serializer.errors

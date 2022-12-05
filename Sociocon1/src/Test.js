@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
-import profilepic from "./MyProfile/profilepic.jpeg";
+import profilepic from "./MyProfile/defaultpp.png";
 function Test() {
     const[value, setValue] = useState(""); 
     const[p_post, setPost] = useState([]); 
@@ -33,7 +33,7 @@ function Test() {
     <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
         <ListItem alignItems="flex-start">
         <ListItemAvatar>
-            <Avatar alt="Remy Sharp" src={profilepic} />
+           
         </ListItemAvatar>
         <ListItemText
             primary="Harsh Shah"

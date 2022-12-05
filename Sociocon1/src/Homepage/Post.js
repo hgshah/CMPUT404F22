@@ -8,7 +8,7 @@ import List from '@mui/material/List';
 import Comment from './Comment';
 import {useNavigate, useParams} from 'react-router-dom'
 import { Avatar, Button, TextField} from '@mui/material';
-import profilepic from "../MyProfile/profilepic.jpeg";
+// import profilepic from "../MyProfile/profilepic.jpeg";
 import CommentIcon from '@mui/icons-material/ModeComment';
 import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
@@ -22,7 +22,7 @@ import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
 import EditPost from './EditPost';
-function Post({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid}) {
+function Post({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid, comm}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
@@ -332,23 +332,23 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 </div>
                 
                  <img width = "300px" className='post_content' src = {image} alt = " "/> 
+
+                
                  <form>
                     <span>
                         <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {likes}  </Button>  &nbsp;&nbsp;&nbsp;
                         <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button> &nbsp;&nbsp;&nbsp;
-                        <Button onClick = {Show_Comments} variant='contained' size = "small" endIcon= {<CommentIcon/>} > See Comments</Button>
-                        
+                        <Button onClick = {Show_Comments} variant='contained' size = "small" endIcon= {<CommentIcon/>} > See Comments</Button> 
                         
                     </span>
 
                     </form>
-                    <h5 >
-                        <ol style = {{listStyleType: 'upper-roman'}}>
-                            <li>
-                                {comments}
-                            </li>
-                        </ol>
-                    </h5>
+                    <div className='post_comments'>
+                        <p> <Comment pcurl = {purl}/> </p> 
+                    </div>
+                    
+                    
+                    
                    
                     
                 <div className='post_footer'>

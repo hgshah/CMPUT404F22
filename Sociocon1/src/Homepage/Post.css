@@ -28,6 +28,11 @@
     
 }
 
+.post_comments {
+    font-style: italic;
+    margin-left: 1rem;
+    font-size: 15px;
+}
 .post_headerdis{
     margin-bottom: 10px;
     font-size: 15px;
