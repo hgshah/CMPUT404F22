@@ -8,7 +8,7 @@ import List from '@mui/material/List';
 import Comment from '../Homepage/Comment';
 import {useNavigate, useParams} from 'react-router-dom'
 import { Avatar, Button, TextField} from '@mui/material';
-import profilepic from "../MyProfile/profilepic.jpeg";
+
 import CommentIcon from '@mui/icons-material/ModeComment';
 import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
@@ -239,7 +239,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
         <div className='post_body'>
             <div className='post_header'>
                
-            <React.Fragment>
+            {/* <React.Fragment>
                     {
                         showForm ? (
                         <form>
@@ -280,7 +280,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                         : (<Button onClick = {() => setShowForm(true)}  variant='contained' size = "small" endIcon= {<EditIcon/>} >Edit</Button>)
                     }
                      
-             </React.Fragment>
+             </React.Fragment> */}
                 
                 <div className='header_text'>
                 
@@ -383,8 +383,8 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                             <Button onClick = {AddComment} variant='contained' size = "small" endIcon= {<SendIcon/>}  >   </Button> 
                             
                         </form> 
-                        <Button onClick = {DeletePostInfo} variant = 'contained' endIcon = {<DeleteIcon/>} className = "postdel_button" type = "submit"> Delete</Button>
-                        
+                        {/* <Button onClick = {DeletePostInfo} variant = 'contained' endIcon = {<DeleteIcon/>} className = "postdel_button" type = "submit"> Delete</Button>
+                         */}
                     </div> 
                     {/* <div className='getcomments'>
                     <h4>

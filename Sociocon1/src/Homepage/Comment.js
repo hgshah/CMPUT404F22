@@ -12,7 +12,7 @@ import Avatar from '@mui/material/Avatar';
 import Post from './Post'
 import axios from 'axios'
 import Typography from '@mui/material/Typography';
-import profilepic from "../MyProfile/profilepic.jpeg";
+
 import { grey } from '@mui/material/colors';
 function Comment({pcurl}) {
   const [pcomment, setPostComment] = useState('');

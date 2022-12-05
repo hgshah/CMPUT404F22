@@ -28,7 +28,7 @@ export default function Info() {
     const [displayedName, setDisplayName] = useState("")
     const [userGithub, setUserGithub] = useState("")
     const shownProfile = profile.map((item) => item.profileView)
-    const ibase64 = localStorage.getItem("image")
+    const ibase64 = localStorage.getItem("image1")
     const [editModal, setEditModal] = useState(false)
     const [gitModal, setGitModal] = useState(false)
 
@@ -44,10 +44,10 @@ export default function Info() {
         // console.log(typeof pic.type.substring(0,5))
         //check if it is an image
         if (pic === null) {
-            localStorage.removeItem("image")
+            localStorage.removeItem("image1")
             // console.log(pic)
         } else {
-            localStorage.setItem("image", base64)
+            localStorage.setItem("image1", base64)
             // localStorage.setItem("image", pic)
         }
         setProfilePic(base64)
@@ -136,15 +136,15 @@ export default function Info() {
                 // console.log(response.data.profileImage)
             })
             //show default profile pic
-            if (profilePic === "") {
-                await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:defaultPP},
-                    {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
-                ).then((response) => {
-                    // console.log("RESPONSE: ", response)
-                }).catch((error) => {
-                     // console.log("ERROR: ", error.response)
-                })
-            }
+            // if (profilePic === "") {
+            //     await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:defaultPP},
+            //         {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
+            //     ).then((response) => {
+            //         // console.log("RESPONSE: ", response)
+            //     }).catch((error) => {
+            //          // console.log("ERROR: ", error.response)
+            //     })
+            // }
         }
 
         async function getFollowerCount() {

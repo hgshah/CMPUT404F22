@@ -21,8 +21,11 @@ export default function RemPosts() {
                         )
                         const ipost = []
                         for(let i = 0; i<p_inbox.data.items.length; i++){
+                            if(p_inbox.data.items[i].visibility ==="PUBLIC"){
+                                ipost.push(p_inbox.data.items[i])
+                            }
                             
-                           ipost.push(p_inbox.data.items[i])
+                           
                         }
                     console.log(ipost)
                     setRPInbox(ipost)
