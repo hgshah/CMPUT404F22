@@ -174,8 +174,48 @@ class Team12Local(LocalDefault):
                 'localUrl': f'{BaseUtil.get_http_or_https()}{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{author_target.get_id()}/followers/{author_actor.get_url()}',
                 'id': None
             }  # <- GOOD
-        print(f"{self}: post_local_follow_remote: remote server response: Code ({response.status_code}): {response.text}")
+        print(
+            f"{self}: post_local_follow_remote: remote server response: Code ({response.status_code}): {response.text}")
         return response.status_code
+
+    def team12_accept(self, author_actor: Author, author_target: Author):
+        """Make call to remote node to accept"""
+        # /friendrequest/accept_external/sender/{snd_uuid}/recipient/{rec_uuid}/
+        snd_uuid = author_actor.get_id()
+        rec_uuid = author_target.get_id()
+        url = f'{self.get_base_url()}/friendrequest/accept_external/sender/{snd_uuid}/recipient/{rec_uuid}/'
+        response = requests.post(url, headers=self.get_headers())
+        if 200 <= response.status_code < 300:
+            return
+
+        print(f"{self}: team12_accept: non-successful: ({response.status_code}): {response.text}")
+        # silently ignore if it went wrong
+
+    def team12_reject(self, author_actor: Author, author_target: Author):
+        """Make call to remote node to reject"""
+        # /friendrequest/reject_external/sender/{snd_uuid}/recipient/{rec_uuid}/
+        snd_uuid = author_actor.get_id()
+        rec_uuid = author_target.get_id()
+        url = f'{self.get_base_url()}/friendrequest/reject_external/sender/{snd_uuid}/recipient/{rec_uuid}/'
+        response = requests.post(url, headers=self.get_headers())
+        if 200 <= response.status_code < 300:
+            return
+
+        print(f"{self}: team12_reject: non-successful: ({response.status_code}): {response.text}")
+        # silently ignore if it went wrong
+
+    def team12_unfollow(self, author_actor: Author, author_target: Author):
+        """Make call to remote node to unfollow"""
+        # /{follower_id}/unfollow/{user_id}/
+        follower_id = author_actor.get_id()
+        user_id = author_target.get_id()
+        url = f'{self.get_base_url()}/{follower_id}/unfollow/{user_id}/'
+        response = requests.post(url, headers=self.get_headers())
+        if 200 <= response.status_code < 300:
+            return
+
+        print(f"{self}: team12_unfollow: non-successful: ({response.status_code}): {response.text}")
+        # silently ignore if it went wrong
 
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""

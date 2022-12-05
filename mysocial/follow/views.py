@@ -21,6 +21,7 @@ from follow.serializers.follow_serializer import FollowRequestListSerializer, Fo
 from mysocial.settings import base
 from remote_nodes.node_config_base import NodeConfigBase
 from remote_nodes.remote_util import RemoteUtil
+from remote_nodes.team12_local import Team12Local
 from remote_nodes.team14_local import Team14Local
 from remote_nodes.team14_main import Team14Main
 
@@ -618,6 +619,12 @@ class FollowersIndividualView(GenericAPIView):
         follow.has_accepted = True
         follow.save()
 
+        # for team12
+        host = follow.get_author_actor().host
+        node_config: Team12Local = base.REMOTE_CONFIG.get(host)
+        if node_config is not None and node_config.team_metadata_tag == 'team12':
+            node_config.team12_accept(follow.get_author_actor(), follow.get_author_target())
+
         follow_serializer = FollowRequestSerializer(follow)
         follow_json = follow_serializer.data
         return Response(follow_json)
@@ -682,6 +689,18 @@ class FollowersIndividualView(GenericAPIView):
 
         # delete
         follow.delete()
+
+        # for team12
+        actor_host = follow.get_author_actor().host
+        node_config: Team12Local = base.REMOTE_CONFIG.get(actor_host)
+        if node_config is not None and node_config.team_metadata_tag == 'team12':
+            node_config.team12_unfollow(follow.get_author_actor(), follow.get_author_target())
+            node_config.team12_reject(follow.get_author_actor(), follow.get_author_target())
+
+        target_host = follow.get_author_target().host
+        node_config: Team12Local = base.REMOTE_CONFIG.get(target_host)
+        if node_config is not None and node_config.team_metadata_tag == 'team12':
+            node_config.team12_reject(follow.get_author_actor(), follow.get_author_target())
 
         return Response(follow_json, status=204)
 
