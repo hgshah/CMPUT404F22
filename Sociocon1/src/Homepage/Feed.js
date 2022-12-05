@@ -7,6 +7,7 @@ import "./Feed.css"
 import Postbox from './Postbox'
 import { Avatar, Button, TextField} from '@mui/material';
 import Post from './Post'
+// import profilepic from "../MyProfile/Info.js";
 import Inbox from "../Inbox/Inbox";
 import axios from 'axios'
 import Comment from './Comment'
@@ -25,6 +26,7 @@ function Feed({}) {
     const token = localStorage.getItem("token")
     const preferredName = localStorage.getItem("preferredName")
     const ibase64 = localStorage.getItem("image")
+    const [profilePic, setProfilePic] = useState()
     // useEffect(() =>{
     //         setPosts()
     // }, [])
@@ -41,7 +43,21 @@ function Feed({}) {
           }
           
       }
+
+      //get the profile pic
+      async function getProfilePic() {
+        await axios.get('https://socioecon.herokuapp.com/authors/self/', {
+                headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+            }).then((response) => {
+                //if "" then put default pic
+                
+                setProfilePic(response.data.profileImage)
+                // console.log(response.data.profileImage)
+            })
+      }
+
       getAllPosts()
+      getProfilePic()
   }, [])
 
 
@@ -83,7 +99,7 @@ function Feed({}) {
                               
                                 <h2 >
                                   
-                                   <Post post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = {posts.content}  visibility = {posts.visibility}/>
+                                   <Post post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = {posts.content} avatar = {profilePic} visibility = {posts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     
