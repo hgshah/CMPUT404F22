@@ -76,8 +76,31 @@ class Team12Local(LocalDefault):
             print(f'{self}: headers: bearer token still empty')
 
         return {
-            'Authorization': f'Bearer {self.bearer_token}'
+            'Authorization': f'Bearer {self.bearer_token}',
+            'Content-Type': 'application/json'
         }
+
+    def get_all_followers(self, author: Author, params=None):
+        if params is None:
+            # python has a weird property that if the argument is mutable, like a dictionary
+            # if you pass the reference around, you can actually change the default values,
+            # like params here. doing this to prevent evil things
+            params = {}
+
+        url = f'{author.get_url()}/followers/'
+        if len(params) > 0:
+            query_param = urllib.parse.urlencode(params)
+            url += '?' + query_param
+        response = requests.get(url, headers=self.get_headers())
+        if response.status_code == 200:
+            response_json = json.loads(response.text)
+            # team12 oddities
+            if 'posts' in response_json:
+                print('Team12 local returns weird for followers. If this appears in prod: uh-oh!')
+                return []
+
+            return AuthorSerializer.deserializer_author_list(response.content.decode('utf-8'))
+        return None
 
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""
