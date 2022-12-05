@@ -44,7 +44,7 @@ class PostView(GenericAPIView):
     @extend_schema(
         summary = "post_get_post_by_id",
         responses = PostSerializer,
-        tags=['post', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=['post', RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='post_get_post_by_id')
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
@@ -252,7 +252,7 @@ class CreationPostView(GenericAPIView):
     @extend_schema(
         responses=PostSerializerList,
         summary="post_get_authors_posts",
-        tags=["post", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=["post", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED, RemoteUtil.TEAM7_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='post_get_author_posts')
     def get(self, request, *args, **kwargs):
