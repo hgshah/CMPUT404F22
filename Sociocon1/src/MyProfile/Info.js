@@ -1,14 +1,15 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import "./Info.css"
-import { appBarClasses, Avatar, Button, TextField, Dialog} from '@mui/material';
+import { appBarClasses, Avatar, Button, TextField, Dialog, modalClasses} from '@mui/material';
 // import 'antd/dist/antd.css';
 import {InputText} from 'primereact/inputtext';
 import { flattenOptionGroups } from '@mui/base';
 import { green } from '@mui/material/colors';
-import { AiFillEdit } from "react-icons/ai";
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
+import { AiFillEdit, AiFillCloseSquare, AiFillCheckSquare } from "react-icons/ai";
+import defaultPP from "./defaultpp.png"
+// import Popup from 'reactjs-popup';
+// import 'reactjs-popup/dist/index.css';
 
 
 export default function Info() {
@@ -17,16 +18,19 @@ export default function Info() {
     const [postsCount, setPostsCount] = useState()
     const [realFriendCount, setRealFriendCount] = useState()
     const [profilePic, setProfilePic] = useState("")
-    const [cropImage, setCropImage] = useState("")
+    // const [cropImage, setCropImage] = useState("")
     const [profile, setProfile] = useState([])
     const [profileView, setProfileView] = useState(false)
     const [src, setSrc] = useState(false)
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
     // const displayName = localStorage.getItem("displayName") //check to see if this gets updated when changed
-    const [displayName, setDisplayName] = useState("")
+    const [displayedName, setDisplayName] = useState("")
+    const [userGithub, setUserGithub] = useState("")
     const shownProfile = profile.map((item) => item.profileView)
     const ibase64 = localStorage.getItem("image")
+    const [editModal, setEditModal] = useState(false)
+    const [gitModal, setGitModal] = useState(false)
 
     let pb64
     const changeProfilePic = async(e) => {
@@ -54,15 +58,16 @@ export default function Info() {
         // const profile_picture = {profileImage:ibase64}
         // console.log(ibase64)
         // console.log(typeof ibase64)
+
+        //set new profile pic
         await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:base64},
-        // await axios.put('http://127.0.0.1:8000//authors/' + authorid + '/', formField,
-        {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
+                    {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
         ).then((response) => {
             // console.log("RESPONSE: ", response)
-
         }).catch((error) => {
             // console.log("ERROR: ", error.response)
         })
+        
     }
 
     const toB64 = (pimage) => {
@@ -80,8 +85,44 @@ export default function Info() {
         })
     }
 
-    const editClicked = async() => {
-        
+    const toggleModal = async() => {
+        setEditModal(!editModal)
+    }
+    const toggleGitModal = async() => {
+        setGitModal(!gitModal)
+    }
+
+    const handleSubmit = async() => {
+        setEditModal(!editModal)
+        // console.log(displayName)
+        await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {displayName:displayedName}, {
+            headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+        }).then((response) => {
+            console.log(response)
+        }).catch((error) => {
+            console.log("ERROR: ", error.response)
+        })
+    }
+
+    const handleGitSubmit = async() => {
+        setGitModal(!gitModal)
+        await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {github:userGithub}, {
+            headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+        }).then((response) => {
+            console.log(response)
+        }).catch((error) => {
+            console.log("ERROR: ", error.response)
+        })
+    }
+
+    const handleDeletePP = async() => {
+        await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:""},
+        {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
+        ).then((response) => {
+            // console.log("RESPONSE: ", response)
+        }).catch((error) => {
+            // console.log("ERROR: ", error.response)
+        })
     }
 
     useEffect(() => {
@@ -94,6 +135,16 @@ export default function Info() {
                 setProfilePic(response.data.profileImage)
                 // console.log(response.data.profileImage)
             })
+            //show default profile pic
+            if (profilePic === "") {
+                await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:defaultPP},
+                    {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
+                ).then((response) => {
+                    // console.log("RESPONSE: ", response)
+                }).catch((error) => {
+                     // console.log("ERROR: ", error.response)
+                })
+            }
         }
 
         async function getFollowerCount() {
@@ -126,8 +177,17 @@ export default function Info() {
             await axios.get('https://socioecon.herokuapp.com/authors/self/', {
                 headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
             }).then((response) => {
-                console.log(response.data)
+                // console.log(response.data)
                 setDisplayName(response.data.displayName)
+            })
+        }
+
+        async function getGitgub() {
+            await axios.get('https://socioecon.herokuapp.com/authors/self/', {
+                headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+            }).then((response) => {
+                // console.log(response.data.github)
+                setUserGithub(response.data.github)
             })
         }
         
@@ -136,6 +196,7 @@ export default function Info() {
         getPostsCount()
         getRealFriendsCount()
         getDisplayName()
+        getGitgub()
     }, [])
 
     return (
@@ -145,22 +206,62 @@ export default function Info() {
             <div className='profileHeader'>
                 <h1>Profile</h1>
                 <br></br>
-                <img className='profilePicture' src={profilePic} alt="" onClick={() => setCropImage(true)}/>
+                <img className='profilePicture' src={profilePic} alt=""/>
                 <br></br>
 
                 <InputText
                 type="file"
                 accept='/image/*'
                 onChange={(e)=>{changeProfilePic(e)}}/>
+                <Button className='delete_pp' onClick={() => handleDeletePP()}>
+                    Delete Profile Pic
+                </Button>
 
                 <h2 className='showUsername'>
-                    {displayName}
-                    <AiFillEdit className='editUsername' onClick={() => editClicked()}>
-
-                    </AiFillEdit>
+                    {displayedName} <span>
+                    <AiFillEdit className='editUsername' onClick={() => toggleModal()}> </AiFillEdit></span>
+                    <p className='user_github'>
+                        {userGithub} <span>
+                        <AiFillEdit className='editUsername' onClick={() => toggleGitModal()}> </AiFillEdit></span>
+                    </p>
                 </h2>
-            </div>
+                {editModal && (
+                <div className='edit_modal'>
+                    <div className='overlay' onClick={() => toggleModal()}> </div>
+                    <div className='edit_content'>
+                        <h2>Edit Display Name</h2>
+                        <AiFillCloseSquare className='close_modal' onClick={() => toggleModal()}> </AiFillCloseSquare>
+                        <form>
+                            <input
+                            type="text"
+                            placeholder='Username'
+                            onChange={(e) => setDisplayName(e.target.value)}>
+                            </input>
+                            <AiFillCheckSquare className='submit' onClick={() => handleSubmit()}></AiFillCheckSquare>
+                        </form>
+                    </div>
+                </div>
+                )}
 
+                {gitModal && (
+                <div className='edit_modal'>
+                    <div className='overlay' onClick={() => toggleGitModal()}> </div>
+                    <div className='edit_content'>
+                        <h2>Edit Github</h2>
+                        <AiFillCloseSquare className='close_modal' onClick={() => toggleGitModal()}> </AiFillCloseSquare>
+                        <form>
+                            <input
+                            type="text"
+                            placeholder='Github URL'
+                            onChange={(e) => setUserGithub(e.target.value)}>
+                            </input>
+                            <AiFillCheckSquare className='submit' onClick={() => handleGitSubmit()}></AiFillCheckSquare>
+                        </form>
+                    </div>
+                </div>
+                )}
+
+            </div>
             <div className='socials'>
                 <table className='display_socials'>
                     <tr>
@@ -175,65 +276,10 @@ export default function Info() {
                     </tr>
                 </table>
             </div>
+            <div className='my_info'>
+
+            </div>
 
         </div>
     )
 }
-
-
-// const onClose = () => {
-//     setProfileView(null)
-// }
-
-// const onCrop = (view) => {
-//     setProfileView(view)
-// }
-
-// const saveCroppedImage = () => {
-//     setProfile([...profile, {profileView}])
-//     setCropImage(false)
-// }
-
-{/* <div className='info'>
-
-<div className='profileHeader'>
-    <h1>Profile</h1>
-    <img className='profilePicture' src={profilePic} onClick={() => setCropImage(true)}/>
-
-    <label htmlFor='' className='showUsername'>{preferredName}</label>
-
-    <Dialog 
-    visible={cropImage} header={() => (
-        <p htmlFor="" className='imageCrop'>
-            Update
-        </p>
-    )}
-    onHide={() => setCropImage(false)}
-    >
-
-        <div className='changeName'>
-            <Avatar
-            onCrop={onCrop}
-            onClose={onClose}
-            src={src}
-            width={500}
-            height={400}
-            background-color={'green'}
-            />
-
-            <div className='changeAswell'>
-                <div className='change3'>
-                    <Button onClick={saveCroppedImage} label="Save" icon="pi pi-check"></Button>
-                </div>
-            </div>
-        </div>
-    </Dialog>
-    
-    <InputText 
-    type="file"
-    accept='/image/*'
-    onChange={(e)=>{changeProfilePic(e)}}/>
-
-</div>
-
-</div> */}
