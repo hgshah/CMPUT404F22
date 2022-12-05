@@ -28,7 +28,7 @@ export default function Info() {
     const [displayedName, setDisplayName] = useState("")
     const [userGithub, setUserGithub] = useState("")
     const shownProfile = profile.map((item) => item.profileView)
-    const ibase64 = localStorage.getItem("image")
+    const ibase64 = localStorage.getItem("image1")
     const [editModal, setEditModal] = useState(false)
     const [gitModal, setGitModal] = useState(false)
 
@@ -44,13 +44,13 @@ export default function Info() {
         // console.log(typeof pic.type.substring(0,5))
         //check if it is an image
         if (pic === null) {
-            localStorage.removeItem("image")
+            localStorage.removeItem("image1")
             // console.log(pic)
         } else {
-            localStorage.setItem("image", base64)
+            localStorage.setItem("image1", base64)
             // localStorage.setItem("image", pic)
         }
-        setProfilePic(base64)
+        // setProfilePic(base64)
 
         let formField = new FormData();
         formField.append("profileImage",ibase64)
@@ -61,9 +61,10 @@ export default function Info() {
 
         //set new profile pic
         await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:base64},
-                    {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
+                {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
         ).then((response) => {
             // console.log("RESPONSE: ", response)
+            setProfilePic("BASE64: ", base64)
         }).catch((error) => {
             // console.log("ERROR: ", error.response)
         })
@@ -119,6 +120,7 @@ export default function Info() {
         await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:""},
         {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
         ).then((response) => {
+            setProfilePic("")
             // console.log("RESPONSE: ", response)
         }).catch((error) => {
             // console.log("ERROR: ", error.response)
@@ -127,19 +129,27 @@ export default function Info() {
 
     useEffect(() => {
         async function getProfilePic() {
+            let result = "";
             await axios.get('https://socioecon.herokuapp.com/authors/self/', {
                 headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
             }).then((response) => {
                 //if "" then put default pic
-                
                 setProfilePic(response.data.profileImage)
+                result = response.data.profileImage
                 // console.log(response.data.profileImage)
+                // console.log(profilePic)
+                // console.log(setProfilePic)
+                console.log("RESULT:", result)
             })
-            //show default profile pic
-            if (profilePic === "") {
+            // show default profile pic
+            // console.log("OUTSIDE: ", profilePic)
+            if (result === "") {
+                // console.log("INSIDE: ", profilePic)
                 await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:defaultPP},
                     {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
                 ).then((response) => {
+                    setProfilePic(defaultPP)
+                    // console.log("AFTER: ", profilePic)
                     // console.log("RESPONSE: ", response)
                 }).catch((error) => {
                      // console.log("ERROR: ", error.response)
