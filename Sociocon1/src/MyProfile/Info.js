@@ -1,13 +1,23 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import "./Info.css"
-import { appBarClasses, Avatar, Button, TextField, Dialog, modalClasses} from '@mui/material';
+import { appBarClasses, Avatar, Button, Card, TextField, Dialog, modalClasses} from '@mui/material';
 // import 'antd/dist/antd.css';
 import {InputText} from 'primereact/inputtext';
 import { flattenOptionGroups } from '@mui/base';
 import { green } from '@mui/material/colors';
 import { AiFillEdit, AiFillCloseSquare, AiFillCheckSquare } from "react-icons/ai";
 import defaultPP from "./defaultpp.png"
+import Box from '@mui/material/Box';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+
+
+
+
+
+
 // import Popup from 'reactjs-popup';
 // import 'reactjs-popup/dist/index.css';
 
@@ -27,6 +37,7 @@ export default function Info() {
     // const displayName = localStorage.getItem("displayName") //check to see if this gets updated when changed
     const [displayedName, setDisplayName] = useState("")
     const [userGithub, setUserGithub] = useState("")
+    const [GithubAct, setGithubActivity] = useState("")
     const shownProfile = profile.map((item) => item.profileView)
     const ibase64 = localStorage.getItem("image1")
     const [editModal, setEditModal] = useState(false)
@@ -200,6 +211,17 @@ export default function Info() {
                 setUserGithub(response.data.github)
             })
         }
+
+        async function getGitactivity() {
+            await axios.get('https://api.github.com/users/hgshah', {
+                
+            }).then((response) => {
+                // console.log(response.data.github)
+                console.log(response.data.bio)
+                setGithubActivity(response.data.bio)
+            })
+            
+        }
         
         getProfilePic()
         getFollowerCount()
@@ -207,6 +229,7 @@ export default function Info() {
         getRealFriendsCount()
         getDisplayName()
         getGitgub()
+        getGitactivity()
     }, [])
 
     return (
@@ -285,9 +308,32 @@ export default function Info() {
                         <td>{postsCount}</td>
                     </tr>
                 </table>
+                
+                
             </div>
             <div className='my_info'>
 
+            </div>
+            <div className='profile_footer'>
+            {/* link:  https://mui.com/material-ui/react-card/ 
+            author:https://mui.com/material-ui/react-card/
+            license:  */}
+            <React.Fragment>
+                <CardContent>
+                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                    Github bio
+                </Typography>
+               
+                <Typography variant="body2">
+                    {GithubAct}
+                    <br />
+                    {'"Thank you for reading my bio, for more info click learn more"'}
+                </Typography>
+                </CardContent>
+                <CardActions>
+                <Button size="small">Learn More</Button>
+                </CardActions>
+            </React.Fragment>
             </div>
 
         </div>
