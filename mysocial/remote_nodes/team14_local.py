@@ -48,6 +48,9 @@ class Team14Local(LocalDefault):
     def get_base_url(self):
         return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}/api'
 
+    def convert_to_valid_author_url(self, author_id: str) -> str:
+        return f'{self.get_base_url()}/authors/{author_id}'
+
     @classmethod
     def create_node_credentials(cls):
         """This is for local testing"""

@@ -7,6 +7,7 @@ from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
 from mysocial.settings import base
 from remote_nodes.local_default import LocalDefault
+from remote_nodes.node_config_base import NodeConfigBase
 
 
 class Team12Local(LocalDefault):
@@ -81,6 +82,9 @@ class Team12Local(LocalDefault):
             'Content-Type': 'application/json'
         }
 
+    def convert_to_valid_author_url(self, author_id: str) -> str:
+        return f'{self.get_base_url()}/authors/{author_id}/'  # watch out for that slash!!!
+
     def get_all_followers(self, author: Author, params=None):
         if params is None:
             # python has a weird property that if the argument is mutable, like a dictionary
@@ -103,20 +107,15 @@ class Team12Local(LocalDefault):
             # clean up process
             for author_data in response_json:
                 _, host, path, _, _, _ = urllib.parse.urlparse(author_data['host'])
-                node_config = base.REMOTE_CONFIG.get(host)
+                node_config: NodeConfigBase = base.REMOTE_CONFIG.get(host)
                 if node_config is None:
                     data_host = author_data['host']
                     print(f"AuthorSerializer: Host not found: {host} for {data_host}")
                     continue
 
-                # todo
-                remote_fields: dict = node_config.remote_author_fields
+                author_data['url'] = node_config.convert_to_valid_author_url(author_data['sender_id'])
 
-                # sender id
-                # host
-                pass
-
-            return AuthorSerializer.deserializer_author_list(response.content.decode('utf-8'))
+            return AuthorSerializer.deserializer_author_list(response_json)
         return None
 
     def get_all_author_jsons(self, params: dict):
