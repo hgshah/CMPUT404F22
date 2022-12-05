@@ -83,6 +83,9 @@ class NodeConfigBase:
     def get_base_url(self):
         return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}'
 
+    def convert_to_valid_author_url(self, author_id: str) -> str:
+        return f'{self.get_base_url()}/authors/{author_id}'
+
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""
         url = f'{self.get_base_url()}/authors/'
