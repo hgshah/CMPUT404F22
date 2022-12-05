@@ -179,7 +179,8 @@ class AuthorSerializer(serializers.ModelSerializer):
 
                 # special processing for team12
                 if node_config.team_metadata_tag == 'team12':
-                    setattr(author, 'url', data['url'])
+                    author_url = data['url']
+                    setattr(author, 'url', f'{author_url}/')
                     author.username = author.display_name
         except Exception as e:
             print(f"AuthorSerializer: failed serializing: {e}")
