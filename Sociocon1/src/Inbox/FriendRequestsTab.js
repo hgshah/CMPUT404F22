@@ -6,6 +6,7 @@ import axios from "axios";
 import { Navigate } from 'react-router-dom';
 import {useNavigate, useParams} from 'react-router-dom'
 import { CookieSharp } from '@mui/icons-material';
+import Info from '../MyProfile/Info';
 
 export default function FriendRequestsTab() {
   const [requests, setRequests] = useState([{}]);

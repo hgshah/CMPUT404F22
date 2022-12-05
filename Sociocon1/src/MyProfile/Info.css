@@ -22,3 +22,22 @@
     object-fit: cover;
     border:rgb(159, 185, 31);
 }
+
+.display_socials {
+    text-align: center;
+    width: 100%;
+}
+
+.showUsername {
+    margin-top: 10px;
+}
+
+table {
+    border: 2px solid;
+    margin-top: 20px;
+    font-size: large;
+}
+
+.editUsername {
+    color: rgb(159, 185, 31);
+}

@@ -7,7 +7,7 @@ import axios from 'axios'
 import "./Postbox.css"
 import { Avatar} from '@mui/material';
 import {useNavigate} from 'react-router-dom'
-import profilepic from "../MyProfile/profilepic.jpeg"
+// import profilepic from "../MyProfile/profilepic.jpeg"
 import { upload } from '@testing-library/user-event/dist/upload';
 
 
@@ -21,7 +21,9 @@ function Postbox ({}) {
     const [base, setBase] = useState('');
     const navigate = useNavigate()
     const authorid = localStorage.getItem("authorid")
+    const token = localStorage.getItem("token")
     const ibase64 = localStorage.getItem("image")
+    const [profilePic, setProfilePic] = useState()
      // const handleClick = () => {
     //     //  "message" stores input field value
     //     setPostMessage(postMessage);
@@ -182,13 +184,28 @@ function Postbox ({}) {
 
             })
     }
+
+    useState(() => {
+        //get the profile pic
+      async function getProfilePic() {
+        await axios.get('https://socioecon.herokuapp.com/authors/self/', {
+                headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+            }).then((response) => {
+                //if "" then put default pic
+                
+                setProfilePic(response.data.profileImage)
+                // console.log(response.data.profileImage)
+            })
+      }
+      getProfilePic()
+    }, [])
     
   return (
     <div className='postbox'>
         <form> 
             
             <div className="postbox_input">
-                <Avatar sr  c = {profilepic} />
+                <Avatar src = {profilePic} />
                 
                 <input 
                 onChange={e => setPostTitle(e.target.value)} 

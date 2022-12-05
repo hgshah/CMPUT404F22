@@ -6,12 +6,15 @@ import { appBarClasses, Avatar, Button, TextField, Dialog} from '@mui/material';
 import {InputText} from 'primereact/inputtext';
 import { flattenOptionGroups } from '@mui/base';
 import { green } from '@mui/material/colors';
+import { AiFillEdit } from "react-icons/ai";
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 
 
 export default function Info() {
 
     const [followerCount, setFollowerCount] = useState()
-    const [followingCount, setFollowingCount] = useState()
+    const [postsCount, setPostsCount] = useState()
     const [realFriendCount, setRealFriendCount] = useState()
     const [profilePic, setProfilePic] = useState("")
     const [cropImage, setCropImage] = useState("")
@@ -20,7 +23,8 @@ export default function Info() {
     const [src, setSrc] = useState(false)
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
-    const preferredName = localStorage.getItem("preferredName") //check to see if this gets updated when changed
+    // const displayName = localStorage.getItem("displayName") //check to see if this gets updated when changed
+    const [displayName, setDisplayName] = useState("")
     const shownProfile = profile.map((item) => item.profileView)
     const ibase64 = localStorage.getItem("image")
 
@@ -50,14 +54,14 @@ export default function Info() {
         // const profile_picture = {profileImage:ibase64}
         // console.log(ibase64)
         // console.log(typeof ibase64)
-        await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:pic.name},
+        await axios.put('https://socioecon.herokuapp.com/authors/' + authorid + '/', {profileImage:base64},
         // await axios.put('http://127.0.0.1:8000//authors/' + authorid + '/', formField,
         {headers: {"Content-Type":"application/json", "Authorization": "Token " + token}}
         ).then((response) => {
-            console.log("RESPONSE: ", response)
+            // console.log("RESPONSE: ", response)
 
         }).catch((error) => {
-            console.log("ERROR: ", error.response)
+            // console.log("ERROR: ", error.response)
         })
     }
 
@@ -76,18 +80,9 @@ export default function Info() {
         })
     }
 
-    // const onClose = () => {
-    //     setProfileView(null)
-    // }
-
-    // const onCrop = (view) => {
-    //     setProfileView(view)
-    // }
-
-    // const saveCroppedImage = () => {
-    //     setProfile([...profile, {profileView}])
-    //     setCropImage(false)
-    // }
+    const editClicked = async() => {
+        
+    }
 
     useEffect(() => {
         async function getProfilePic() {
@@ -96,8 +91,8 @@ export default function Info() {
             }).then((response) => {
                 //if "" then put default pic
                 
-                // setProfilePic(response.data.profileImage)
-                console.log(response.data.profileImage)
+                setProfilePic(response.data.profileImage)
+                // console.log(response.data.profileImage)
             })
         }
 
@@ -109,12 +104,38 @@ export default function Info() {
         })
         }
 
-        async function getFollowingCount() {
-            
+        async function getPostsCount() {
+            await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/posts/', {
+                headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+            }).then((response) => {
+                // console.log(response.data.items.length)
+                setPostsCount(response.data.items.length)
+            })
+        }
+
+        async function getRealFriendsCount() {
+            await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/real-friends/',
+            {headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+        }).then((response) => {
+            // console.log(response.data.items.length)
+            setRealFriendCount(response.data.items.length)
+        })
+        }
+
+        async function getDisplayName() {
+            await axios.get('https://socioecon.herokuapp.com/authors/self/', {
+                headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+            }).then((response) => {
+                console.log(response.data)
+                setDisplayName(response.data.displayName)
+            })
         }
         
         getProfilePic()
         getFollowerCount()
+        getPostsCount()
+        getRealFriendsCount()
+        getDisplayName()
     }, [])
 
     return (
@@ -124,27 +145,33 @@ export default function Info() {
             <div className='profileHeader'>
                 <h1>Profile</h1>
                 <br></br>
-                <img className='profilePicture' src={profilePic} onClick={() => setCropImage(true)}/>
+                <img className='profilePicture' src={profilePic} alt="" onClick={() => setCropImage(true)}/>
                 <br></br>
+
                 <InputText
                 type="file"
                 accept='/image/*'
                 onChange={(e)=>{changeProfilePic(e)}}/>
 
                 <h2 className='showUsername'>
-                    {preferredName}
+                    {displayName}
+                    <AiFillEdit className='editUsername' onClick={() => editClicked()}>
+
+                    </AiFillEdit>
                 </h2>
             </div>
 
             <div className='socials'>
-                <table>
+                <table className='display_socials'>
                     <tr>
                         <th>Followers</th>
-                        <th>Following</th>
                         <th>Real Friends</th>
+                        <th>Posts</th>
                     </tr>
                     <tr>
-                        <th>{followerCount}</th>
+                        <td>{followerCount}</td>
+                        <td>{realFriendCount}</td>
+                        <td>{postsCount}</td>
                     </tr>
                 </table>
             </div>
@@ -152,6 +179,20 @@ export default function Info() {
         </div>
     )
 }
+
+
+// const onClose = () => {
+//     setProfileView(null)
+// }
+
+// const onCrop = (view) => {
+//     setProfileView(view)
+// }
+
+// const saveCroppedImage = () => {
+//     setProfile([...profile, {profileView}])
+//     setCropImage(false)
+// }
 
 {/* <div className='info'>
 
