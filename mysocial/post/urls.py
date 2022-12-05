@@ -8,4 +8,5 @@ urlpatterns = [
     path('authors/<uuid:author_id>/posts/', views.CreationPostView.as_view()),
     path('authors/<uuid:author_id>/posts/<uuid:post_id>/share', views.SharePostView.as_view()),
     path('authors/<uuid:author_id>/following/posts/', views.FollowingPostView.as_view()),
+    path('authors/<uuid:author_id>/posts/<uuid:post_id>/image', views.ImagePostView.as_view()),
 ]

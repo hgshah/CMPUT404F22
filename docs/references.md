@@ -24,6 +24,7 @@ probably use to authenticate
   .
   https://stackoverflow.com/questions/16416172/how-can-i-modify-procfile-to-run-gunicorn-process-in-a-non-standard-folder-on-he
   https://stackoverflow.com/questions/2201598/how-to-define-two-fields-unique-as-couple
+  https://stackoverflow.com/questions/42176978/return-image-using-django-rest-framework-render
 
 ### Allan
 
