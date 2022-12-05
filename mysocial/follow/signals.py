@@ -12,12 +12,15 @@ def on_change(sender, instance: Follow, **kwargs):
     if instance.id is None:  # new object will be created
         pass  # write your code here
     else:
-        previous = Follow.objects.get(id=instance.id)
-        if previous.has_accepted != instance.has_accepted and not previous.has_accepted:
-            host = instance.get_author_actor().host
-            node_config: Team12Local = base.REMOTE_CONFIG.get(host)
-            if node_config is not None and node_config.team_metadata_tag == 'team12':
-                node_config.team12_accept(instance.get_author_actor(), instance.get_author_target())
+        try:
+            previous = Follow.objects.get(id=instance.id)
+            if previous.has_accepted != instance.has_accepted and not previous.has_accepted:
+                host = instance.get_author_actor().host
+                node_config: Team12Local = base.REMOTE_CONFIG.get(host)
+                if node_config is not None and node_config.team_metadata_tag == 'team12':
+                    node_config.team12_accept(instance.get_author_actor(), instance.get_author_target())
+        except Exception:
+            pass  # it's fine lol
 
 
 @receiver(post_delete, sender=Follow)
