@@ -5,6 +5,7 @@ import requests
 
 from authors.models.author import Author
 from authors.serializers.author_serializer import AuthorSerializer
+from mysocial.settings import base
 from remote_nodes.local_default import LocalDefault
 
 
@@ -99,6 +100,22 @@ class Team12Local(LocalDefault):
                 print('Team12 local returns weird for followers. If this appears in prod: uh-oh!')
                 return []
 
+            # clean up process
+            for author_data in response_json:
+                _, host, path, _, _, _ = urllib.parse.urlparse(author_data['host'])
+                node_config = base.REMOTE_CONFIG.get(host)
+                if node_config is None:
+                    data_host = author_data['host']
+                    print(f"AuthorSerializer: Host not found: {host} for {data_host}")
+                    continue
+
+                # todo
+                remote_fields: dict = node_config.remote_author_fields
+
+                # sender id
+                # host
+                pass
+
             return AuthorSerializer.deserializer_author_list(response.content.decode('utf-8'))
         return None
 
@@ -123,6 +140,8 @@ class Team12Local(LocalDefault):
         return None
 
     def get_author_via_url(self, author_url: str) -> Author:
+        author_url = author_url.rstrip('/')
+        author_url = f'{author_url}/'
         response = requests.get(author_url, headers=self.get_headers())
 
         if response.status_code == 200:
