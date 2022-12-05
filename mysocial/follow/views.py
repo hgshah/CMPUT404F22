@@ -110,11 +110,9 @@ class IndividualRequestView(APIView):
         Get an individual follow request
 
         User story: as an author: I want to un-befriend local and remote authors.
-        todo(turnip): remote authors not yet implemented
 
         User story: as an author, When I befriend someone (they accept my friend request) I follow them, only when the
         other author befriends me do I count as a real friend – a bi-directional follow is a true friend.
-        todo(turnip): remote authors not yet implemented
 
         User story: As an author, I want to befriend local authors
 
@@ -123,20 +121,9 @@ class IndividualRequestView(APIView):
         """
         try:
             follow: Follow = Follow.objects.get(id=follow_id)
-            user_url = request.user.get_url()
-            if follow.target != user_url and follow.actor != user_url:
-                # Only the two accounts should be able to delete an account
-                # Returning not found due to security concerns
-                return HttpResponseNotFound()
-
-            # if remote_url is present, and we are not authoritative, sync!
-            if follow.remote_url != '' and follow.actor == user_url:
-                # todo(turnip): get Follow object from remote
-                # todo(turnip): update our current Follow object
-                pass
-
-            serializers = FollowRequestSerializer(follow)
-            return Response(data=serializers.data)
+            return FollowersIndividualView.get(request,
+                                               follow.get_author_target().get_id(),
+                                               follow.get_author_actor().get_id())
         except Follow.DoesNotExist:
             return HttpResponseNotFound()
         except Exception as e:
@@ -154,35 +141,18 @@ class IndividualRequestView(APIView):
         This is only one way. You cannot make a follow back into has_accepted = False, you have to delete it.
 
         User story: as an author: I want to un-befriend local and remote authors.
-        todo(turnip): remote authors not yet implemented
 
         User story: as an author, When I befriend someone (they accept my friend request) I follow them, only when the
         other author befriends me do I count as a real friend – a bi-directional follow is a true friend.
-        todo(turnip): remote authors not yet implemented
 
         See the step-by-step calls to follow or befriend someone at:
         https://github.com/hgshah/cmput404-project/blob/main/endpoints.txt#L137
         """
-        # todo(turnip): implement case where remote node informs us that our Follow request was accepted
-
         try:
             follow = Follow.objects.get(id=follow_id)
-            if follow.target != request.user.get_url():
-                # Only the two accounts should be able to delete an account
-                # Returning not found due to security concerns
-                return HttpResponseNotFound()
-            if Follow.FIELD_NAME_HAS_ACCEPTED not in request.data \
-                    or not request.data[Follow.FIELD_NAME_HAS_ACCEPTED]:
-                # You cannot make a follow back into has_accepted = False, you have to delete it.
-                return HttpResponseBadRequest()
-
-            follow.has_accepted = True
-            follow.save()
-
-            # todo(turnip): update the Follow reference from the remote server
-
-            serializers = FollowRequestSerializer(follow)
-            return Response(data=serializers.data)
+            return FollowersIndividualView.put(request,
+                                               follow.get_author_target().get_id(),
+                                               follow.get_author_actor().get_id())
         except Follow.DoesNotExist:
             return HttpResponseNotFound()
         except Exception as e:
@@ -201,23 +171,12 @@ class IndividualRequestView(APIView):
         Delete, decline, or cancel a follow request
 
         User story: as an author: I want to un-befriend local and remote authors.
-        todo(turnip): remote authors not yet implemented
         """
-        if not request.user.is_authenticated:
-            return HttpResponseNotFound()
-
         try:
-            follow: Follow = Follow.objects.get(id=follow_id)
-            if follow.target != request.user.get_url() and follow.actor != request.user.get_url():
-                # Only the two accounts should be able to delete an account
-                # Returning not found due to security concerns
-                return HttpResponseNotFound()
-
-            follow.delete()
-
-            # todo(turnip): if remote, delete Follow reference or mirror from the remote server
-
-            return Response(status=204)
+            follow = Follow.objects.get(id=follow_id)
+            return FollowersIndividualView.delete(request,
+                                               follow.get_author_target().get_id(),
+                                               follow.get_author_actor().get_id())
         except Follow.DoesNotExist:
             return HttpResponseNotFound()
         except Exception as e:
@@ -559,7 +518,7 @@ class FollowersIndividualView(GenericAPIView):
             # you're not allowed!
             return HttpResponseForbidden()
 
-        has_accepted = request.data.get('hasAccepted') in ['True', 'true']
+        has_accepted = request.data.get('hasAccepted') in ['True', 'true', True]
         if has_accepted is None or not isinstance(has_accepted, bool):
             return HttpResponseBadRequest("Missing boolean hasAccepted payload")
 
