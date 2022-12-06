@@ -55,10 +55,10 @@ class RemoteUtil:
         Setup all remote node configs and logic
         """
         if '127.0.0.1' in base.CURRENT_DOMAIN:
-            connected_node_classes = (LocalDefault, LocalMirror, Team14Local, Team7Local, Team12Local)
+            connected_node_classes = (Team14Local, Team7Local, Team12Local, LocalMirror, LocalDefault)
         else:
-            connected_node_classes = (TurnipOomfie, PotatoOomfie, UAlberta,
-                                      MacEwan, Team14Main, Socioecon, Team7Main, Team12Main)
+            connected_node_classes = (Team14Main, Team7Main, Team12Main,
+                                      TurnipOomfie, PotatoOomfie, UAlberta, MacEwan, Socioecon)
 
         # special remote node configs if you're running locally
         # you may add (or even override) your node here or via the REMOTE_NODE_CREDENTIALS config (see docs/server.md)
