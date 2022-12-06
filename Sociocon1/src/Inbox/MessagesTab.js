@@ -26,7 +26,7 @@ export default function MessagesTab() {
       let array = []
       let array2 = []
       let ne = []
-      for(let i = 0; i<34; i++){
+      for(let i = 0; i<response.data.items.length; i++){
        
        array.push(response.data.items[i])
        array2.push(response.data.items[i].id)
