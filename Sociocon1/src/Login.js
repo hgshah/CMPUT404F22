@@ -94,7 +94,7 @@ function Login() {
     let formField_token = new FormData()
     formField_token.append("username",uname.value)
     formField_token.append("password", pass.value)
-    
+    localStorage.setItem("displayedName", uname.value)
      await axios({
             method:'post',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
