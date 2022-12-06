@@ -300,3 +300,15 @@ class NodeConfigBase:
             return Response("Failed to get image post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
             
         return Response(response.content, status = status.HTTP_200_OK, content_type= response.headers['Content-Type'])
+    
+    def like_a_post(self, data, target_author_url, extra_data = None):
+        if target_author_url is None:
+            return 404
+        url = f'{target_author_url}/inbox'
+        response = requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+        
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to create like from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        return Response(response.content, status = status.HTTP_200_OK, content_type= response.headers['Content-Type'])
+
