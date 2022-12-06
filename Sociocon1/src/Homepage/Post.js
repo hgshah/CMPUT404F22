@@ -160,6 +160,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
         
         let formField_share = new FormData()
         formField_share.append("object",purl)
+        console.log(purl)
         await axios({
                 method:'put',
                 withCredentials: true ,

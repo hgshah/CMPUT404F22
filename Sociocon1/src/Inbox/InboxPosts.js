@@ -49,7 +49,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
         let formField = new FormData()
         formField.append("comment", comment)
         formField.append("contentType", "text/plain")
-        console.log(formField)
+            console.log(commenturl+'/comments')
         await axios({
             method: 'post',
             withCredentials: true ,
@@ -57,31 +57,30 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
             url: commenturl + '/comments' ,
             data: formField
         }).then((response) =>{
-            console.log(response.data)
-            
+            console.log(response.data)            
         })
     }
 
-    const UpdatePost = async () => {
-        let formField = new FormData()
-        formField.append("title", updatetitle)
-        formField.append("description", updatebody)
-        await axios({
-            method: 'post',
-            withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
-            // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+    // const UpdatePost = async () => {
+    //     let formField = new FormData()
+    //     formField.append("title", updatetitle)
+    //     formField.append("description", updatebody)
+    //     await axios({
+    //         method: 'post',
+    //         withCredentials: true ,
+    //         headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+    //         // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
+    //         // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+    //         // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             
-            url: purl + '/',
+    //         url: purl + '/',
 
-            data: formField
-        }).then((response) =>{
-            console.log(response.data)
+    //         data: formField
+    //     }).then((response) =>{
+    //         console.log(response.data)
             
-        })
-    }
+    //     })
+    // }
     
    
     const navigate = useNavigate()
@@ -158,12 +157,13 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
         
         let formField_share = new FormData()
         formField_share.append("object",purl)
+        console.log(purl)
         await axios({
                 method:'put',
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: purl + '/share',
+                url: commenturl + '/share',
                 data: formField_share
             
         }).then((response) =>{
@@ -173,43 +173,67 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
         })
     }
 
-    const Show_Comments = async () => {
+    // const Show_Comments = async () => {
         
-        await axios({
-                method: "get",
-                withCredentials: true ,
-                headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
-                url: purl + '/comments' ,
+    //     await axios({
+    //             method: "get",
+    //             withCredentials: true ,
+    //             headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+    //             url: purl + '/comments' ,
             
-        }).then((response) =>{
-           const newcom = []
+    //     }).then((response) =>{
+    //        const newcom = []
             
-            newcom.push({...response.data.items[0].comment})
-            const updatecom = Object.values(newcom[0]).join('')
-            setComments(updatecom)
+    //         newcom.push({...response.data.items[0].comment})
+    //         const updatecom = Object.values(newcom[0]).join('')
+    //         setComments(updatecom)
 
 
-        })
-    }
+    //     })
+    // }
     const Show_Likes = async () => {
+        if (visibility==="friends"){
+            console.log(commenturl+ '/likes')
+            await axios({
+                    method: "get",
+                    withCredentials: true ,
+                    headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+                    url: purl + '/likes' ,
+                
+            }).then((response) =>{
+                
+                setLikes(response.data.length)
+            //    const newlike = []
+                
+            //     newlike.push({...response.data.items[0].comment})
+            //     const updatecom = Object.values(newcom[0]).join('')
+            //     setComments(updatecom)
+    
+    
+            })
+        }
+        else {
+            console.log(commenturl+ '/likes')
+            await axios({
+                    method: "get",
+                    withCredentials: true ,
+                    headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+                    url: commenturl + '/likes' ,
+                
+            }).then((response) =>{
+                
+                setLikes(response.data.length)
+            //    const newlike = []
+                
+            //     newlike.push({...response.data.items[0].comment})
+            //     const updatecom = Object.values(newcom[0]).join('')
+            //     setComments(updatecom)
+    
+    
+            })
+        }
         
-        await axios({
-                method: "get",
-                withCredentials: true ,
-                headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
-                url: purl + '/likes' ,
-            
-        }).then((response) =>{
-            
-            setLikes(response.data.length)
-        //    const newlike = []
-            
-        //     newlike.push({...response.data.items[0].comment})
-        //     const updatecom = Object.values(newcom[0]).join('')
-        //     setComments(updatecom)
-
-
-        })
+        
     }
 
     useEffect(() => {
@@ -236,12 +260,13 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
         let formField12 = new FormData()
         formField12.append("type","like")
         formField12.append("object",purl)
+        console.log(authorid)
         await axios({
                 method:'post',
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/inbox',
+                url: 'https://socioecon.herokuapp.com/authors/' +  + '/inbox',
                 data: formField12
             
         }).then((response) =>{
