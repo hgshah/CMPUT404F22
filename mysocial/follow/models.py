@@ -80,10 +80,12 @@ class Follow(models.Model):
         return "Follow"
 
     def __str__(self):
+        self.actor = self.actor.rstrip('/') + '/'
         actor, _ = AuthorUtil.from_author_url_to_author(self.actor)
         actor_name = ""
         if actor is not None:
             actor_name = str(actor)
+        self.target = self.target.rstrip('/') + '/'
         target, _ = AuthorUtil.from_author_url_to_author(self.target)
         target_name = ""
         if target is not None:

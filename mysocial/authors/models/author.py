@@ -78,7 +78,8 @@ class Author(AbstractUser):
 
         # local authors
         prefix = BaseUtil.get_http_or_https()
-        return f"{prefix}{base.CURRENT_DOMAIN}/{Author.URL_PATH}/{self.official_id}"
+        return f"" \
+               f"{self.official_id}"
 
     def get_id(self) -> str:
         """
