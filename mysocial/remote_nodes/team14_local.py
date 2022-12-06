@@ -239,8 +239,16 @@ class Team14Local(LocalDefault):
         else:
             return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
 
-    def create_comment_on_post(self, comments_path, data):
-        return Response(status = status.HTTP_501_NOT_IMPLEMENTED)
+    def create_comment_on_post(self, comments_path, data, extra_data = None):
+        url = f'{self.get_base_url()}{comments_path}/'
+        data = self.create_team14_comment(data, extra_data)
+        response = requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+        if response.status_code < 200 or response.status_code > 300:
+            return Response(
+                f"Failed to get post from remote server, error {json.loads(response.content)}",
+                status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response("Successfully created comment to team 14!", status=status.HTTP_200_OK)
 
     def convert_team14_post(self, url, post_data):
         post_data["url"] = url
@@ -280,3 +288,28 @@ class Team14Local(LocalDefault):
         inbox_post['post']['author']['id'] = data['author']['id']
         inbox_post['post']['author']['url'] = data['author']['url']
         return inbox_post
+
+    def create_team14_comment(self, data, extra_data):
+        comment = {
+            "type": "comment",
+            "comment": "",
+            "content_type": "",
+            "author": {
+                "id": "",
+                "url": ""
+            },
+            "post": {
+                "id": "",
+                "author": {
+                    "id": "",
+                    "url": ""
+                }
+            }
+        }
+
+        comment['comment'] = data['comment']
+        comment['content_type'] = data['contentType']
+        comment['author']['url'] = data['actor']
+        comment['author']['id'] = data['actor'].split('authors/')[1]
+        comment.update(extra_data['post'])
+        return comment

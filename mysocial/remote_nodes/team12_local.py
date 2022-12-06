@@ -356,6 +356,21 @@ class Team12Local(LocalDefault):
         else:
             return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
 
+    def create_comment_on_post(self, comments_path, data, extra_data = None):
+        split_comments = comments_path.split('posts')
+        display_name = extra_data['displayName']
+
+        url = f'{self.get_base_url()}{split_comments[0]}{display_name}/posts{split_comments[1]}/'
+        data = self.create_team12_comment(data)
+        response = requests.post(url = url, data = json.dumps(data), headers=self.get_headers())
+        
+        if response.status_code < 200 or response.status_code > 300:
+            return Response(
+                f"Failed to get post from remote server, error {json.loads(response.content)}",
+                status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response("Successfully created comment to team 12!", status=status.HTTP_200_OK)
+        
     
     def convert_team12_post(self, url, post):
         post["url"] = url
@@ -374,3 +389,9 @@ class Team12Local(LocalDefault):
             return serializer.data
         else:
             return serializer.errors
+    
+    def create_team12_comment(self, data):
+        comment = {
+            "comment": data['comment']
+        }
+        return comment
