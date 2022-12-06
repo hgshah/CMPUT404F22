@@ -37,6 +37,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
     const [likeactive, setPostLikeactive] = useState(false);
     const [comments, setComments] = useState([])
     const [likes, setLikes] = useState([])
+    const rempostid = localStorage.getItem("rempostid")
     //const[p_post, setPost] = useState([]); 
     // link : https://www.youtube.com/watch?v=a8KruvMkEtY
     // author: https://www.youtube.com/@ahmedelgammudi
@@ -259,14 +260,14 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
 
         let formField12 = new FormData()
         formField12.append("type","like")
-        formField12.append("object",purl)
+        formField12.append("object",commenturl)
         console.log(authorid)
         await axios({
                 method:'post',
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: 'https://socioecon.herokuapp.com/authors/' +  + '/inbox',
+                url: 'https://socioecon.herokuapp.com/authors/' + rempostid + '/inbox',
                 data: formField12
             
         }).then((response) =>{
