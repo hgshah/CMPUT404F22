@@ -265,6 +265,18 @@ class Team14Local(LocalDefault):
             data.append(converted_author)
         
         return Response(data, status = status.HTTP_200_OK)
+    
+    def like_a_post(self, data, target_author_url, extra_data = None):
+        url = f'{target_author_url}/inbox/'
+        data = self.create_team14_like_post(data, target_author_url)
+        response = requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+        
+        if response.status_code < 200 or response.status_code > 300:
+            return Response(
+                f"Failed to like post on team 14, error {json.loads(response.content)}",
+                status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response("Successfully created like to team 14!", status=status.HTTP_200_OK)
 
     def convert_team14_post(self, url, post_data):
         post_data["url"] = url
@@ -338,3 +350,27 @@ class Team14Local(LocalDefault):
         comment['author']['id'] = data['actor'].split('authors/')[1]
         comment.update(extra_data['post'])
         return comment
+
+    def create_team14_like_post(self, data, target_author_url):
+        like = {
+            "type": "like",
+            "author": {
+                "id": "",
+                "url": ""
+            },
+            "post": {
+                "id": "",
+                "author": {
+                "id": "",
+                "url": ""
+                }
+            }
+        }   
+
+        like['author']['url'] = data['actor'] + '/'
+        like['author']['id'] = data['actor'].split('authors/')[1]
+        like['post']['id'] = data['object'].split('posts/')[1]
+        like['post']['author']['url'] = target_author_url
+        like['post']['author']['id'] = target_author_url.split('authors/')[1]
+        return like
+
