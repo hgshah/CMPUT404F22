@@ -395,14 +395,13 @@ class Team12Local(LocalDefault):
             return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         team12_authors = json.loads(response.content.decode('utf-8'))
+        print(team12_authors)
         data = []
 
         try:
             for author in team12_authors:
-                print(author['author'])
                 converted_author = self.convert_team12_authors(url, author['author'])
                 data.append(converted_author)
-                
         except Exception as e:
             return Response(f"Failed to deserialize authors for team 12 {e}", status.HTTP_500_INTERNAL_SERVER_ERROR)
         
