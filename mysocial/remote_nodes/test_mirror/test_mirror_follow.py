@@ -54,6 +54,8 @@ class TestMirrorFollow(TestCase):
         # local actor follows remote target
         response = self.local.session.post(f'{self.local.base}/authors/{self.remote.author_id}/followers/')
         content = response.content.decode('utf-8')
+        if response.status_code != 201:
+            print("result: ", response.text)
         self.assertEqual(response.status_code, 201, content)
 
         # # target receives follow request

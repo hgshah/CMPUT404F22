@@ -26,7 +26,8 @@ function Feed({}) {
     const token = localStorage.getItem("token")
     const preferredName = localStorage.getItem("preferredName")
     const ibase64 = localStorage.getItem("image")
-    const [profilePic, setProfilePic] = useState()
+    const [profilePic, setProfilePic] = useState("")
+    // var user_pp = ""
     // useEffect(() =>{
     //         setPosts()
     // }, [])
@@ -34,7 +35,8 @@ function Feed({}) {
       async function getAllPosts(){
           try {
                   const p_post = await axios.get("https://socioecon.herokuapp.com/posts/public/")
-                  console.log(p_post.data)
+                  // console.log("P_post: ", p_post.data)
+                  // console.log(p_post.data.title)
                   setPost(p_post.data)
           }
           
@@ -45,22 +47,28 @@ function Feed({}) {
       }
 
       //get the profile pic
-      async function getProfilePic() {
-        await axios.get('https://socioecon.herokuapp.com/authors/self/', {
-                headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
-            }).then((response) => {
-                //if "" then put default pic
+      // async function getProfilePic() {
+      //   await axios.get('https://socioecon.herokuapp.com/posts/public/', {
+      //           headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+      //       }).then((response) => {
+      //           //if "" then put default pic
                 
-                setProfilePic(response.data.profileImage)
-                // console.log(response.data.profileImage)
-            })
-      }
+      //           // setProfilePic(response.data.profileImage)
+      //           // var user_pp = response.data.profileImage
+      //           // console.log("PP: ", user_pp)
+      //           // console.log("INSIDE: ", profilePic)
+      //           console.log("PP: ", response.data[0].author.profileImage)
+      //           console.log("ALL: ", response.data)
+      //       })
+      // }
+      // console.log("AFTER: ", profilePic)
+      // console.log("PP: ", user_pp)
 
       getAllPosts()
-      getProfilePic()
+      // getProfilePic()
   }, [])
 
-
+  // console.log("PP: ", user_pp)
 
   const navigate = useNavigate()
     // link: https://www.youtube.com/watch?v=aRYkCe6JcGM
@@ -99,7 +107,7 @@ function Feed({}) {
                               
                                 <h2 >
                                   
-                                   <Post post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = {posts.content} avatar = {profilePic} visibility = {posts.visibility}/>
+                                   <Post post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = {posts.content} avatar = {posts.author.profileImage} visibility = {posts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     

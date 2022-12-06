@@ -116,7 +116,11 @@ class Team7Local(LocalDefault):
         return None
 
     def get_author_via_url(self, author_url: str) -> Author:
-        response = requests.get(author_url)  # no password
+        try:
+            response = requests.get(author_url)  # no password
+        except Exception as e:
+            print(f'{self}: get_author_via_url: possibly no connection: {e}')
+            return None
 
         if response.status_code == 200:
             author_json = json.loads(response.content.decode('utf-8'))
