@@ -149,7 +149,7 @@ class Team12Local(LocalDefault):
                     try:
                         author_id = author_data['sender_id']
                         author = Author.get_author(author_id, should_do_recursively=False)
-                        author_list.append(author)
+                        author_list.append(AuthorSerializer(author).data)
                     except Exception as e:
                         print(f'{self}: get_all_followers: failed with host({host}); data_host({data_host}); id({author_id}): error: {e}')
                     continue
