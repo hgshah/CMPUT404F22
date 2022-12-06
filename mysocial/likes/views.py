@@ -35,7 +35,7 @@ class LikeView(GenericViewSet):
     @extend_schema(
         responses=AuthorSerializer,
         summary="likes_retrieve_authors_for_post",
-        tags=["likes", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=["likes", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='get_authors_liked_on_post')
     def get_authors_liked_on_post(self, request: Request, *args, **kwargs) -> HttpResponse:
@@ -58,11 +58,7 @@ class LikeView(GenericViewSet):
             else:
                 object_id = request.path
                 node_config = base.REMOTE_CONFIG.get(target_author.host)
-                response = node_config.get_authors_liked_on_post(object_id)
-                if response.status_code < 200 or response.status_code > 300:
-                    return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-                return Response(json.loads(response.content), status = status.HTTP_200_OK)
+                return node_config.get_authors_liked_on_post(object_id)
 
         # remote -> local
         if request.user.is_authenticated_node:

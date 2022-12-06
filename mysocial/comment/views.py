@@ -34,7 +34,7 @@ class CommentView(GenericAPIView):
     @extend_schema(
         responses=CommentSerializerList,
         summary="comment_get_comments_on_post",
-        tags=["comment", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=["comment", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM7_CONNECTED, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='comment_get_comments_on_post')
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
@@ -72,11 +72,7 @@ class CommentView(GenericAPIView):
             # local -> remote
             else:
                 node_config = base.REMOTE_CONFIG.get(target_author.host)
-                response = node_config.get_comments_for_post(request.get_full_path())
-                if response.status_code < 200 or response.status_code > 300:
-                    return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-                return Response(json.loads(response.content), status = status.HTTP_200_OK)
+                return node_config.get_comments_for_post(request.get_full_path(), author = target_author, request = request)
 
         # remote -> local
         if request.user.is_authenticated_node:
@@ -101,7 +97,7 @@ class CommentView(GenericAPIView):
             request = CreateCommentSerializer,
             
             responses = CommentSerializer,
-            tags=['comment', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+            tags=['comment', RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM7_CONNECTED, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED]
         )
     @action(detail=True, methods=['get'], url_name='comment_post')
     def post(self, request: Request, *args, **kwargs) -> HttpResponse:
@@ -148,11 +144,24 @@ class CommentView(GenericAPIView):
                     return Response(f"Could not get local author {requesting_author_id}", status = status.HTTP_400_BAD_REQUEST)
 
                 data['actor'] =  json_author["url"]
-                response = node_config.create_comment_on_post(request.get_full_path(), data = data)
-                if response.status_code < 200 or response.status_code > 300:
-                    return Response("Failed to create a comment on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-                return Response(json.loads(response.content), status = status.HTTP_200_OK)
+
+                # get the post id,kwargs
+                # get the original author id kwargs
+                # get the author url, post_author
+                post = {
+                    "post": {
+                        "post": {
+                        "id": str(kwargs['post_id']),
+                        "author" : {
+                            "id": str(kwargs['author_id']),
+                            "url": post_author.get_url()
+                        }
+                        }
+                    },
+                    "displayName": post_author.display_name
+                }
+
+                return node_config.create_comment_on_post(request.get_full_path(), data = data, extra_data = post)
 
         # remote -> local
         if request.user.is_authenticated_node:

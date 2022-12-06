@@ -20,7 +20,7 @@ import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
 import EditPost from '../Homepage/EditPost';
-function InboxPosts({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid}) {
+function InboxPosts({displayName, title, description, text, image, avatar, visibility,contenttype, purl, commenturl, post_authorid}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
@@ -54,7 +54,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
             method: 'post',
             withCredentials: true ,
             headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
-            url: purl + '/comments' ,
+            url: commenturl + '/comments' ,
             data: formField
         }).then((response) =>{
             console.log(response.data)
@@ -229,7 +229,28 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
     updateFollowBtn()
     }, []) //something here newFollowButtonText
 
+    const PostInfo_Likes = async () => {
+        
+        Show_Likes()
 
+        let formField12 = new FormData()
+        formField12.append("type","like")
+        formField12.append("object",purl)
+        await axios({
+                method:'post',
+                withCredentials: true ,
+                headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
+                // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
+                url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/inbox',
+                data: formField12
+            
+        }).then((response) =>{
+            console.log(response.data)
+            console.log(purl)
+           
+        })
+        
+    }
 
   return (
     <div className='post'>
@@ -328,21 +349,17 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                  
                  <form>
                     <span>
-                        <Button onClick={Show_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {likes}  </Button>  &nbsp;&nbsp;&nbsp;
+                        <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {likes}  </Button>  &nbsp;&nbsp;&nbsp;
                         <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button> &nbsp;&nbsp;&nbsp;
-                        <Button onClick = {Show_Comments} variant='contained' size = "small" endIcon= {<CommentIcon/>} > See Comments</Button>
+                        {/* <Button onClick = {Show_Comments} variant='contained' size = "small" endIcon= {<CommentIcon/>} > See Comments</Button> */}
                         
                         
                     </span>
 
                     </form>
-                    <h5 >
-                        <ol style = {{listStyleType: 'upper-roman'}}>
-                            <li>
-                                {comments}
-                            </li>
-                        </ol>
-                    </h5>
+                    <div className='post_comments'>
+                        <p> <Comment pcurl = {commenturl}/> </p> 
+                    </div>
                    
                     
                 <div className='post_footer'>

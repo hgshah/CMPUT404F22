@@ -90,3 +90,4 @@ link: https://contactmentor.com/login-form-react-js-code/
 https://bobbyhadz.com/blog/react-onclick-redirect
 https://www.youtube.com/watch?v=a8KruvMkEtY
 https://masteringjs.io/tutorials/axios/headers // header in .get
+https://docs.djangoproject.com/en/4.1/howto/static-files/#:~:text=How%20to%20manage%20static%20files%20%28e.g.%20images%2C%20JavaScript%2C,Testing%20...%205%20Deployment%20...%206%20Learn%20more // deployment of frontend to heroku 

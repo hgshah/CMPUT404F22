@@ -1,13 +1,24 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import "./Info.css"
-import { appBarClasses, Avatar, Button, TextField, Dialog, modalClasses} from '@mui/material';
+import { appBarClasses, Avatar, Button, Card, TextField, Dialog, modalClasses} from '@mui/material';
 // import 'antd/dist/antd.css';
 import {InputText} from 'primereact/inputtext';
 import { flattenOptionGroups } from '@mui/base';
 import { green } from '@mui/material/colors';
 import { AiFillEdit, AiFillCloseSquare, AiFillCheckSquare } from "react-icons/ai";
 import defaultPP from "./defaultpp.png"
+import Box from '@mui/material/Box';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import { Navigate, useNavigate } from 'react-router-dom';
+
+
+
+
+
+
 // import Popup from 'reactjs-popup';
 // import 'reactjs-popup/dist/index.css';
 
@@ -23,10 +34,14 @@ export default function Info() {
     const [profileView, setProfileView] = useState(false)
     const [src, setSrc] = useState(false)
     const authorid = localStorage.getItem("authorid")
+    const disName = localStorage.getItem("displayedName")
     const token = localStorage.getItem("token")
+    const navigate = useNavigate()
     // const displayName = localStorage.getItem("displayName") //check to see if this gets updated when changed
     const [displayedName, setDisplayName] = useState("")
     const [userGithub, setUserGithub] = useState("")
+    const [GithubAct, setGithubActivity] = useState("")
+    const [Githubrepos,setGithubrepos] = useState("")
     const shownProfile = profile.map((item) => item.profileView)
     const ibase64 = localStorage.getItem("image1")
     const [editModal, setEditModal] = useState(false)
@@ -200,6 +215,9 @@ export default function Info() {
                 setUserGithub(response.data.github)
             })
         }
+
+        
+
         
         getProfilePic()
         getFollowerCount()
@@ -207,8 +225,29 @@ export default function Info() {
         getRealFriendsCount()
         getDisplayName()
         getGitgub()
+        
     }, [])
+    useEffect(() => {
 
+        async function getGitactivity() {
+            await axios.get('https://api.github.com/repos/' + disName + '/cmput404-project/commits' , {
+                
+            }).then((response) => {
+                // console.log(response.data.github)
+                console.log(response.data.length)
+                setGithubActivity(response.data.bio)
+                setGithubrepos(response.data.length)
+            })
+            
+        }
+  
+        getGitactivity()
+        
+    }, [GithubAct])
+
+    function Goto() {
+        navigate('https://api.github.com/users/' + disName )
+    }
     return (
 
         <div className='info'>
@@ -285,9 +324,39 @@ export default function Info() {
                         <td>{postsCount}</td>
                     </tr>
                 </table>
+                
+                
             </div>
             <div className='my_info'>
-
+            
+            </div>
+            <div className='profile_footer'>
+            {/* link:  https://mui.com/material-ui/react-card/ 
+            author:https://mui.com/material-ui/react-card/
+            license:  */}
+            <React.Fragment>
+                <CardContent>
+                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                    Github bio
+                </Typography>
+               
+                <Typography variant="body2">
+                    {GithubAct}
+                    <br />
+                    <br/>
+                
+                </Typography>
+                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                    Total Commits: {Githubrepos}
+                </Typography>
+                <Typography variant='body2' sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                 {'"Thank you for reading my bio, for more info click learn more"'}
+                </Typography>
+                </CardContent>
+                <CardActions>
+                <Button onClick={Goto} size="small">Learn More</Button>
+                </CardActions>
+            </React.Fragment>
             </div>
 
         </div>

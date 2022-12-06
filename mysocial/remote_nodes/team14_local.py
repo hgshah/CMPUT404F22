@@ -14,6 +14,7 @@ from follow.serializers.follow_serializer import FollowRequestSerializer
 from remote_nodes.local_default import LocalDefault
 from post.serializer import PostSerializer
 from rest_framework import status
+from comment.serializers import CommentSerializer
 
 from common.pagination_helper import PaginationHelper
 
@@ -44,6 +45,16 @@ class Team14Local(LocalDefault):
         "visibility": "visibility",
         "unlisted": "unlisted",
         "content": "content"
+    }
+
+    comment_remote_fields = {
+        "id": "url",
+        "type": "type",
+        "author": "author",
+        "comment": "comment",
+        "content_type": "contentType",
+        "created_at": "published",
+        "official_id": "official_id"
     }
 
     def get_base_url(self):
@@ -203,13 +214,96 @@ class Team14Local(LocalDefault):
 
         return Response("Successfully sent to remote inbox!", status=status.HTTP_200_OK)
 
-    def create_comment_on_post(self, comments_path, data):
-        return Response(status = status.HTTP_501_NOT_IMPLEMENTED)
+    def get_comments_for_post(self, comments_path, author = None, request = None):
+        url = f'{self.get_base_url()}{comments_path}/'
+
+        try:
+            response = requests.get(url, auth=(self.username, self.password))
+            if response.status_code < 200 or response.status_code > 300:
+                return Response("Failed to get comments for post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        except Exception as e:
+            return Response(f"Failed to get comments for post from remote server, error: {e}",
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        data = []
+        comment_data = json.loads(response.content.decode('utf-8'))
+        
+        for comment in comment_data:
+            data.append(self.convert_team14_comment(comment))
+        
+        data, err = PaginationHelper.paginate_serialized_data(request, data)
+
+        if err is not None:
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
+
+    def create_comment_on_post(self, comments_path, data, extra_data = None):
+        author_url = extra_data['post']['post']['author']['url']
+        url = f'{author_url}/inbox/'
+        data = self.create_team14_comment(data, extra_data)
+        response = requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+        if response.status_code < 200 or response.status_code > 300:
+            return Response(
+                f"Failed to get post from remote server, error {json.loads(response.content)}",
+                status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response("Successfully created comment to team 14!", status=status.HTTP_200_OK)
+    
+    def get_authors_liked_on_post(self, object_id):
+        url = f'{self.get_base_url()}{object_id}'
+        response =  requests.get(url = url, auth = (self.username, self.password))
+
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        team14_authors = json.loads(response.content.decode('utf-8'))
+        data = []
+        for author in team14_authors:
+            converted_author = self.convert_team14_authors(url, author)
+            data.append(converted_author)
+        
+        return Response(data, status = status.HTTP_200_OK)
+    
+    def like_a_post(self, data, target_author_url, extra_data = None):
+        url = f'{target_author_url}/inbox/'
+        data = self.create_team14_like_post(data, target_author_url)
+        response = requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+        
+        if response.status_code < 200 or response.status_code > 300:
+            return Response(
+                f"Failed to like post on team 14, error {json.loads(response.content)}",
+                status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response("Successfully created like to team 14!", status=status.HTTP_200_OK)
 
     def convert_team14_post(self, url, post_data):
         post_data["url"] = url
 
         serializer = PostSerializer(data=post_data)
+        if serializer.is_valid():
+            return serializer.data
+        else:
+            return serializer.errors
+    
+    def convert_team14_authors(self, url, author_data):
+        author_data["url"] = url
+
+        serializer = AuthorSerializer(data=author_data)
+        if serializer.is_valid():
+            return serializer.data
+        else:
+            return serializer.errors
+    
+    def convert_team14_comment(self, comment_data):
+        team14_comment_id = comment_data['id'].split('comments/')[1].rstrip("/")
+        comment_data['official_id'] = team14_comment_id
+
+        url = comment_data['id']
+        comment_data['url'] = url
+        
+        serializer = CommentSerializer(data = comment_data)
         if serializer.is_valid():
             return serializer.data
         else:
@@ -231,3 +325,52 @@ class Team14Local(LocalDefault):
         inbox_post['post']['author']['id'] = data['author']['id']
         inbox_post['post']['author']['url'] = data['author']['url']
         return inbox_post
+
+    def create_team14_comment(self, data, extra_data):
+        comment = {
+            "type": "comment",
+            "comment": "",
+            "content_type": "",
+            "author": {
+                "id": "",
+                "url": ""
+            },
+            "post": {
+                "id": "",
+                "author": {
+                    "id": "",
+                    "url": ""
+                }
+            }
+        }
+
+        comment['comment'] = data['comment']
+        comment['content_type'] = data['contentType']
+        comment['author']['url'] = data['actor']
+        comment['author']['id'] = data['actor'].split('authors/')[1]
+        comment.update(extra_data['post'])
+        return comment
+
+    def create_team14_like_post(self, data, target_author_url):
+        like = {
+            "type": "like",
+            "author": {
+                "id": "",
+                "url": ""
+            },
+            "post": {
+                "id": "",
+                "author": {
+                "id": "",
+                "url": ""
+                }
+            }
+        }   
+
+        like['author']['url'] = data['actor'] + '/'
+        like['author']['id'] = data['actor'].split('authors/')[1]
+        like['post']['id'] = data['object'].split('posts/')[1]
+        like['post']['author']['url'] = target_author_url
+        like['post']['author']['id'] = target_author_url.split('authors/')[1]
+        return like
+

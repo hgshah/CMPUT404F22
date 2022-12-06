@@ -20,6 +20,7 @@ export default function RemPosts() {
                         
                         )
                         const ipost = []
+                        
                         for(let i = 0; i<p_inbox.data.items.length; i++){
                             if(p_inbox.data.items[i].visibility ==="PUBLIC"){
                                 ipost.push(p_inbox.data.items[i])
@@ -51,9 +52,8 @@ export default function RemPosts() {
                             
                                 <p>
                                   
-                                  <InboxPosts purl = {iposts.url} title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content}  visibility = {iposts.visibility}/>
-                                    {/* {posts.title} <br></br>
-                                    {posts.description} */}
+                                  <InboxPosts purl = {iposts.url} commenturl = { "https://socioecon.herokuapp.com/authors/" + rempostid + "/posts/" + iposts.id} title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content}  visibility = {iposts.visibility}/>
+                                    
                                     
                                     {/* <Buttson onClick = {() =>DeletePostInfo(posts.id)}  className = "postdel_button">Delete</Button> */}
                                 </p>
