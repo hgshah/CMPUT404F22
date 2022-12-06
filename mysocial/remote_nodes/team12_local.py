@@ -397,10 +397,14 @@ class Team12Local(LocalDefault):
         team12_authors = json.loads(response.content.decode('utf-8'))
         data = []
 
-        for author in team12_authors:
-            print(author['author'])
-            converted_author = self.convert_team12_authors(url, author['author'])
-            data.append(converted_author)
+        try:
+            for author in team12_authors:
+                print(author['author'])
+                converted_author = self.convert_team12_authors(url, author['author'])
+                data.append(converted_author)
+                
+        except Exception as e:
+            return Response(f"Failed to deserialize authors for team 12 {e}", status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         return Response(data, status = status.HTTP_200_OK)
 
