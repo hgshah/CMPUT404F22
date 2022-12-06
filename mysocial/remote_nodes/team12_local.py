@@ -15,6 +15,7 @@ from follow.serializers.follow_serializer import FollowRequestSerializer
 from mysocial.settings import base
 from post.serializer import PostSerializer
 from remote_nodes.local_default import LocalDefault
+from comment.serializers import CommentSerializer
 from remote_nodes.node_config_base import NodeConfigBase
 
 
@@ -45,6 +46,16 @@ class Team12Local(LocalDefault):
         "published": "published",
         "visibility": "visibility",
         "unlisted": "unlisted"
+    }
+
+    comment_remote_fields = {
+        "id": "official_id",
+        "type": "type",
+        "author": "author",
+        "comment": "comment",
+        "contentType": "contentType",
+        "published": "published",
+        "url": "url"
     }
 
     def __init__(self):
@@ -311,7 +322,7 @@ class Team12Local(LocalDefault):
                 return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         except Exception as e:
-            return Response(f"Failed to get author's post from remote server, error: {e}",
+            return Response(f"Failed to get post from remote server, error: {e}",
                             status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         post_data = json.loads(response.content.decode('utf-8'))
@@ -319,10 +330,46 @@ class Team12Local(LocalDefault):
         post = self.convert_team12_post(url, post_data)
         return Response(post, status=status.HTTP_200_OK)
 
+    def get_comments_for_post(self, comments_path, author = None, request = None):
+        split_comments = comments_path.split('posts')
+        url = f'{self.get_base_url()}{split_comments[0]}{author.display_name}/posts{split_comments[1]}/'
+        try:
+
+            response = requests.get(url, headers=self.get_headers())
+            if response.status_code < 200 or response.status_code > 300:
+                return Response("Failed to get comments for post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        except Exception as e:
+            return Response(f"Failed to get comments for post from remote server, error: {e}",
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        data = []
+        comment_data = json.loads(response.content.decode('utf-8'))
+        
+        for comment in comment_data:
+            data.append(self.convert_team12_comment(url, comment))
+        
+        data, err = PaginationHelper.paginate_serialized_data(request, data)
+
+        if err is not None:
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
+
+    
     def convert_team12_post(self, url, post):
         post["url"] = url
 
         serializer = PostSerializer(data=post)
+        if serializer.is_valid():
+            return serializer.data
+        else:
+            return serializer.errors
+    
+    def convert_team12_comment(self, url, comment):
+        comment["url"] = url
+
+        serializer = CommentSerializer(data = comment)
         if serializer.is_valid():
             return serializer.data
         else:

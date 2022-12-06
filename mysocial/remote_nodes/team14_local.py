@@ -14,6 +14,7 @@ from follow.serializers.follow_serializer import FollowRequestSerializer
 from remote_nodes.local_default import LocalDefault
 from post.serializer import PostSerializer
 from rest_framework import status
+from comment.serializers import CommentSerializer
 
 from common.pagination_helper import PaginationHelper
 
@@ -44,6 +45,16 @@ class Team14Local(LocalDefault):
         "visibility": "visibility",
         "unlisted": "unlisted",
         "content": "content"
+    }
+
+    comment_remote_fields = {
+        "id": "url",
+        "type": "type",
+        "author": "author",
+        "comment": "comment",
+        "content_type": "contentType",
+        "created_at": "published",
+        "official_id": "official_id"
     }
 
     def get_base_url(self):
@@ -203,6 +214,31 @@ class Team14Local(LocalDefault):
 
         return Response("Successfully sent to remote inbox!", status=status.HTTP_200_OK)
 
+    def get_comments_for_post(self, comments_path, author = None, request = None):
+        url = f'{self.get_base_url()}{comments_path}/'
+
+        try:
+            response = requests.get(url, auth=(self.username, self.password))
+            if response.status_code < 200 or response.status_code > 300:
+                return Response("Failed to get comments for post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        except Exception as e:
+            return Response(f"Failed to get comments for post from remote server, error: {e}",
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        data = []
+        comment_data = json.loads(response.content.decode('utf-8'))
+        
+        for comment in comment_data:
+            data.append(self.convert_team14_comment(comment))
+        
+        data, err = PaginationHelper.paginate_serialized_data(request, data)
+
+        if err is not None:
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
+
     def create_comment_on_post(self, comments_path, data):
         return Response(status = status.HTTP_501_NOT_IMPLEMENTED)
 
@@ -210,6 +246,19 @@ class Team14Local(LocalDefault):
         post_data["url"] = url
 
         serializer = PostSerializer(data=post_data)
+        if serializer.is_valid():
+            return serializer.data
+        else:
+            return serializer.errors
+    
+    def convert_team14_comment(self, comment_data):
+        team14_comment_id = comment_data['id'].split('comments/')[1].rstrip("/")
+        comment_data['official_id'] = team14_comment_id
+
+        url = comment_data['id']
+        comment_data['url'] = url
+        
+        serializer = CommentSerializer(data = comment_data)
         if serializer.is_valid():
             return serializer.data
         else:
