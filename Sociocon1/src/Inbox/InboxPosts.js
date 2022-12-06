@@ -144,7 +144,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
             url: 'https://socioecon.herokuapp.com/authors/' + post_authorid + '/followers/',
             // data: formField_follow
         }).then((response) => {
-            console.log(response.data)
+            console.log("FOLLOW CLICKED: ", response.data)
             
         })
     }
