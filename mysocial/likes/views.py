@@ -35,7 +35,7 @@ class LikeView(GenericViewSet):
     @extend_schema(
         responses=AuthorSerializer,
         summary="likes_retrieve_authors_for_post",
-        tags=["likes", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=["likes", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='get_authors_liked_on_post')
     def get_authors_liked_on_post(self, request: Request, *args, **kwargs) -> HttpResponse:

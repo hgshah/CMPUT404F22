@@ -142,6 +142,19 @@ class Team12Local(LocalDefault):
                     continue
 
                 _, host, path, _, _, _ = urllib.parse.urlparse(data_host)
+
+                # local case
+                if host in ('127.0.0.1:8000', '127.0.0.1:8080', 'socioecon.herokuapp.com'):
+                    author_id = None
+                    try:
+                        author_id = author_data['sender_id']
+                        author = Author.get_author(author_id, should_do_recursively=False)
+                        author_list.append(AuthorSerializer(author).data)
+                    except Exception as e:
+                        print(f'{self}: get_all_followers: failed with host({host}); data_host({data_host}); id({author_id}): error: {e}')
+                    continue
+
+                # remote case
                 host = BaseUtil.transform_host(host)
                 node_config: NodeConfigBase = base.REMOTE_CONFIG.get(host)
                 if node_config is None:
@@ -372,6 +385,39 @@ class Team12Local(LocalDefault):
         return Response("Successfully created comment to team 12!", status=status.HTTP_200_OK)
         
     
+    def get_authors_liked_on_post(self, object_id):
+        post_path = object_id.split('posts')[1]
+        url = f'{self.get_base_url()}/posts{post_path}/'
+  
+        response =  requests.get(url = url, headers=self.get_headers())
+
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        team12_authors = json.loads(response.content.decode('utf-8'))
+        data = []
+
+        for author in team12_authors:
+            print(author['author'])
+            converted_author = self.convert_team12_authors(url, author['author'])
+            data.append(converted_author)
+        
+        return Response(data, status = status.HTTP_200_OK)
+
+    def like_a_post(self, data, target_author_url, extra_data = None):
+        split_post = data['object'].split('posts')
+        display_name = extra_data['displayName']
+
+        url = f'{split_post[0]}{display_name}/posts{split_post[1]}/likes/'
+        response = requests.post(url = url, headers=self.get_headers())
+        
+        if response.status_code < 200 or response.status_code > 300:
+            return Response(
+                f"Failed to like post on team 12, error {json.loads(response.content)}",
+                status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response("Successfully created like to team 12!", status=status.HTTP_200_OK)
+
     def convert_team12_post(self, url, post):
         post["url"] = url
 
@@ -395,3 +441,12 @@ class Team12Local(LocalDefault):
             "comment": data['comment']
         }
         return comment
+
+    def convert_team12_authors(self, url, author_data):
+        author_data["url"] = url
+
+        serializer = AuthorSerializer(data=author_data)
+        if serializer.is_valid():
+            return serializer.data
+        else:
+            return serializer.errors
