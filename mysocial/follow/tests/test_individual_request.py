@@ -1,5 +1,3 @@
-from unittest import skip
-
 from authors.util import AuthorUtil
 from follow.models import Follow
 from follow.tests.base_test_follower_view import BaseTestFollowerView

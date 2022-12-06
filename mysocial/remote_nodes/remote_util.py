@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework.request import Request
@@ -125,6 +126,10 @@ class RemoteUtil:
                     TestHelper.overwrite_author(username, other_args)
             except Exception as e:
                 print(f'RemoteUtil: setup: unknown error: {e}')
+
+        if 'test' in sys.argv and 'integration' not in sys.argv:
+            print("Ignoring remote because it's a local test")
+            return
 
         # This is where the endpoints and configs are added!
         # When it's local (contains 127.0.0.1), we add 127.0.0.1:8000 and 127.0.0.1:8080
