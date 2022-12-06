@@ -142,6 +142,19 @@ class Team12Local(LocalDefault):
                     continue
 
                 _, host, path, _, _, _ = urllib.parse.urlparse(data_host)
+
+                # local case
+                if host in ('127.0.0.1:8000', '127.0.0.1:8080', 'socioecon.herokuapp.com'):
+                    author_id = None
+                    try:
+                        author_id = author_data['sender_id']
+                        author = Author.get_author(author_id, should_do_recursively=False)
+                        author_list.append(author)
+                    except Exception as e:
+                        print(f'{self}: get_all_followers: failed with host({host}); data_host({data_host}); id({author_id}): error: {e}')
+                    continue
+
+                # remote case
                 host = BaseUtil.transform_host(host)
                 node_config: NodeConfigBase = base.REMOTE_CONFIG.get(host)
                 if node_config is None:
