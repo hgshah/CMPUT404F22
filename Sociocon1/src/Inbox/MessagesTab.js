@@ -6,6 +6,8 @@ import RPost from './RPost';
 import { render } from '@testing-library/react';
 import  ReactDOM from 'react-dom';
 import { Alert, TextField } from '@mui/material';
+import { lightGreen } from '@mui/material/colors';
+import { Card } from 'antd';
 export default function MessagesTab() {
   const [authorlist, setAuthorList] = useState([])
   const [post, setPost] = useState([])
@@ -26,7 +28,7 @@ export default function MessagesTab() {
       let array = []
       let array2 = []
       let ne = []
-      for(let i = 0; i<34; i++){
+      for(let i = 0; i<response.data.items.length; i++){
        
        array.push(response.data.items[i])
        array2.push(response.data.items[i].id)
@@ -94,7 +96,11 @@ function handle() {
             authorlist.map((dat) => { 
               return(
                   
-                  <p> {dat.preferredName} <input value = {dat.id}/></p>
+                  <Card> 
+                    
+                        {dat.preferredName}<br/> <input value = {dat.id}/>
+                    
+                  </Card>
                 // <RPost title = {dat.preferredName} description = {dat.id}/>
               )
             }

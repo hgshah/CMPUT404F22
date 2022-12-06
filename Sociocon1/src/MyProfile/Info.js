@@ -230,13 +230,13 @@ export default function Info() {
     useEffect(() => {
 
         async function getGitactivity() {
-            await axios.get('https://api.github.com/users/' + disName , {
+            await axios.get('https://api.github.com/repos/' + disName + '/cmput404-project/commits' , {
                 
             }).then((response) => {
                 // console.log(response.data.github)
-                console.log(response.data.bio)
+                console.log(response.data.length)
                 setGithubActivity(response.data.bio)
-                setGithubrepos(response.data.public_repos)
+                setGithubrepos(response.data.length)
             })
             
         }
@@ -347,7 +347,7 @@ export default function Info() {
                 
                 </Typography>
                 <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    Github Repositories: {Githubrepos}
+                    Total Commits: {Githubrepos}
                 </Typography>
                 <Typography variant='body2' sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                  {'"Thank you for reading my bio, for more info click learn more"'}
