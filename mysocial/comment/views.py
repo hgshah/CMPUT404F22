@@ -34,7 +34,7 @@ class CommentView(GenericAPIView):
     @extend_schema(
         responses=CommentSerializerList,
         summary="comment_get_comments_on_post",
-        tags=["comment", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=["comment", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM7_CONNECTED, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='comment_get_comments_on_post')
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
@@ -97,7 +97,7 @@ class CommentView(GenericAPIView):
             request = CreateCommentSerializer,
             
             responses = CommentSerializer,
-            tags=['comment', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+            tags=['comment', RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM7_CONNECTED, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED]
         )
     @action(detail=True, methods=['get'], url_name='comment_post')
     def post(self, request: Request, *args, **kwargs) -> HttpResponse:
