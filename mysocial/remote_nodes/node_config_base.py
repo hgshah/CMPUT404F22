@@ -242,7 +242,12 @@ class NodeConfigBase:
 
     def get_authors_liked_on_post(self, object_id):
         url = f'{self.get_base_url()}{object_id}'
-        return requests.get(url = url, auth = (self.username, self.password))
+        response =  requests.get(url = url, auth = (self.username, self.password))
+
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
     def get_authors_liked_on_comment(self, object_id):
         url = f'{self.get_base_url()}{object_id}'

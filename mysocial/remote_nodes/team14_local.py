@@ -240,7 +240,8 @@ class Team14Local(LocalDefault):
             return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
 
     def create_comment_on_post(self, comments_path, data, extra_data = None):
-        url = f'{self.get_base_url()}{comments_path}/'
+        author_url = extra_data['post']['post']['author']['url']
+        url = f'{author_url}/inbox/'
         data = self.create_team14_comment(data, extra_data)
         response = requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
         if response.status_code < 200 or response.status_code > 300:
@@ -249,11 +250,35 @@ class Team14Local(LocalDefault):
                 status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response("Successfully created comment to team 14!", status=status.HTTP_200_OK)
+    
+    def get_authors_liked_on_post(self, object_id):
+        url = f'{self.get_base_url()}{object_id}'
+        response =  requests.get(url = url, auth = (self.username, self.password))
+
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        team14_authors = json.loads(response.content.decode('utf-8'))
+        data = []
+        for author in team14_authors:
+            converted_author = self.convert_team14_authors(url, author)
+            data.append(converted_author)
+        
+        return Response(data, status = status.HTTP_200_OK)
 
     def convert_team14_post(self, url, post_data):
         post_data["url"] = url
 
         serializer = PostSerializer(data=post_data)
+        if serializer.is_valid():
+            return serializer.data
+        else:
+            return serializer.errors
+    
+    def convert_team14_authors(self, url, author_data):
+        author_data["url"] = url
+
+        serializer = AuthorSerializer(data=author_data)
         if serializer.is_valid():
             return serializer.data
         else:
