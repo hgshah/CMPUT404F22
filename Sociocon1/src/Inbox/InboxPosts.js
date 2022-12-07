@@ -142,7 +142,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
             method:'post',
             withCredentials: true,
             headers: {'Content-Type':'application/json', "Authorization": "Token " + token},
-            url: 'https://socioecon.herokuapp.com/authors/' + post_authorid + '/followers/',
+            url: 'https://socioecon.herokuapp.com/authors/' + rempostid + '/followers/',
             // data: formField_follow
         }).then((response) => {
             console.log("FOLLOW CLICKED: ", response.data)
@@ -242,7 +242,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
         async function updateFollowBtn() {
 
         // if(newFollowButtonText === "Follow") {
-            await axios.get('https://socioecon.herokuapp.com/authors/' + post_authorid + '/followers/' + authorid, {
+            await axios.get('https://socioecon.herokuapp.com/authors/' + rempostid + '/followers/' + authorid, {
                 headers: {"Content-Type":"application/json", "Authorization": "Token " + token}
             }).then((response) => {
                     setFollowing(!following);

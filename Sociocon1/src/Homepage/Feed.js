@@ -94,7 +94,7 @@ function Feed({}) {
            <h2>Home              
             </h2>
             <h3>
-              user:{preferredName} 
+              User: {preferredName} 
             </h3>
           
         </div>
