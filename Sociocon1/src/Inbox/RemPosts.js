@@ -52,7 +52,7 @@ export default function RemPosts() {
                             
                                 <p>
                                   
-                                  <InboxPosts purl = {iposts.url} commenturl = { "https://socioecon.herokuapp.com/authors/" + rempostid + "/posts/" + iposts.id} title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content}  visibility = {iposts.visibility}/>
+                                  <InboxPosts purl = {iposts.url} commenturl = { "https://socioecon.herokuapp.com/authors/" + rempostid + "/posts/" + iposts.id} title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content} avatar = {iposts.author.profileImage} visibility = {iposts.visibility}/>
                                     
                                     
                                     {/* <Buttson onClick = {() =>DeletePostInfo(posts.id)}  className = "postdel_button">Delete</Button> */}

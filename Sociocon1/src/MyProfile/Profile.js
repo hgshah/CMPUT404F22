@@ -13,11 +13,6 @@ function Profile() {
       <Sidebar/>
       <Info/>
       <News/>
-      
-      {/* <h6> This is profile page</h6>
-      <input value = "First Name" />
-      <input value = "Last Name" /> */}
-      
     </div>
   )
 }

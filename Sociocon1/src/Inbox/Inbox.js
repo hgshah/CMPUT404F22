@@ -24,7 +24,7 @@ import RemPosts from "./RemPosts"
 
 export default function Inbox() {
     //initial selected tab will be activity
-    const [currentTab, setCurrentTab] = useState("activity");
+    const [currentTab, setCurrentTab] = useState("requests");
     
     // Handle when user changes tabs
     function handleActivityTab() {
