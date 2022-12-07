@@ -56,7 +56,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
             withCredentials: true ,
             headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
             url: commenturl + '/comments' ,
-            data: formField
+            data: {"comment": comment, "contentType":"text/plain"}
         }).then((response) =>{
             console.log(response.data)            
         })
@@ -164,9 +164,9 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: commenturl + '/share',
-                data: formField_share
-            
+                url: purl + '/share',
+                data: {"object": purl}
+
         }).then((response) =>{
             console.log(response.data)
             console.log(purl)
@@ -267,8 +267,8 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/inbox',
-                data: formField12
+                url: 'https://socioecon.herokuapp.com/authors/' + rempostid + '/inbox', // remid
+                data: {"type": "like", "object":commenturl}
             
         }).then((response) =>{
             console.log(response.data)

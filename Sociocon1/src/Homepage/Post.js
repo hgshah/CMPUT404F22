@@ -157,7 +157,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     }
 
     const Share_Post = async () => {
+
         
+
         let formField_share = new FormData()
         formField_share.append("object",purl)
         console.log(purl)
