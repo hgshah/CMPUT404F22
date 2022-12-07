@@ -17,21 +17,41 @@ export default function FriendRequestsTab() {
   const navigate = useNavigate();
   const authorid = localStorage.getItem("authorid")
   const token = localStorage.getItem("token")
+  const [notFolBack, setNotFolBack] = useState([{}]);
   // const noFollowBack = acceptedRequests
   // console.log("accepted req up: ", acceptedRequests)
   // console.log("real f up: ", realFriends)
 
   // console.log("before no follow back: ", acceptedRequests)
-  for (var notFBack of acceptedRequests) {
-    for (var realF of realFriends) {
-      if (notFBack.id === realF.id) {
-        console.log("In loop: ", notFBack)
-        acceptedRequests.splice(notFBack, 1)
-      }
-    }
+  // console.log("ACCEPTED: ", acceptedRequests)
+  // console.log("RF: ", realFriends)
+  // for (var notFBack of acceptedRequests) {
+  //   for (var realF of realFriends) {
+  //     if (notFBack.id === realF.id) {
+  //       console.log("In loop: ", notFBack)
+  //       console.log("SPLICE REMOVES: " ,acceptedRequests.splice(notFBack, 1))
+  //     }
+  //   }
     // console.log("in no follow back: ", acceptedRequests)
-  }
-  console.log("not following back: ", acceptedRequests)
+  // }
+  // console.log("not following back: ", acceptedRequests)
+
+  // const getNotFollowingBack = () => {
+  //   const result = [...acceptedRequests]
+  //   console.log("RESULT: ", result)
+  //   console.log("RF: ", realFriends)
+  //   for (var notFBack of result) {
+  //     for (var realF of realFriends) {
+  //       if (notFBack.id === realF.id) {
+  //         console.log("In loop: ", notFBack)
+  //         console.log("SPLICE REMOVES: " ,result.splice(notFBack, 1))
+  //       }
+  //     }
+  //     // console.log("in no follow back: ", acceptedRequests)
+  //   }
+  //   console.log("FINAL RESULT: ", result)
+  //   return result
+  // }
 
   //add to friends list, remove from requests
   const accept_clicked = async(id) => {
@@ -120,23 +140,23 @@ export default function FriendRequestsTab() {
   useEffect(() => {
     async function getAllRequests() {
       const arr = [];
-      await axios.get('https://socioecon.herokuapp.com/follows/incoming/', {
+      return await axios.get('https://socioecon.herokuapp.com/follows/incoming/', {
         headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
-      }).then((response) => {
-        for (let follow of response.data.items) {
-          arr.push(follow)
-          // console.log(response.data.items)
-          // console.log("FOLLOW: ", follow)
-        }
-        setRequests(arr)
-        // console.log(setRequests)
-        // console.log(arr)
       })
+      // .then((response) => {
+      //   for (let follow of response.data.items) {
+      //     arr.push(follow)
+      //     // console.log(response.data.items)
+      //     // console.log("FOLLOW: ", follow)
+      //   }
+      //   setRequests(arr)
+      //   // console.log(setRequests)
+      //   // console.log(arr)
+      // })
     }
-    getAllRequests()
-  }, []) //check what goes here TOO MANY GET REQUESTS WITH requests, cant leave blank mininmum requests
+  // }, []) //check what goes here TOO MANY GET REQUESTS WITH requests, cant leave blank mininmum requests
 
-  useEffect(() => {
+  // useEffect(() => {
     // update button to show "Follow Back" or "Un befriend"
      //get real friends of authorid
       // await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/real-friends/', {
@@ -161,42 +181,72 @@ export default function FriendRequestsTab() {
     // show all accepted friend requests
     async function getAcceptedRequests() {
       const accepted = [];
-      await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/followers/', {
+      return await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/followers/', {
         headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
-      }).then((response) => {
-        for (var acc_follower of response.data.items) {
-          accepted.push(acc_follower);
-          // console.log(acc_follower.id)
-          // console.log(response.data.items)
-          // updateAcceptedBtns(acc_follower.id);
-
-          // setFollowingBack(!followingBack)
-          // setAccButtonText("Follow Back")
-        }
-        setAcceptedRequests(accepted);
-        // updateAcceptedBtns(acc_follower.id);
-      }).catch((error) => {
-        console("ERROR showing all accepted requests: ", error.data)
       })
+      
+      // .then((response) => {
+      //   for (var acc_follower of response.data.items) {
+      //     accepted.push(acc_follower);
+      //     // console.log(acc_follower.id)
+      //     // console.log(response.data.items)
+      //     // updateAcceptedBtns(acc_follower.id);
+
+      //     // setFollowingBack(!followingBack)
+      //     // setAccButtonText("Follow Back")
+      //   }
+      //   setAcceptedRequests(accepted);
+      //   // updateAcceptedBtns(acc_follower.id);
+      // }).catch((error) => {
+      //   console("ERROR showing all accepted requests: ", error.data)
+      // })
     }
 
     async function getRealFriends() {
       const rf_arr = []
-      await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/real-friends/', {
+      return await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/real-friends/', {
         headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
-      }).then((response) => {
-        for (var rf of response.data.items) {
-          rf_arr.push(rf)
-          // console.log("RF: ", rf.id)
-          // setFollowingBack(!followingBack)
-          // setAccButtonText("Un-Befriend")
-        }
-        setRealFriends(rf_arr)
       })
+      // .then((response) => {
+      //   for (var rf of response.data.items) {
+      //     rf_arr.push(rf)
+      //     // console.log("RF: ", rf.id)
+      //     // setFollowingBack(!followingBack)
+      //     // setAccButtonText("Un-Befriend")
+      //   }
+      //   setRealFriends(rf_arr)
+      // })
     }
 
-    getAcceptedRequests();
-    getRealFriends();
+    const getNotFollowingBack = (ar, rf) => {
+      const result = [...ar]
+      // console.log("RESULT: ", result)
+      // console.log("RF: ", rf)
+      for (var notFBack in result) {
+        for (var realF in rf) {
+          if (result[notFBack].id === rf[realF].id) {
+            // console.log("In loop: ", notFBack.id)
+            console.log("SPLICE REMOVES: " ,result.splice(notFBack, 1))
+          }
+        }
+        // console.log("in no follow back: ", acceptedRequests)
+      }
+      // console.log("FINAL RESULT: ", result)
+      return result
+    }
+
+    // await getAllRequests();
+    // await getAcceptedRequests();
+    // await getRealFriends();
+    // getNotFollowingBack();
+
+    Promise.all([getAllRequests(), getAcceptedRequests(), getRealFriends()]).then((values) => {
+      console.log("VALUES: ", values)
+      setRequests(values[0].data.items)
+      setAcceptedRequests(values[1].data.items)
+      setRealFriends(values[2].data.items)
+      setNotFolBack(getNotFollowingBack(values[1].data.items, values[2].data.items))
+    })
 
   }, []) //accepted requests but send too many get
 
@@ -224,7 +274,7 @@ export default function FriendRequestsTab() {
             </div>
           ))
           }
-          {acceptedRequests.map((acc) =>(
+          {notFolBack.map((acc) =>(
             <div key={acc.preferredName}>
               {/* {console.log(acc)} */}
               <p className='accepted_list'>
