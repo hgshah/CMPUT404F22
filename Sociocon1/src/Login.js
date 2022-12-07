@@ -184,7 +184,7 @@ function Login() {
           <Card>
             <div>
               <label>Username </label>
-              <input type="text" name="uname" required /> 
+              <input type="text" name="uname" required />  <br/>
               {renderErrorMessage("uname")} <br></br>
             </div>
             <div>
@@ -193,15 +193,11 @@ function Login() {
               {renderErrorMessage("pass")}  <br></br>
             </div>
            
-            
-
           </Card>
-          
           
         </div>
         <div className="input-container">
           <Button style={{ backgroundColor: "white" }} onClick = {handleSubmit} > Submit </Button>
-            
               
             
             {isSubmitted}
