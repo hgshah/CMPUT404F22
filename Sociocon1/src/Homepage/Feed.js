@@ -91,8 +91,8 @@ function Feed({}) {
   return (
     <div className='feed'>
         <div className="feed_header">
-           <h2>Home              
-            </h2>
+           <h1>Home              
+            </h1>
             <h3>
               User: {preferredName} 
             </h3>
@@ -108,7 +108,7 @@ function Feed({}) {
                                 
                                 <h2 >
                                   
-                                   <Post published = {posts.published} post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = {posts.content} avatar = {posts.author.profileImage} visibility = {posts.visibility}/>
+                                   <Post  post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = {posts.content} avatar = {posts.author.profileImage} visibility = {posts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     

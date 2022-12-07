@@ -9,6 +9,7 @@ import { Avatar} from '@mui/material';
 import {useNavigate} from 'react-router-dom'
 // import ReactMarkdown from 'react-markdown'
 import { upload } from '@testing-library/user-event/dist/upload';
+import { Card } from 'antd';
 
 
 function Postbox ({}) {
@@ -225,58 +226,64 @@ function Postbox ({}) {
     
   return (
     <div className='postbox'>
+        <h4>Make a new post</h4>
         <form> 
             
             <div className="postbox_input">
                 {/* <Avatar src = {profilepic} /> */}
-                
-                <input 
-                onChange={e => setPostTitle(e.target.value)} 
-                value={title} 
-                placeholder='Enter post title' 
-                type = "text"
-                name = "title"
-                />
-                
+                <Card>
+                    <input 
+                    onChange={e => setPostTitle(e.target.value)} 
+                    value={title} 
+                    placeholder='Enter post title' 
+                    type = "text"
+                    name = "title"
+                    />
+                    
+                    
+                </Card>
                 <label for="set-visibility"></label>
-                {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
-                       author: https://developer.mozilla.org/en-US/
-                       License: https://creativecommons.org/licenses/by-sa/4.0/*/}
-                <select value={visibility} onChange={e => setPostVisibility(e.target.value)} name="visibility" id="visibility">
-                    <option  value="" >choose an option--</option>
-                    <option  value="public">Public</option>
-                    <option value = "friends">Friends</option>
-                </select>
+                    {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
+                        author: https://developer.mozilla.org/en-US/
+                        License: https://creativecommons.org/licenses/by-sa/4.0/*/}
+                    <select value={visibility} onChange={e => setPostVisibility(e.target.value)} name="visibility" id="visibility">
+                        <option  value="" >choose an option--</option>
+                        <option  value="public">Public</option>
+                        <option value = "friends">Friends</option>
+                    </select>
                 
             </div>
             <div className='postbody'>
-            <TextField 
-                onChange={e => setPostBody(e.target.value)}
-                value={description} 
-                placeholder='Enter post body' 
-                type = "text"
-                name = "description"
-                
-                /> <br></br>
-                
-                <select value={url} onChange={e => setUrl(e.target.value)} name="contentType" id="ContentType">
-                    <option  value="" >select if url--</option>
-                    <option  value="url">url</option>
-                </select>
-                <label for="set-contentType"></label>
-                {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
-                       author: https://developer.mozilla.org/en-US/
-                       License: https://creativecommons.org/licenses/by-sa/4.0/*/}
+                <Card>
+                    <TextField 
+                    onChange={e => setPostBody(e.target.value)}
+                    value={description} 
+                    placeholder='Enter post body' 
+                    type = "text"
+                    name = "description"
+                    
+                    /> <br></br>
+                    
+                    <select value={url} onChange={e => setUrl(e.target.value)} name="contentType" id="ContentType">
+                        <option  value="" >select if url</option>
+                        <option  value="url">url</option>
+                    </select>
+                    <label for="set-contentType"></label>
+                    {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
+                        author: https://developer.mozilla.org/en-US/
+                        License: https://creativecommons.org/licenses/by-sa/4.0/*/}
 
-                
+                    
 
-                <select value={commonMark} onChange={e => setCommonMark(e.target.value)} name="contentType" id="ContentType">
-                    <option  value="" >choose contentType--</option>
-                    <option  value="text/plain">text/plain</option>
-                    <option value = "text/markdown">text/markdown</option>
-                    <option value = "image/png;base64">image/png;base64</option>
-                    <option value = "image/jpeg;base64">image/jpeg;base64</option>
-                </select>
+                    <select value={commonMark} onChange={e => setCommonMark(e.target.value)} name="contentType" id="ContentType">
+                        <option  value="" >contentType</option>
+                        <option  value="text/plain">text/plain</option>
+                        <option value = "text/markdown">text/markdown</option>
+                        <option value = "image/png;base64">image/png;base64</option>
+                        <option value = "image/jpeg;base64">image/jpeg;base64</option>
+                    </select>
+                </Card>
+            
                 
             </div>
 
@@ -287,7 +294,7 @@ function Postbox ({}) {
                 type = "file"
                 name = "post image"
                 />
-             <img src = {pimage} height = "200px"/>   
+             <img src = {pimage} height = "200px"/> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             {/* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
                 // license:  https://creativecommons.org/licenses/by-sa/4.0/ */}

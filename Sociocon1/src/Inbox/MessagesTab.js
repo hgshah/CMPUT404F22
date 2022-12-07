@@ -32,18 +32,22 @@ export default function MessagesTab() {
       console.log(response.data)
       for(let i = 0; i<response.data.items.length; i++){
        if(teamname==="team10" && response.data.items[i].host ==="socioecon.herokuapp.com"){
+         localStorage.setItem("hosturl",response.data.items[i].host)
           array.push(response.data.items[i])
           array2.push(response.data.items[i].id)
        }
        else if (teamname==="team14" && response.data.items[i].host ==="social-distribution-14degrees.herokuapp.com"){
+          localStorage.setItem("hosturl",response.data.items[i].host)
           array.push(response.data.items[i])
           array2.push(response.data.items[i].id)
        }
        else if(teamname==="team7" && response.data.items[i].host ==="cmput404-social.herokuapp.com") {
+          localStorage.setItem("hosturl",response.data.items[i].host)
           array.push(response.data.items[i])
           array2.push(response.data.items[i].id)
        }
        else if(teamname==="team12" && response.data.items[i].host ==="true-friends-404.herokuapp.com") {
+        localStorage.setItem("hosturl",response.data.items[i].host)
         array.push(response.data.items[i])
         array2.push(response.data.items[i].id)
      }
