@@ -332,7 +332,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                 
                 <div className='header_text'>
                 
-                    <h3>
+                    <h2>
                         {displayName} {" "} <span></span>
                         
                         
@@ -354,7 +354,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                             name = "description"
                             /> */}
                         </span>
-                    </h3>
+                    </h2>
                     
                 </div>
                 <div className='visibility'>
