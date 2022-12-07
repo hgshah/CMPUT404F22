@@ -43,6 +43,12 @@ function Login() {
       "is_superuser": true
     },
     {
+      "username": "team12",
+      "password": "team12",
+      "is_staff": true,
+      "is_superuser": true
+    },
+    {
       "username": "hsmalhi",
       "password": "hsmalhi",
       "is_staff": true,

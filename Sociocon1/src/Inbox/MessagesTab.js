@@ -95,7 +95,7 @@ function handle() {
   return (
     <div className='MessagesTab'>
      
-        <button onClick={Show_AuthorList} >Get</button> <br/>
+        
         <select value={teamname} onChange={e => setTeamname(e.target.value)} name="teamname" id="teamname">
                     <option  value="" >choose contentType--</option>
                     <option  value="team7">team7</option>
@@ -103,6 +103,7 @@ function handle() {
                     <option value = "team14">team14</option>  
                     <option value = "team10">team10</option>  
                 </select> <br/>
+                <button onClick={Show_AuthorList} >Get</button> <br/>
         <input 
                         onChange={e => setRemid(e.target.value)} 
                         value={remid} 

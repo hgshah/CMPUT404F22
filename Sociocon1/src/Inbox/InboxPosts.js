@@ -20,6 +20,7 @@ import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
 import EditPost from '../Homepage/EditPost';
+import { Card } from 'antd';
 function InboxPosts({displayName, title, description, text, image, avatar, visibility,contenttype, purl, commenturl, post_authorid}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
@@ -364,9 +365,18 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                 <div className = "post_headerdis">
                     
                     {/* <p>{text}</p> */}
-                    {title} <br></br>
-                    {description}
-                    {purl}
+                    <table>
+                        
+                            
+                       
+                          Title:{title} <br></br>
+                          Description:{description} <br></br> 
+                       
+                        
+
+                           Post URL:{purl}
+                     </table>
+                    
                     <img width = "300px"  src = {image} /> 
 
 
@@ -381,7 +391,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                         
                         
                     </span>
-
+                            
                     </form>
                     <div className='post_comments'>
                         <p> <Comment pcurl = {commenturl}/> </p> 
