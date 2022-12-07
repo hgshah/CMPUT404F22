@@ -157,7 +157,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
     const Share_Post = async () => {
         
         let formField_share = new FormData()
-        formField_share.append("object",purl)
+        formField_share.append("object",commenturl)
         console.log(purl)
         await axios({
                 method:'put',
@@ -165,7 +165,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                 headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl + '/share',
-                data: {"object": purl}
+                data: {"object": commenturl}
 
         }).then((response) =>{
             console.log(response.data)
