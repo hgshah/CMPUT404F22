@@ -230,7 +230,7 @@ export default function Info() {
     useEffect(() => {
 
         async function getGitactivity() {
-            await axios.get('https://api.github.com/repos/' + disName + '/cmput404-project/commits' , {
+            await axios.get('https://api.github.com/users/' + disName  , {
                 
             }).then((response) => {
                 // console.log(response.data.github)
