@@ -20,6 +20,7 @@ import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
 import EditPost from '../Homepage/EditPost';
+import { Card } from 'antd';
 function InboxPosts({displayName, title, description, text, image, avatar, visibility,contenttype, purl, commenturl, post_authorid}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
@@ -158,18 +159,18 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
         
         let formField_share = new FormData()
         formField_share.append("object",commenturl)
-        console.log(purl)
+       
         await axios({
                 method:'put',
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: commenturl + '/share',
-                data: {"object": commenturl}
+                data: {"object": {commenturl}}
 
         }).then((response) =>{
             console.log(response.data)
-            console.log(purl)
+            
             
         })
     }
@@ -364,9 +365,18 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                 <div className = "post_headerdis">
                     
                     {/* <p>{text}</p> */}
-                    {title} <br></br>
-                    {description}
-                    {purl}
+                    <table>
+                        
+                            
+                       
+                          Title:{title} <br></br>
+                          Description:{description} <br></br> 
+                       
+                        
+
+                           Post URL:{purl}
+                     </table>
+                    
                     <img width = "300px"  src = {image} /> 
 
 
@@ -381,7 +391,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                         
                         
                     </span>
-
+                            
                     </form>
                     <div className='post_comments'>
                         <p> <Comment pcurl = {commenturl}/> </p> 
