@@ -31,6 +31,10 @@ class LikeView(GenericViewSet):
     '''
         Response will be a list of authors!! 
     '''
+    
+    def get_queryset(self):
+        return None
+
 
     @extend_schema(
         responses=AuthorSerializer,

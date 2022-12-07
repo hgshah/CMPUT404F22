@@ -20,6 +20,7 @@ import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
 import EditPost from '../Homepage/EditPost';
+import { Card } from 'antd';
 function InboxPosts({displayName, title, description, text, image, avatar, visibility,contenttype, purl, commenturl, post_authorid}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
@@ -37,6 +38,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
     const [likeactive, setPostLikeactive] = useState(false);
     const [comments, setComments] = useState([])
     const [likes, setLikes] = useState([])
+    const rempostid = localStorage.getItem("rempostid")
     //const[p_post, setPost] = useState([]); 
     // link : https://www.youtube.com/watch?v=a8KruvMkEtY
     // author: https://www.youtube.com/@ahmedelgammudi
@@ -49,39 +51,38 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
         let formField = new FormData()
         formField.append("comment", comment)
         formField.append("contentType", "text/plain")
-        console.log(formField)
+            console.log(commenturl+'/comments')
         await axios({
             method: 'post',
             withCredentials: true ,
             headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
             url: commenturl + '/comments' ,
-            data: formField
+            data: {"comment": comment, "contentType":"text/plain"}
         }).then((response) =>{
-            console.log(response.data)
-            
+            console.log(response.data)            
         })
     }
 
-    const UpdatePost = async () => {
-        let formField = new FormData()
-        formField.append("title", updatetitle)
-        formField.append("description", updatebody)
-        await axios({
-            method: 'post',
-            withCredentials: true ,
-            headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
-            // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+    // const UpdatePost = async () => {
+    //     let formField = new FormData()
+    //     formField.append("title", updatetitle)
+    //     formField.append("description", updatebody)
+    //     await axios({
+    //         method: 'post',
+    //         withCredentials: true ,
+    //         headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+    //         // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
+    //         // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
+    //         // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
             
-            url: purl + '/',
+    //         url: purl + '/',
 
-            data: formField
-        }).then((response) =>{
-            console.log(response.data)
+    //         data: formField
+    //     }).then((response) =>{
+    //         console.log(response.data)
             
-        })
-    }
+    //     })
+    // }
     
    
     const navigate = useNavigate()
@@ -157,59 +158,84 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
     const Share_Post = async () => {
         
         let formField_share = new FormData()
-        formField_share.append("object",purl)
+        formField_share.append("object",commenturl)
+       
         await axios({
                 method:'put',
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: purl + '/share',
-                data: formField_share
-            
+                url: commenturl + '/share',
+                data: {"object": {commenturl}}
+
         }).then((response) =>{
             console.log(response.data)
-            console.log(purl)
+            
             
         })
     }
 
-    const Show_Comments = async () => {
+    // const Show_Comments = async () => {
         
-        await axios({
-                method: "get",
-                withCredentials: true ,
-                headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
-                url: purl + '/comments' ,
+    //     await axios({
+    //             method: "get",
+    //             withCredentials: true ,
+    //             headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+    //             url: purl + '/comments' ,
             
-        }).then((response) =>{
-           const newcom = []
+    //     }).then((response) =>{
+    //        const newcom = []
             
-            newcom.push({...response.data.items[0].comment})
-            const updatecom = Object.values(newcom[0]).join('')
-            setComments(updatecom)
+    //         newcom.push({...response.data.items[0].comment})
+    //         const updatecom = Object.values(newcom[0]).join('')
+    //         setComments(updatecom)
 
 
-        })
-    }
+    //     })
+    // }
     const Show_Likes = async () => {
+        if (visibility==="friends"){
+            console.log(commenturl+ '/likes')
+            await axios({
+                    method: "get",
+                    withCredentials: true ,
+                    headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+                    url: purl + '/likes' ,
+                
+            }).then((response) =>{
+                
+                setLikes(response.data.length)
+            //    const newlike = []
+                
+            //     newlike.push({...response.data.items[0].comment})
+            //     const updatecom = Object.values(newcom[0]).join('')
+            //     setComments(updatecom)
+    
+    
+            })
+        }
+        else {
+            console.log(commenturl+ '/likes')
+            await axios({
+                    method: "get",
+                    withCredentials: true ,
+                    headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
+                    url: commenturl + '/likes' ,
+                
+            }).then((response) =>{
+                
+                setLikes(response.data.length)
+            //    const newlike = []
+                
+            //     newlike.push({...response.data.items[0].comment})
+            //     const updatecom = Object.values(newcom[0]).join('')
+            //     setComments(updatecom)
+    
+    
+            })
+        }
         
-        await axios({
-                method: "get",
-                withCredentials: true ,
-                headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
-                url: purl + '/likes' ,
-            
-        }).then((response) =>{
-            
-            setLikes(response.data.length)
-        //    const newlike = []
-            
-        //     newlike.push({...response.data.items[0].comment})
-        //     const updatecom = Object.values(newcom[0]).join('')
-        //     setComments(updatecom)
-
-
-        })
+        
     }
 
     useEffect(() => {
@@ -235,14 +261,15 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
 
         let formField12 = new FormData()
         formField12.append("type","like")
-        formField12.append("object",purl)
+        formField12.append("object",commenturl)
+        console.log(authorid)
         await axios({
                 method:'post',
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/inbox',
-                data: formField12
+                url: 'https://socioecon.herokuapp.com/authors/' + rempostid + '/inbox', // remid
+                data: {"type": "like", "object": commenturl}
             
         }).then((response) =>{
             console.log(response.data)
@@ -338,9 +365,18 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                 <div className = "post_headerdis">
                     
                     {/* <p>{text}</p> */}
-                    {title} <br></br>
-                    {description}
-                    {purl}
+                    <table>
+                        
+                            
+                       
+                          Title:{title} <br></br>
+                          Description:{description} <br></br> 
+                       
+                        
+
+                           Post URL:{purl}
+                     </table>
+                    
                     <img width = "300px"  src = {image} /> 
 
 
@@ -355,7 +391,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                         
                         
                     </span>
-
+                            
                     </form>
                     <div className='post_comments'>
                         <p> <Comment pcurl = {commenturl}/> </p> 

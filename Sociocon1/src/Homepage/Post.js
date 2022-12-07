@@ -159,16 +159,19 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     }
 
     const Share_Post = async () => {
+
         
+
         let formField_share = new FormData()
         formField_share.append("object",purl)
+        
         await axios({
                 method:'put',
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl + '/share',
-                data: formField_share
+                data: {"object": purl}
             
         }).then((response) =>{
             console.log(response.data)
