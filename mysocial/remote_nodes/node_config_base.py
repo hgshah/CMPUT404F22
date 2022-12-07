@@ -267,7 +267,6 @@ class NodeConfigBase:
                 print(response.text)
                 return None, Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            print(f'{self}: {response.text} TODO REMOVE LATER')  # todo: remove later
             return json.loads(response.text), Response(json.loads(response.text), status = status.HTTP_200_OK)
         except Exception as e:
             print(f'{self}: get_post_by_id: @url: {url}: error: {e}')

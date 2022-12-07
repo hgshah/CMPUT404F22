@@ -432,7 +432,7 @@ class SharePostView(GenericAPIView):
                         if response.status_code < 200 or response.status_code > 300:
                             return Response(json.loads(response.content), status = status.HTTP_500_INTERNAL_SERVER_ERROR)
                     except Exception as e:
-                        print(f'{self}: put: error with remote authors: {e}')
+                        print(f'{self}: put: error with remote authors (author: {follower}): {e} from node: {follower.host}')
 
             return Response("Successfully added to all followers inbox", status = status.HTTP_200_OK)
 
