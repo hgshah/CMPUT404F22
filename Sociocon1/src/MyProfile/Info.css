@@ -3,12 +3,16 @@
     border-right: 1px solid var(--home-background);
     min-width: fit-content;
     overflow-y:scroll;
+    border-radius: 2rem; 
+    /* background-color: rgba(15, 202, 71, 0.238); */
+    /* margin-right: 15px; */
 }
 
 .profileHeader {
     position: sticky;
     text-align: center;
     border: 5px solid lavender;
+    border-radius: 2rem;
 }
 
 /* h1 {
@@ -26,6 +30,7 @@
 .display_socials {
     text-align: center;
     width: 100%;
+    border-radius: 2rem;
 }
 
 .showUsername {
@@ -71,7 +76,9 @@ body.active-modal {
     padding: 14px 28px;
     border-radius: 3px;
     max-width: 600px;
-    min-width: 300px;
+    min-width: 400px;
+    min-height: 250px;
+    margin-top: 20%;
 }
 
 .user_github {
@@ -84,8 +91,34 @@ body.active-modal {
 .profileHeader .delete_pp {
     background-color: rgb(255, 0, 0);
     color: black;
+    font-weight: bold;
 }
 
 .profileHeader .delete_pp:hover {
     background-color: rgba(255, 0, 0, 0.346);
 }
+
+.close_modal {
+    background-color: white;
+    color: red;
+    position: absolute;
+    top: 15px;
+    right: 16px;
+    font-size: 35px;
+}
+
+.submit {
+    background-color: white;
+    color: green;
+    position: absolute;
+    right: 30px;
+    bottom: 130px;
+    font-size: 35px;
+}
+
+.input_size {
+    margin-top: 18%;
+    font-size: x-large;
+    margin-right: 50%;
+}
+

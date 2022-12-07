@@ -131,8 +131,10 @@ function Post({displayName, title, description, text, image, avatar, visibility,
 
     const follow_clicked = async() => {
         if (followButtonText == "Follow") {
+            //send the request
             newFollowButtonText("Following");
         } else {
+            //unsend the reqeust when following is click
             newFollowButtonText("Follow")
         }
 

@@ -47,7 +47,7 @@ export default function ActivityTab() {
                               
                                 <p>
                                   
-                                  <InboxPosts purl = {iposts.url} commenturl = { "https://socioecon.herokuapp.com/authors/" + authorid + "/posts/" + iposts.id} title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content}  visibility = {iposts.visibility}/>
+                                  <InboxPosts purl = {iposts.url} commenturl = { "https://socioecon.herokuapp.com/authors/" + authorid + "/posts/" + iposts.id} title = {iposts.title} description = {iposts.description} displayName = {iposts.author.displayName}  image = {iposts.content} avatar = {iposts.author.profileImage} visibility = {iposts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     
