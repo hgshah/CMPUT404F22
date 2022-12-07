@@ -1,3 +1,13 @@
 .news{
     flex:0.3;
+    border-radius: 2rem;
+    background-color: rgba(159, 241, 81, 0.582);
+}
+
+.news_header {
+    margin: 20px;
+}
+
+.news_outer {
+    margin: 20px;
 }

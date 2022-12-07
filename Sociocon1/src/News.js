@@ -3,7 +3,8 @@ import "./News.css";
 function News() {
   return (
     <div className='news'>
-      <h2> News</h2>
+      <div className='news_outer'>
+      <h2 className='news_header'> News</h2>
       <h4> Check the weather updates</h4>
       
       <img width = "300px" src = "https://media4.giphy.com/media/YtWAe6foXLTvLRD7TN/giphy.gif?cid=ecf05e47xnt2xhr84pndkckk3a9appmnoori4lf4i0gesgcp&rid=giphy.gif&ct=g"/>
@@ -16,7 +17,7 @@ function News() {
        Happy?  <input type = 'radio' value='happy'></input> <br></br>
        tired?  <input type = 'radio' value='tired'></input>
 
-      
+      </div>
     </div>
   )
 }

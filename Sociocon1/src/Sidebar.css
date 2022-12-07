@@ -1,20 +1,23 @@
 .sidebar {
     border-right: 1px solid var(--home-background);
     flex: 0.2;
-    margin-top: 20px;
+    /* margin-top: 20px; */
     padding-left: 20px;
     padding-right: 20px;
     width: 150px;
+    /* background-color: rgba(60, 219, 237, 0.332); */
+    background-color: rgba(159, 241, 81, 0.582);
     /* background-color: black; */
+    border-radius: 2rem;
    
 }
 
-.sidebar:hover{
+/* .sidebar:hover{
     background-color: white;
     border-radius: 30px;
     color: var(--home-color);
     transition: color 100ms ease-out;
-}
+} */
 
 .sidebar_post{
     background-color: var(--home-color) !important;
