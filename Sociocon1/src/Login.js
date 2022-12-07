@@ -184,13 +184,13 @@ function Login() {
           <Card>
             <div>
               <label>Username </label>
-              <input type="text" name="uname" required /> <br/> <br/>
-              {renderErrorMessage("uname")}
+              <input type="text" name="uname" required /> 
+              {renderErrorMessage("uname")} <br></br>
             </div>
             <div>
               <label>Password </label>
               <input type="password" name="pass" required /> <br/> 
-              {renderErrorMessage("pass")}
+              {renderErrorMessage("pass")}  <br></br>
             </div>
            
             
