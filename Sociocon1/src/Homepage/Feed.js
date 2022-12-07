@@ -15,6 +15,7 @@ import Test from '../Test';
 import Profile from "../MyProfile/Profile";
 import Login from '../Login';
 import ReactDom from 'react-dom'
+import { Card } from 'antd';
 import ReactMarkdown from 'react-markdown'
 import Home from './Home'
 import {useNavigate, useParams} from 'react-router-dom'
@@ -104,10 +105,10 @@ function Feed({}) {
       {
                         p_post.map((posts) => {
                             return (
-                              
+                                
                                 <h2 >
                                   
-                                   <Post post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = {posts.content} avatar = {posts.author.profileImage} visibility = {posts.visibility}/>
+                                   <Post published = {posts.published} post_authorid = {posts.author.id} purl = {posts.url} title = {posts.title} description = {posts.description} displayName = {posts.author.preferredName}  image = {posts.content} avatar = {posts.author.profileImage} visibility = {posts.visibility}/>
                                     {/* {posts.title} <br></br>
                                     {posts.description} */}
                                     

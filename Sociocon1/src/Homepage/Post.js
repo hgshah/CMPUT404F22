@@ -22,7 +22,7 @@ import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
 import EditPost from './EditPost';
-function Post({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid, comm}) {
+function Post({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid, comm, published}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
@@ -240,10 +240,15 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     <div className='post'>
         <div className = "post_avatar">
             <Avatar src = {avatar}/>
+            
         </div>
         <div className='post_body'>
+            <h5>
+                  {published}
+            </h5>
+           
             <div className='post_header'>
-               
+            
             <React.Fragment>
                     {
                         showForm ? (
