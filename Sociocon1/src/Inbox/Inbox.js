@@ -55,7 +55,7 @@ export default function Inbox() {
             <ul className="choose">
                 <TabDesc id="activity" title="Activity" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
                 <TabDesc id="requests" title="Friend Requests" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
-                <TabDesc id="messages" title="Messages" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
+                <TabDesc id="authorlist" title="AuthorList" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
                 <TabDesc id="remposts" title="RemPosts" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
                 {/* <li className={currentTab === "activity" ? "current" : ""}
                 onClick={handleActivityTab}>Activity</li>
@@ -73,7 +73,7 @@ export default function Inbox() {
                 <Tabs id="requests" currentTab={currentTab}>
                     <FriendRequestsTab />
                 </Tabs>
-                <Tabs id="messages" currentTab={currentTab}>
+                <Tabs id="authorlist" currentTab={currentTab}>
                     <MessagesTab />
                 </Tabs>
                 <Tabs id="remposts" currentTab={currentTab}>
