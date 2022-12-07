@@ -57,3 +57,24 @@
 .accepted_list {
     margin-bottom: 5%;
 }
+
+.rf_btn .unbefriend_btn {
+    background-color: red;
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+    text-transform: capitalize;
+}
+
+.rf_btn .unbefriend_btn:hover {
+    background-color: rgba(211, 211, 211, 0.616);
+}
+
+.rf_btn {
+    float: right;
+    margin-right: 1%;
+}
+
+.rf_list {
+    margin-bottom: 5%;
+}
