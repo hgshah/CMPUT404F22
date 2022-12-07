@@ -402,12 +402,16 @@ class SharePostView(GenericAPIView):
                     return Response(f"Error getting post id: {kwargs['post_id']}", status.HTTP_400_BAD_REQUEST)
             #local getting a remote post
             else:
-                node_config = base.REMOTE_CONFIG.get(target_author.host)
-                response = node_config.get_post_by_post_id(request.path.split('/share')[0])
-                if response.status_code < 200 or response.status_code > 300:
+                try:
+                    node_config = base.REMOTE_CONFIG.get(target_author.host)
+                    response = node_config.get_post_by_post_id(request.path.split('/share')[0])
+                    if response.status_code < 200 or response.status_code > 300:
+                        return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    post = json.loads(response.content)
+                except Exception as e:
+                    print(f'{self}: put: error getting remote post: {e}')
                     return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-                post = json.loads(response.content)
+
 
             requesting_author = Author.get_author(self.request.user.get_id())
             followers = FollowUtil.get_followers(requesting_author)
@@ -420,10 +424,13 @@ class SharePostView(GenericAPIView):
                     inbox = Inbox.objects.get(author = follower)
                     inbox.add_to_inbox(post)
                 else:
-                    node_config = base.REMOTE_CONFIG.get(follower.host)
-                    response = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = post)
-                    if response.status_code < 200 or response.status_code > 300:  
-                        return Response(json.loads(response.content), status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    try:
+                        node_config = base.REMOTE_CONFIG.get(follower.host)
+                        response = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = post)
+                        if response.status_code < 200 or response.status_code > 300:
+                            return Response(json.loads(response.content), status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    except Exception as e:
+                        print(f'{self}: put: error with remote authors: {e}')
 
             return Response("Successfully added to all followers inbox", status = status.HTTP_200_OK)
 
