@@ -8,6 +8,7 @@ import { Avatar, Button, getAccordionDetailsUtilityClass, TextField} from '@mui/
 import Post from './Homepage/Post';
 import Feed from './Homepage/Feed';
 import Home from './Homepage/Home'
+import { Card } from 'antd';
 import Postbox from './Homepage/Postbox';
 import { Construction, DataSaverOffTwoTone, LocalConvenienceStoreOutlined, ReceiptLongOutlined } from '@mui/icons-material';
 // link: https://contactmentor.com/login-form-react-js-code/
@@ -170,20 +171,35 @@ function Login() {
   };
 
 
-
+  const renderErrorMessage = (name) =>
+  name === errorMessages.name && (
+    <div className="error">{errorMessages.message}</div>
+  );
 
   return (
     <div className="form">
+      <h2> LOGIN </h2> 
       <form >
         <div className="input-container">
-          <label>Username </label>
-          <input type="text" name="uname" required />
+          <Card>
+            <div>
+              <label>Username </label>
+              <input type="text" name="uname" required />  <br/>
+              {renderErrorMessage("uname")} <br></br>
+            </div>
+            <div>
+              <label>Password </label>
+              <input type="password" name="pass" required /> <br/> 
+              {renderErrorMessage("pass")}  <br></br>
+            </div>
+           
+          </Card>
           
         </div>
         <div className="input-container">
-            <label>Password </label>
-            <input type="password" name="pass" required />
-            <button onClick = {handleSubmit} > Submit </button>
+          <Button style={{ backgroundColor: "white" }} onClick = {handleSubmit} > Submit </Button>
+              
+            
             {isSubmitted}
             
                 {

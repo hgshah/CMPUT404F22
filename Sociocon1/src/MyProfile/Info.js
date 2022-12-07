@@ -230,7 +230,7 @@ export default function Info() {
     useEffect(() => {
 
         async function getGitactivity() {
-            await axios.get('https://api.github.com/repos/' + disName + '/cmput404-project/commits' , {
+            await axios.get('https://api.github.com/users/' + disName  , {
                 
             }).then((response) => {
                 // console.log(response.data.github)
@@ -253,7 +253,8 @@ export default function Info() {
         <div className='info'>
 
             <div className='profileHeader'>
-                <h1>Profile</h1>
+                <br></br>
+                <h1>My Profile</h1>
                 <br></br>
                 <img className='profilePicture' src={profilePic} alt=""/>
                 <br></br>
@@ -280,8 +281,8 @@ export default function Info() {
                     <div className='edit_content'>
                         <h2>Edit Display Name</h2>
                         <AiFillCloseSquare className='close_modal' onClick={() => toggleModal()}> </AiFillCloseSquare>
-                        <form>
-                            <input
+                        <form className='modal_form'>
+                            <input className='input_size'
                             type="text"
                             placeholder='Username'
                             onChange={(e) => setDisplayName(e.target.value)}>
@@ -298,8 +299,8 @@ export default function Info() {
                     <div className='edit_content'>
                         <h2>Edit Github</h2>
                         <AiFillCloseSquare className='close_modal' onClick={() => toggleGitModal()}> </AiFillCloseSquare>
-                        <form>
-                            <input
+                        <form className='modal_form'>
+                            <input className='input_size'
                             type="text"
                             placeholder='Github URL'
                             onChange={(e) => setUserGithub(e.target.value)}>

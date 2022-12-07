@@ -145,7 +145,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
             url: 'https://socioecon.herokuapp.com/authors/' + post_authorid + '/followers/',
             // data: formField_follow
         }).then((response) => {
-            console.log(response.data)
+            console.log("FOLLOW CLICKED: ", response.data)
             
         })
     }
@@ -261,7 +261,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
 
         let formField12 = new FormData()
         formField12.append("type","like")
-        formField12.append("object",commenturl)
+        formField12.append("object",purl)
         console.log(authorid)
         await axios({
                 method:'post',
@@ -269,7 +269,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                 headers: {'Content-Type': 'application/json' , "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: 'https://socioecon.herokuapp.com/authors/' + rempostid + '/inbox', // remid
-                data: {"type": "like", "object": commenturl}
+                data: {"type": "like", "object": purl}
             
         }).then((response) =>{
             console.log(response.data)
