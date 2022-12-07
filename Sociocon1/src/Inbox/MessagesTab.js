@@ -16,6 +16,7 @@ export default function MessagesTab() {
   const [rempost, setRempost] = useState([])
   const authorid = localStorage.getItem("authorid")
   const token = localStorage.getItem("token")  
+  const [ teamname,setTeamname] = useState('')
   const Show_AuthorList = async () => {
         
     await axios({
@@ -28,11 +29,24 @@ export default function MessagesTab() {
       let array = []
       let array2 = []
       let ne = []
+      console.log(response.data)
       for(let i = 0; i<response.data.items.length; i++){
-       
-       array.push(response.data.items[i])
-       array2.push(response.data.items[i].id)
-       
+       if(teamname==="team10" && response.data.items[i].host ==="socioecon.herokuapp.com"){
+          array.push(response.data.items[i])
+          array2.push(response.data.items[i].id)
+       }
+       else if (teamname==="team14" && response.data.items[i].host ==="social-distribution-14degrees.herokuapp.com"){
+          array.push(response.data.items[i])
+          array2.push(response.data.items[i].id)
+       }
+       else if(teamname==="team7" && response.data.items[i].host ==="cmput404-social.herokuapp.com") {
+          array.push(response.data.items[i])
+          array2.push(response.data.items[i].id)
+       }
+       else if(teamname==="team12" && response.data.items[i].host ==="true-friends-404.herokuapp.com") {
+        array.push(response.data.items[i])
+        array2.push(response.data.items[i].id)
+     }
        
       }
       
@@ -81,7 +95,15 @@ function handle() {
   return (
     <div className='MessagesTab'>
      
-        <button onClick={Show_AuthorList} >Get</button>
+        
+        <select value={teamname} onChange={e => setTeamname(e.target.value)} name="teamname" id="teamname">
+                    <option  value="" >choose contentType--</option>
+                    <option  value="team7">team7</option>
+                    <option value = "team12">team12</option>
+                    <option value = "team14">team14</option>  
+                    <option value = "team10">team10</option>  
+                </select> <br/>
+                <button onClick={Show_AuthorList} >Get</button> <br/>
         <input 
                         onChange={e => setRemid(e.target.value)} 
                         value={remid} 

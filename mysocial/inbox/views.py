@@ -227,8 +227,6 @@ class InboxView(GenericAPIView):
 
         # step two
         like_data = Like(author = json_author, author_id = requesting_author_id, object = request.data.get('object'), object_type = LikeType.POST) 
-        if like_data is None:
-            return Response(f"Could not create Like object. Maybe you tried to like something twice", status = status.HTTP_400_BAD_REQUEST)
 
         # step 2.A
         like_data = LikeSerializer(like_data).data
@@ -245,6 +243,8 @@ class InboxView(GenericAPIView):
             return Response(f"Failed to like a post: {target_author.display_name}", status = status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         like_data = self.create_like(request, json_author = json_author, requesting_author_id = str(requesting_author_id))
+        if like_data is None:
+            return Response(f"Could not create Like object. Maybe you tried to like something twice", status = status.HTTP_400_BAD_REQUEST)
         return response
     
     def local_likes_local(self, request, target_author):
