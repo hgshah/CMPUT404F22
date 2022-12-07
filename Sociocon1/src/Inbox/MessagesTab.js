@@ -5,7 +5,7 @@ import axios from 'axios'
 import RPost from './RPost';
 import { render } from '@testing-library/react';
 import  ReactDOM from 'react-dom';
-import { Alert, TextField } from '@mui/material';
+import { Alert, TextField, Button } from '@mui/material';
 import { lightGreen } from '@mui/material/colors';
 import { Card } from 'antd';
 export default function MessagesTab() {
@@ -101,13 +101,13 @@ function handle() {
      
         
         <select value={teamname} onChange={e => setTeamname(e.target.value)} name="teamname" id="teamname">
-                    <option  value="" >choose contentType--</option>
+                    <option  value="" >choose team</option>
                     <option  value="team7">team7</option>
                     <option value = "team12">team12</option>
                     <option value = "team14">team14</option>  
                     <option value = "team10">team10</option>  
                 </select> <br/>
-                <button onClick={Show_AuthorList} >Get</button> <br/>
+                <Button onClick={Show_AuthorList} >Get </Button> <br/>
         <input 
                         onChange={e => setRemid(e.target.value)} 
                         value={remid} 
@@ -115,7 +115,7 @@ function handle() {
                         type = "text"
                         name = "rempost"
                 />
-                <button onClick = {localStorage.setItem("rempostid", remid)}> Search</button>
+                <Button onClick = {localStorage.setItem("rempostid", remid)}> Search </Button>
         
         
         {
