@@ -1,8 +1,9 @@
 .feed{
-    flex: 0.5;
+    flex: 0.8;
     border-right: 1px solid var(--home-background);
     min-width: fit-content;
     overflow-y:scroll;
+    border-radius: 2rem;
 }
 
 .feed::-webkit-scrollbar{

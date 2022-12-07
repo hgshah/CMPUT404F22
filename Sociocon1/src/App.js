@@ -7,11 +7,26 @@ import News from './News';
 import Login from './Login';
 import Profile from './MyProfile/Profile';
 import Inbox from './Inbox/Inbox';
+import {Button} from '@mui/material';
+import useLocalStorage from 'use-local-storage';
+
 function App() {
+  // const defaultDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // const [theme, setTheme] = useLocalStorage('theme', defaultDark ? 'dark' : 'light');
+
+  // const switchTheme = () => {
+  //   const newTheme = theme === 'light' ? 'dark' : 'light'
+  //   setTheme(newTheme)
+  // }
+
   return (
     // bem
     <Router>
+      {/* <div className="app" data-theme={theme}> */}
         <div className="app">
+          {/* <Button onClick={switchTheme}>
+            Switch to {theme === 'light' ? 'Dark' : 'Light'} Theme
+          </Button> */}
         {/* link: https://www.youtube.com/watch?v=Ul3y1LXxzdU
             author: https://www.youtube.com/c/WebDevSimplified 
             License: https://creativecommons.org/choose/ */}

@@ -25,6 +25,7 @@ import RemPosts from "./RemPosts"
 export default function Inbox() {
     //initial selected tab will be activity
     const [currentTab, setCurrentTab] = useState("requests");
+    const preferredName = localStorage.getItem("preferredName")
     
     // Handle when user changes tabs
     function handleActivityTab() {
@@ -49,6 +50,7 @@ export default function Inbox() {
             
             <div className="InboxHeader">
                 <h1>Inbox</h1>
+                <h3>User: {preferredName}</h3>
             </div>
             <ul className="choose">
                 <TabDesc id="activity" title="Activity" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
