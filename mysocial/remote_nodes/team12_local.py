@@ -325,23 +325,23 @@ class Team12Local(LocalDefault):
         else:
             return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
 
-    def get_post_by_post_id(self, post_url):
+    def get_post_by_post_id(self, post_url) -> (dict, Response):
         url = f'{self.get_base_url()}{post_url}'
 
         try:
             response = requests.get(url, headers=self.get_headers())
 
             if response.status_code < 200 or response.status_code > 300:
-                return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return None, Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         except Exception as e:
-            return Response(f"Failed to get post from remote server, error: {e}",
+            return None, Response(f"Failed to get post from remote server, error: {e}",
                             status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         post_data = json.loads(response.content.decode('utf-8'))
 
         post = self.convert_team12_post(url, post_data)
-        return Response(post, status=status.HTTP_200_OK)
+        return post, Response(post, status=status.HTTP_200_OK)
 
     def get_comments_for_post(self, comments_path, author = None, request = None):
         split_comments = comments_path.split('posts')

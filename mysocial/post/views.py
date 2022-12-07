@@ -75,7 +75,8 @@ class PostView(GenericAPIView):
             # local -> remote
             else:
                 node_config = base.REMOTE_CONFIG.get(target_author.host) 
-                return node_config.get_post_by_post_id(request.path)
+                _, response = node_config.get_post_by_post_id(request.path)
+                return response
 
         # remote -> local
         if request.user.is_authenticated_node:
@@ -404,14 +405,13 @@ class SharePostView(GenericAPIView):
             else:
                 try:
                     node_config = base.REMOTE_CONFIG.get(target_author.host)
-                    response = node_config.get_post_by_post_id(request.path.split('/share')[0])
+                    post, response = node_config.get_post_by_post_id(request.path.split('/share')[0])
                     if response.status_code < 200 or response.status_code > 300:
                         return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                    post = json.loads(response.content)
                 except Exception as e:
                     print(f'{self}: put: error getting remote post: error: {e}')
                     post_id = request.path.split('/share')[0]
-                    print(f'{self}: put: error getting remote post: remote post: {post_id}')
+                    print(f'{self}: put: error getting remote post: remote post: {post_id} @ node: {node_config}')
                     return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

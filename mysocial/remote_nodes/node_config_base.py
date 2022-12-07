@@ -257,19 +257,19 @@ class NodeConfigBase:
         url = f'{target_author_url}/liked'
         return requests.get(url = url, auth = (self.username, self.password))
 
-    def get_post_by_post_id(self, post_url):
+    def get_post_by_post_id(self, post_url) -> (dict, Response):
         try:
             url = f'{self.get_base_url()}{post_url}'
             response =  requests.get(url = url, auth = (self.username, self.password))
 
             if response.status_code < 200 or response.status_code > 300:
                 print(response.text)
-                return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return None, Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            return Response(json.loads(response.content), status = status.HTTP_200_OK)
+            return json.loads(response.content), Response(json.loads(response.content), status = status.HTTP_200_OK)
         except Exception as e:
             print(f'{self}: get_post_by_id: error: {e}')
-            return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return None, Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_authors_posts(self, request, author_posts_path):
         url = f'{self.get_base_url()}{author_posts_path}'
