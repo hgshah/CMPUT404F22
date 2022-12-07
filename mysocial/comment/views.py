@@ -148,18 +148,21 @@ class CommentView(GenericAPIView):
                 # get the post id,kwargs
                 # get the original author id kwargs
                 # get the author url, post_author
-                post = {
-                    "post": {
+                try:
+                    post = {
                         "post": {
-                        "id": str(kwargs['post_id']),
-                        "author" : {
-                            "id": str(kwargs['author_id']),
-                            "url": post_author.get_url()
-                        }
-                        }
-                    },
-                    "displayName": post_author.display_name
-                }
+                            "post": {
+                            "id": str(kwargs['post_id']),
+                            "author" : {
+                                "id": str(kwargs['author_id']),
+                                "url": post_author.get_url()
+                            }
+                            }
+                        },
+                        "displayName": post_author.display_name
+                    }
+                except Exception as e:
+                    return Response(f'Cannot form extra data {e}', status = status.HTTP_400_BAD_REQUEST)
 
                 return node_config.create_comment_on_post(request.get_full_path(), data = data, extra_data = post)
 
