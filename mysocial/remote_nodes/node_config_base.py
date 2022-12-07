@@ -258,6 +258,7 @@ class NodeConfigBase:
         return requests.get(url = url, auth = (self.username, self.password))
 
     def get_post_by_post_id(self, post_url) -> (dict, Response):
+        url = post_url  # for debugging
         try:
             url = f'{self.get_base_url()}{post_url}'
             response =  requests.get(url = url, auth = (self.username, self.password))
@@ -266,9 +267,10 @@ class NodeConfigBase:
                 print(response.text)
                 return None, Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            return json.loads(response.content), Response(json.loads(response.content), status = status.HTTP_200_OK)
+            print(f'{self}: {response.text} TODO REMOVE LATER')  # todo: remove later
+            return json.loads(response.text), Response(json.loads(response.text), status = status.HTTP_200_OK)
         except Exception as e:
-            print(f'{self}: get_post_by_id: error: {e}')
+            print(f'{self}: get_post_by_id: @url: {url}: error: {e}')
             return None, Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_authors_posts(self, request, author_posts_path):
