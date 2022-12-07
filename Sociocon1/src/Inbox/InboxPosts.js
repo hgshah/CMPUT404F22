@@ -164,7 +164,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
-                url: purl + '/share',
+                url: commenturl + '/share',
                 data: {"object": commenturl}
 
         }).then((response) =>{
