@@ -61,6 +61,7 @@ class TestRequestView(BaseTestFollowerView):
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
+    @skip
     def test_put_forbidden_follower(self):
         # special case: followers cannot accept their own pending request
         self.client.logout()

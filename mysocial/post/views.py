@@ -409,7 +409,9 @@ class SharePostView(GenericAPIView):
                         return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
                     post = json.loads(response.content)
                 except Exception as e:
-                    print(f'{self}: put: error getting remote post: {e}')
+                    print(f'{self}: put: error getting remote post: error: {e}')
+                    post_id = request.path.split('/share')[0]
+                    print(f'{self}: put: error getting remote post: remote post: {post_id}')
                     return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
