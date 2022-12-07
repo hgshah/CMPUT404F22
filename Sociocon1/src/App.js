@@ -8,7 +8,6 @@ import Login from './Login';
 import Profile from './MyProfile/Profile';
 import Inbox from './Inbox/Inbox';
 import {Button} from '@mui/material';
-import useLocalStorage from 'use-local-storage';
 
 function App() {
   // const defaultDark = window.matchMedia('(prefers-color-scheme: dark)').matches;

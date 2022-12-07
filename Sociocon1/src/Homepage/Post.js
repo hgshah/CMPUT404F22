@@ -296,7 +296,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 
                 <div className='header_text'>
                 
-                    <h3>
+                    <h2>
                         {displayName} {" "} <span></span>
                         
                         
@@ -318,7 +318,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             name = "description"
                             /> */}
                         </span>
-                    </h3>
+                    </h2>
                     
                 </div>
                 <div className='visibility'>

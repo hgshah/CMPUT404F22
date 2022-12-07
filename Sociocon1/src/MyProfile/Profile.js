@@ -4,7 +4,6 @@ import Info from './Info'
 import News from '../News'
 import Postbox from '../Homepage/Postbox'
 import "./Profile.css"
-import useLocalStorage from 'use-local-storage';
 import {Button} from '@mui/material';
 //link :https://www.youtube.com/watch?v=ygV99J2Ehjs
 
