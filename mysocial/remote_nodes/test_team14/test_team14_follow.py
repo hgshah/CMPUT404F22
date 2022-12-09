@@ -39,8 +39,9 @@ class TestTeam14Follow(TestCase):
         self.remote_id = str(uuid.UUID('739252c2b11e4fe8bb96b57b939a8331'))
 
     def test_all(self):
-        self.follow_flow_happy_path()
-        self.check_if_follow()
+        # self.follow_flow_happy_path()
+        # self.check_if_follow()
+        self.delete()
 
     def follow_flow_happy_path(self):
         # local actor checks if they already requested remote target (404)
@@ -66,3 +67,7 @@ class TestTeam14Follow(TestCase):
         response = self.local.session.get(
             f'{self.local.base}/authors/{self.remote_id}/followers/{self.local.author_id}')
         self.assertEqual(response.status_code, 200)
+
+    def delete(self):
+        self.local.session.delete(
+            f'{self.local.base}/authors/{self.remote_id}/followers/{self.local.author_id}')
