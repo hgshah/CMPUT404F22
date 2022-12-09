@@ -254,6 +254,7 @@ function Postbox ({}) {
                             placeholder='Enter post body' 
                             type = "text"
                             name = "description"
+                            style={{height: "250px"}}
                             />
             </div>
             <div className='poxtbox_footer'>
