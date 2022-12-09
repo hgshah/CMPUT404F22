@@ -6,15 +6,15 @@ import axios from "axios";
 import { Navigate } from 'react-router-dom';
 import {useNavigate, useParams} from 'react-router-dom'
 import { CookieSharp } from '@mui/icons-material';
-
+import Info from '../MyProfile/Info';
 export default function FriendRequestsTab() {
   const [requests, setRequests] = useState([{}]);
   const [acceptedRequests, setAcceptedRequests] = useState([{}]);
-  const [followingBack, setFollowingBack] = useState(false);
-  const [accButtonText, setAccButtonText] = useState("Follow Back")
+  const [realFriends, setRealFriends] = useState([{}])
   const navigate = useNavigate();
   const authorid = localStorage.getItem("authorid")
   const token = localStorage.getItem("token")
+  const [notFolBack, setNotFolBack] = useState([{}]);
 
   //add to friends list, remove from requests
   const accept_clicked = async(id) => {
@@ -32,20 +32,16 @@ export default function FriendRequestsTab() {
       );
       setRequests(updatedRequests);
     })
-    // const updatedRequests = requests.filter(
-    //   (req) => req.id !== id
-    // );
-    // setRequests(updatedRequests);
     
   }
 
   //remove from requests
   const decline_clicked = async(id) => {
-    console.log("declined " + id)
+    // console.log("declined " + id)
     await axios.delete('https://socioecon.herokuapp.com/follows/'+ id + '/', {
       headers: {"Authorization": "Token " + token}
     }).then((response) => {
-      console.log(response.data)
+      // console.log(response.data)
     })
     const updatedRequests = requests.filter(
       (req) => req.id !== id
@@ -57,89 +53,125 @@ export default function FriendRequestsTab() {
     //if user is not yet following back
     // console.log("un be friend " + auth_id)
     // if(!followingBack) {
-    if (accButtonText === "Follow Back") {
-      await axios.post('https://socioecon.herokuapp.com/authors/' + auth_id + '/followers/', {
-      withCredentials:true}, 
+    // if (accButtonText === "Follow Back") {
+      await axios.post('https://socioecon.herokuapp.com/authors/' + auth_id + '/followers/', 
+      {withCredentials:true}, 
       {headers: {'Content-Type':'application/json', "Authorization": "Token " + token}}
       ).then((response) => {
-        console.log(followingBack)
-        setFollowingBack(!followingBack);
-        setAccButtonText("Un-Befriend")
-        console.log(followingBack)
-        console.log(response.data)
+        // console.log(followingBack)
+        // setFollowingBack(!followingBack);
+        // setAccButtonText("Un-Befriend")
+        // console.log(followingBack)
+        // console.log(response.data)
     })
-    //if user is already following back
-    } else {
-      //auth id = id of user that is losing the follower, the nnext id is of the user that is un be-friending
-      await axios.delete('https://socioecon.herokuapp.com/authors/'+ auth_id + '/followers/' + authorid, {
-        headers: {"Authorization": "Token " + token}
+  }
+
+  const unbefriendClicked = async(rf_id) => {
+    await axios.delete('https://socioecon.herokuapp.com/authors/'+ rf_id + '/followers/' + authorid, 
+    {headers: {"Authorization": "Token " + token}
       }).then((response) => {
-        console.log(followingBack)
-        setFollowingBack(!followingBack);
-        setAccButtonText('Follow Back')
-        console.log(followingBack)
+        // console.log(followingBack)
+        // setFollowingBack(!followingBack);
+        // setAccButtonText('Follow Back')
+        // console.log(followingBack)
         console.log(response.data)
+      }).catch((error) => {
+        console("ERROR followBackClicked else: ", error.data)
       })
-    }
   }
 
   //show all pending friend requests
   useEffect(() => {
     async function getAllRequests() {
       const arr = [];
-      await axios.get('https://socioecon.herokuapp.com/follows/incoming/', {
+      return await axios.get('https://socioecon.herokuapp.com/follows/incoming/', {
         headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
-      }).then((response) => {
-        for (let follow of response.data.items) {
-          arr.push(follow)
-          // console.log(response.data.items)
-          // console.log(follow)
-        }
-        setRequests(arr)
-        // console.log(setRequests)
-        // console.log(arr)
       })
+      // .then((response) => {
+      //   for (let follow of response.data.items) {
+      //     arr.push(follow)
+      //     // console.log(response.data.items)
+      //     // console.log("FOLLOW: ", follow)
+      //   }
+      //   setRequests(arr)
+      //   // console.log(setRequests)
+      //   // console.log(arr)
+      // })
     }
-    getAllRequests()
-  }, []) //check what goes here TOO MANY GET REQUESTS WITH requests, cant leave blank mininmum requests
+  // }, []) //check what goes here TOO MANY GET REQUESTS WITH requests, cant leave blank mininmum requests
 
-  useEffect(() => {
+  // useEffect(() => {
     // update button to show "Follow Back" or "Un befriend"
-    async function updateAcceptedBtns(follower_id) {
-      //logged in user is a follower of follower_id
-      await axios.get('https://socioecon.herokuapp.com/authors/' + follower_id + '/followers/' + authorid, {
-        //get real friends of authorid
+     //get real friends of authorid
       // await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/real-friends/', {
-        headers: {"Content-Type":"application/json", "Authorization": "Token " + token}
-      }).then((response) => {
-          setFollowingBack(!followingBack)
-          setAccButtonText("Un-Befriend")
-      })
-    }
+    // console.log("HERE")
 
     // show all accepted friend requests
     async function getAcceptedRequests() {
       const accepted = [];
-      await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/followers/', {
+      return await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/followers/', {
         headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
-      }).then((response) => {
-        for (var acc_follower of response.data.items) {
-          accepted.push(acc_follower);
-          // console.log(acc_follower.id)
-          // console.log(response.data.items)
-          updateAcceptedBtns(acc_follower.id);
-        }
-        setAcceptedRequests(accepted);
-        // updateAcceptedBtns(acc_follower.id);
       })
+      
+      // .then((response) => {
+      //   for (var acc_follower of response.data.items) {
+      //     accepted.push(acc_follower);
+      //     // console.log(acc_follower.id)
+      //     // console.log(response.data.items)
+      //     // updateAcceptedBtns(acc_follower.id);
+
+      //     // setFollowingBack(!followingBack)
+      //     // setAccButtonText("Follow Back")
+      //   }
+      //   setAcceptedRequests(accepted);
+      //   // updateAcceptedBtns(acc_follower.id);
+      // }).catch((error) => {
+      //   console("ERROR showing all accepted requests: ", error.data)
+      // })
     }
 
-    getAcceptedRequests();
-  }, []) //accepted requests but send too many get
+    async function getRealFriends() {
+      const rf_arr = []
+      return await axios.get('https://socioecon.herokuapp.com/authors/' + authorid + '/real-friends/', {
+        headers: {"Content-Type":"application/json", "Authorization": "Token " + token},
+      })
+      // .then((response) => {
+      //   for (var rf of response.data.items) {
+      //     rf_arr.push(rf)
+      //     // console.log("RF: ", rf.id)
+      //     // setFollowingBack(!followingBack)
+      //     // setAccButtonText("Un-Befriend")
+      //   }
+      //   setRealFriends(rf_arr)
+      // })
+    }
 
-  // useEffect(() => {
-  //   async function get
-  // })
+    const getNotFollowingBack = (ar, rf) => {
+      const result = [...ar]
+      // console.log("RESULT: ", result)
+      // console.log("RF: ", rf)
+      for (var notFBack in result) {
+        for (var realF in rf) {
+          if (result[notFBack].id === rf[realF].id) {
+            // console.log("In loop: ", notFBack.id)
+            console.log("SPLICE REMOVES: " ,result.splice(notFBack, 1))
+          }
+        }
+        // console.log("in no follow back: ", acceptedRequests)
+      }
+      // console.log("FINAL RESULT: ", result)
+      return result
+    }
+
+    Promise.all([getAllRequests(), getAcceptedRequests(), getRealFriends()]).then((values) => {
+      console.log("VALUES: ", values)
+      setRequests(values[0].data.items)
+      setAcceptedRequests(values[1].data.items)
+      setRealFriends(values[2].data.items)
+      setNotFolBack(getNotFollowingBack(values[1].data.items, values[2].data.items))
+    })
+
+  }, []) //accepted requests but send too many get
 
   return (
       <div className='FriendRequestsTab'>
@@ -148,7 +180,7 @@ export default function FriendRequestsTab() {
             <div key={req.summary}>
               {/* {console.log(req)} */}
               <p className='request_list'>
-                {req.summary}
+                <span className='follow_action'>{req.summary}</span>
                 <span className='request_btns'>
                   <Button className='accept_btn' onClick={() => accept_clicked(req.id)}>
                     Accept
@@ -161,18 +193,36 @@ export default function FriendRequestsTab() {
             </div>
           ))
           }
-          {acceptedRequests.map((acc) =>(
+          {notFolBack.map((acc) =>(
             <div key={acc.preferredName}>
-              {console.log(acc)}
+              {/* {console.log(acc)} */}
               <p className='accepted_list'>
-                {acc.preferredName} is following you
+                <span className='incoming_action'> {acc.preferredName}</span> is following you
                 <span className='accepted_btn'>
                   <Button 
                   className='follow_back_btn' 
                   onClick={() => followBackClicked(acc.id)}
-                  style={{backgroundColor: accButtonText === "Un-Befriend" ? "red" : "rgb(159, 185, 31)"}}>
+                  // style={{backgroundColor: accButtonText === "Un-Befriend" ? "red" : "rgb(159, 185, 31)"}}>
+                  >
                     {/* {followingBack ? "Un-Befriend" : "Follow Back"} */}
-                    {accButtonText}
+                    {/* {accButtonText} */}
+                    Follow Back
+                  </Button>
+                </span>
+              </p>
+            </div>
+          ))}
+
+          {realFriends.map((real) => (
+            <div key={real.preferredName}>
+              <p className='rf_list'>
+                <span className='incoming_action'> {real.preferredName} </span>is your real friend
+                <span className='rf_btn'>
+                  <Button
+                  className='unbefriend_btn'
+                  onClick={() => unbefriendClicked(real.id)}
+                  style={{backgroundColor: "red"}}>
+                    Un-Befriend
                   </Button>
                 </span>
               </p>

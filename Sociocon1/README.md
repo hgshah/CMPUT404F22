@@ -89,3 +89,21 @@ https://www.youtube.com/watch?v=HTSAJna3X8c
 link: https://contactmentor.com/login-form-react-js-code/
 https://bobbyhadz.com/blog/react-onclick-redirect
 https://www.youtube.com/watch?v=a8KruvMkEtY
+https://masteringjs.io/tutorials/axios/headers // header in .get
+https://docs.djangoproject.com/en/4.1/howto/static-files/#:~:text=How%20to%20manage%20static%20files%20%28e.g.%20images%2C%20JavaScript%2C,Testing%20...%205%20Deployment%20...%206%20Learn%20more // deployment of frontend to heroku 
+https://mui.com/material-ui/react-card/
+https://media4.giphy.com/media/YtWAe6foXLTvLRD7TN/giphy.gif?cid=ecf05e47xnt2xhr84pndkckk3a9appmnoori4lf4i0gesgcp&rid=giphy.gif&ct=g
+https://th.bing.com/th/id/R.c5f4201f6a464e5005217fdb1b06fb7e?rik=9bTsj8CpBmZIMw&pid=ImgRaw&r=0"
+https://www.youtube.com/watch?v=ygV99J2Ehjs
+https://www.youtube.com/watch?v=a8KruvMkEtY
+https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
+https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
+https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
+https://www.youtube.com/watch?v=xtQ74HKTOwY
+https://stackoverflow.com/questions/29108779/how-to-get-selected-value-of-a-dropdown-menu-in-reactjs
+https://www.youtube.com/watch?v=qmr9NCYjueM
+https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
+https://www.youtube.com/watch?v=xtQ74HKTOwY
+https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
+https://github.com/remarkjs/react-markdown 
+https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac

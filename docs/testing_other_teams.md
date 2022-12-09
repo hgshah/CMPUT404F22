@@ -4,6 +4,8 @@ This guide is for local setup.
 
 ## Team 14
 
+Repo: https://github.com/zarifmahfuz/project-socialdistribution
+
 ### Setup
 
 Follow their setup: https://github.com/zarifmahfuz/project-socialdistribution#setup
@@ -44,6 +46,8 @@ As a sanity check, try to connect to their endpoint as a node.
 
 ## Team 7
 
+Repo: https://github.com/irriss-nn/group-cmput404-project
+
 ### Setup
 
 1. First, you gotta install MongoDB: https://www.mongodb.com/try/download/community. Just choose all the default
@@ -78,3 +82,61 @@ To test their production server:
 ```curl
 curl -u team10:pot8os_are_tasty -H 'Origin: https://socioecon.herokuapp.com' https://cmput404-social.herokuapp.com/remote-node
 ```
+
+## Team 12
+
+Repo: https://github.com/bconklinua/404-group
+
+### Setup
+
+1. Follow their guide: https://github.com/bconklinua/404-group#404-group
+2. `python manage.py migrate`
+3. Run the server at port 8012: `python manage.py runserver 8012` just to make sure it runs. Check
+   out `http://127.0.0.1:8012/login`
+4. Create an account using `python manage.py createsuperuser` with the following credentials
+    - email: local_default@mail.com
+    - username: local_default
+    - password: local_default
+
+### Sanity check
+
+#### CURL test
+
+To test their local server, first, we try to obtain a token:
+
+```curl
+curl --location --request POST 'http://127.0.0.1:8012/api/auth/token/obtain/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email": "team10@mail.com",
+    "password": "team10_local"
+}'
+```
+
+The response should look like:
+
+```json
+{
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY4NzMwNTIzOCwiaWF0IjoxNjcwMDI1MjM4LCJqdGkiOiI4MmYyMDYzMTJlYWE0MGNhYTdhMTlkZjBkMmEwY2FhMSIsInVzZXJfZW1haWwiOiJ0ZWFtMTBAbWFpbC5jb20ifQ.lLA2yrQP1NRElS8NeCO0g20Y8PBM7PIXgBCEhh2XPFk",
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc4NjY1MjM4LCJpYXQiOjE2NzAwMjUyMzgsImp0aSI6IjgzMjJlNzBkYzc5ZjQ2M2I5MTliNWM1ODc4MDRmMmUwIiwidXNlcl9lbWFpbCI6InRlYW0xMEBtYWlsLmNvbSJ9.w_oGofHb1e-XkBKz0GwMgQPiuRmWosTMJ1Q91S8SX6A"
+}
+```
+
+Take the access field from the curl request you did and put it in the header. To test their auth endpoints:
+
+```curl
+curl --location --request GET 'http://127.0.0.1:8012/api/auth/test/' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc4NjY1MjM4LCJpYXQiOjE2NzAwMjUyMzgsImp0aSI6IjgzMjJlNzBkYzc5ZjQ2M2I5MTliNWM1ODc4MDRmMmUwIiwidXNlcl9lbWFpbCI6InRlYW0xMEBtYWlsLmNvbSJ9.w_oGofHb1e-XkBKz0GwMgQPiuRmWosTMJ1Q91S8SX6A'
+```
+
+The response should look like:
+
+```
+authenticated
+```
+
+#### Server-to-server check
+
+1. Run our server at port 8000 and run team12's server at port 8012.
+2. Login as admin in our server
+3. Check http://127.0.0.1/8000/authors/, check if local_default is in there

@@ -6,15 +6,16 @@ import Feed from './Feed'
 import Sidebar from '../Sidebar'
 import News from '../News'
 import Login from '../Login'
+import Inbox from '../Inbox/Inbox'
 function Home({authorid, token}) {
   return (
     <div className='home'>
         <Sidebar />
         
         {/*feed */}
-        < Feed />
+        <Feed/>
         {/*widgets */}
-        <News />
+        <News/>
     </div>
   )
 }

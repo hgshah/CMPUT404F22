@@ -1,3 +1,14 @@
 .news{
     flex:0.3;
+    
+    background-color: #C4A484
+    ;
+}
+
+.news_header {
+    margin: 20px;
+}
+
+.news_outer {
+    margin: 20px;
 }

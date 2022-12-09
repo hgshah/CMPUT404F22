@@ -1,0 +1,8 @@
+.comment-body {
+    font-style: italic;
+    margin-left: 1rem;
+  }
+
+.comment {
+    border-top: 0.125rem solid gray;
+}

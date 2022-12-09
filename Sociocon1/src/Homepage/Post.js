@@ -1,6 +1,7 @@
 // link: https://github.com/CleverProgrammers/twitter-clone
 // author: CleverProgrammer: https://www.youtube.com/c/CleverProgrammer/videos
 // license: https://www.apache.org/licenses/LICENSE-2.0
+// this page shows all the component when a post is created, included title, desp, like, share, comment buttons etc
 import React from 'react'
 import {useState, useEffect} from 'react';
 import "./Post.css";
@@ -8,10 +9,12 @@ import List from '@mui/material/List';
 import Comment from './Comment';
 import {useNavigate, useParams} from 'react-router-dom'
 import { Avatar, Button, TextField} from '@mui/material';
-import profilepic from "../profilepic.jpeg";
+// import profilepic from "../MyProfile/profilepic.jpeg";
 import CommentIcon from '@mui/icons-material/ModeComment';
 import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
+import ReactDom from 'react-dom'
+import ReactMarkdown from 'react-markdown'
 import DeleteIcon from '@mui/icons-material/Delete';
 import LikeIcon from '@mui/icons-material/FavoriteBorder';
 import EditIcon from '@mui/icons-material/Edit';
@@ -19,8 +22,8 @@ import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
-import EditPost from './EditPost';
-function Post({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid}) {
+
+function Post({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid, comm, published}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
@@ -70,10 +73,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             method: 'post',
             withCredentials: true ,
             headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
-            // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-            
+
             url: purl + '/',
 
             data: formField
@@ -82,7 +82,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             
         })
     }
- 
+    
    
     const navigate = useNavigate()
     
@@ -129,8 +129,10 @@ function Post({displayName, title, description, text, image, avatar, visibility,
 
     const follow_clicked = async() => {
         if (followButtonText == "Follow") {
+            //send the request
             newFollowButtonText("Following");
         } else {
+            //unsend the reqeust when following is click
             newFollowButtonText("Follow")
         }
 
@@ -155,16 +157,19 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     }
 
     const Share_Post = async () => {
+
         
+
         let formField_share = new FormData()
         formField_share.append("object",purl)
+        
         await axios({
                 method:'put',
                 withCredentials: true ,
                 headers: {'Content-Type': 'application/json', "Authorization": "Token " + token},
                 // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts' + nid + '/',
                 url: purl + '/share',
-                data: formField_share
+                data: {"object": purl}
             
         }).then((response) =>{
             console.log(response.data)
@@ -235,10 +240,15 @@ function Post({displayName, title, description, text, image, avatar, visibility,
     <div className='post'>
         <div className = "post_avatar">
             <Avatar src = {avatar}/>
+            
         </div>
         <div className='post_body'>
+            <h5>
+                  {published}
+            </h5>
+           
             <div className='post_header'>
-               
+            
             <React.Fragment>
                     {
                         showForm ? (
@@ -284,7 +294,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 
                 <div className='header_text'>
                 
-                    <h3>
+                    <h2>
                         {displayName} {" "} <span></span>
                         
                         
@@ -296,6 +306,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             style={{backgroundColor: following ? "rgb(211, 211, 211)" : "rgb(159, 185, 31)"}} >
                                 {/* {following ? "Following" : "Follow"} */}
                                 {followButtonText}
+
                             </Button>
                             {/* hardcode */}
                             {/* <input 
@@ -306,7 +317,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             name = "description"
                             /> */}
                         </span>
-                    </h3>
+                    </h2>
                     
                 </div>
                 <div className='visibility'>
@@ -317,32 +328,38 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                 <div className = "post_headerdis">
                     
                     {/* <p>{text}</p> */}
-                    {title} <br></br>
-                    {description}
- 
+                    <h5>
+                    {title} 
+                    
+                    </h5>
+                    {/* link:https://github.com/remarkjs/react-markdown 
+                    author: https://github.com/remarkjs  
+                    license:  https://www.apache.org/licenses/LICENSE-2.0 */}
+                    <ReactMarkdown>{description}</ReactMarkdown>
+                    
                     
 
 
                 </div>
                 
-                 <img className='post_content' src = {image} alt = " "/> 
+                 <img width = "300px" className='post_content' src = {image} alt = " "/> 
+
+                
                  <form>
                     <span>
                         <Button onClick={PostInfo_Likes} variant='contained' size = "small" endIcon= {<LikeIcon/>} >  {likes}  </Button>  &nbsp;&nbsp;&nbsp;
                         <Button onClick = {Share_Post} variant='contained' size = "small" endIcon= {<ShareIcon/>} >Share</Button> &nbsp;&nbsp;&nbsp;
-                        <Button onClick = {Show_Comments} variant='contained' size = "small" endIcon= {<CommentIcon/>} > See Comments</Button>
-                        
+                        <Button onClick = {Show_Comments} variant='contained' size = "small" endIcon= {<CommentIcon/>} > See Comments</Button> 
                         
                     </span>
 
                     </form>
-                    <h5 >
-                        <ol style = {{listStyleType: 'upper-roman'}}>
-                            <li>
-                                {comments}
-                            </li>
-                        </ol>
-                    </h5>
+                    <div className='post_comments'>
+                        <p> <Comment pcurl = {purl}/> </p> 
+                    </div>
+                    
+                    
+                    
                    
                     
                 <div className='post_footer'>

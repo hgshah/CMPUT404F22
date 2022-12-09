@@ -8,6 +8,7 @@ import { Avatar, Button, getAccordionDetailsUtilityClass, TextField} from '@mui/
 import Post from './Homepage/Post';
 import Feed from './Homepage/Feed';
 import Home from './Homepage/Home'
+import { Card } from 'antd';
 import Postbox from './Homepage/Postbox';
 import { Construction, DataSaverOffTwoTone, LocalConvenienceStoreOutlined, ReceiptLongOutlined } from '@mui/icons-material';
 // link: https://contactmentor.com/login-form-react-js-code/
@@ -15,7 +16,7 @@ import { Construction, DataSaverOffTwoTone, LocalConvenienceStoreOutlined, Recei
 //license: https://contactmentor.com/
 //link :https://bobbyhadz.com/blog/react-onclick-redirect
 //author: https://bobbyhadz.com/
-// license: https://bobbyhadz.com/terms-and-conditions
+// license: https://bobbyhadz.com/
 function Login() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -39,6 +40,12 @@ function Login() {
     {
       "username": "amanda6",
       "password": "amanda6",
+      "is_staff": true,
+      "is_superuser": true
+    },
+    {
+      "username": "team12_user",
+      "password": "team12_user",
       "is_staff": true,
       "is_superuser": true
     },
@@ -94,7 +101,7 @@ function Login() {
     let formField_token = new FormData()
     formField_token.append("username",uname.value)
     formField_token.append("password", pass.value)
-    
+    localStorage.setItem("displayedName", uname.value)
      await axios({
             method:'post',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -164,20 +171,36 @@ function Login() {
   };
 
 
-
+  const renderErrorMessage = (name) =>
+  name === errorMessages.name && (
+    <div className="error">{errorMessages.message}</div>
+  );
 
   return (
     <div className="form">
+      <h2> LOGIN - Sociocecon </h2> 
       <form >
         <div className="input-container">
-          <label>Username </label>
-          <input type="text" name="uname" required />
+          <Card>
+            <div>
+              <label>Username </label>
+              <input type="text" name="uname" required />  <br/>
+              {renderErrorMessage("uname")} <br></br>
+            </div>
+            <div>
+              <br></br>
+              <label>Password </label>
+              <input type="password" name="pass" required /> <br/> 
+              {renderErrorMessage("pass")}  <br></br>
+            </div>
+           
+          </Card>
           
         </div>
         <div className="input-container">
-            <label>Password </label>
-            <input type="password" name="pass" required />
-            <button onClick = {handleSubmit} > Submit </button>
+          <Button style={{ backgroundColor: "white" }} onClick = {handleSubmit} > Submit </Button>
+              
+            
             {isSubmitted}
             
                 {

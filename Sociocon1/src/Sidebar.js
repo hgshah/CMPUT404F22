@@ -10,23 +10,25 @@ import LogoIcon from "@mui/icons-material/Psychology";
 import HomeIcon from "@mui/icons-material/Home"
 import ProfileIcon from '@mui/icons-material/Person2';
 import InboxIcon from "@mui/icons-material/Mail";
-
+import LoginIcon from '@mui/icons-material/Login';
 import { Button } from '@mui/material';
 function Sidebar(){
    
-    return (
+   return (
  <div className = "sidebar">
     {/* Sidebar option*/}
       
       
-      <LogoIcon className="sidebar_logoicon"  /> 
+      <LogoIcon fontSize="large" className="sidebar_logoicon"  /> 
       <div className="list">
-         <ul>
-            <li> <a href="/login">  Login </a> </li>
-            <li> <a href="/home">  Home </a> </li>
-            <li> <a href="/profile">  Profile </a> </li>
-            <li> <a href="/inbox">  Inbox </a> </li>
-         </ul>
+         
+            <Button> <a href="/login" className="login_link"> <LoginIcon/> Login </a> </Button> <br></br>
+            <Button><a href="/home" className="home_link"> <HomeIcon/> Home </a> </Button> <br></br>
+            <Button><a href="/profile" className="profile_link"> <ProfileIcon/> Profile </a> </Button> <br></br>
+            <Button><a href="/inbox" className="inbox_link"> <InboxIcon/> Inbox </a> </Button>
+         
+            
+         
 
       </div>
       

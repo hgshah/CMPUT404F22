@@ -16,6 +16,9 @@ from inbox.models import Inbox
 from mysocial.settings import base
 from remote_nodes.remote_util import RemoteUtil
 import json
+from common.post_helper import PostHelper
+import base64
+from post.custom_renderers import JPEGRenderer, PNGRenderer
 
 logger = logging.getLogger("mylogger")
 
@@ -41,7 +44,7 @@ class PostView(GenericAPIView):
     @extend_schema(
         summary = "post_get_post_by_id",
         responses = PostSerializer,
-        tags=['post', RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=['post', RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='post_get_post_by_id')
     def get(self, request: Request, *args, **kwargs) -> HttpResponse:
@@ -51,7 +54,7 @@ class PostView(GenericAPIView):
         node: Author = request.user
         if not node.is_authenticated:
             return HttpResponseNotFound()
-
+        
         if node.is_authenticated_user:
             try:
                 target_author = Author.get_author(kwargs['author_id'])
@@ -62,8 +65,9 @@ class PostView(GenericAPIView):
             if target_author.is_local():
                 try:
                     post = Post.objects.get(official_id=kwargs['post_id'])
-                    serializer = PostSerializer(post)
-                    return Response(serializer.data)
+                    post_with_comments = PostHelper.add_comments_and_count(author = target_author, post = post)
+               
+                    return Response(post_with_comments)
                 except Exception as e:
                     logger.info(e)
                     return HttpResponseNotFound()
@@ -71,14 +75,17 @@ class PostView(GenericAPIView):
             # local -> remote
             else:
                 node_config = base.REMOTE_CONFIG.get(target_author.host) 
-                return node_config.get_post_by_post_id(request.path)
+                _, response = node_config.get_post_by_post_id(request.path)
+                return response
 
         # remote -> local
         if request.user.is_authenticated_node:
             try:
                 post = Post.objects.get(official_id=kwargs['post_id'])
-                serializer = PostSerializer(post)
-                return Response(serializer.data)
+                target_author = Author.get_author(kwargs['author_id'])
+                
+                post_with_comments = PostHelper.add_comments_and_count(author = target_author, post = post)
+                return Response(post_with_comments)
             except Exception as e:
                 print(e)
                 return HttpResponse(f'Failed to get post for post id: {kwargs["post_id"]}', status = status.HTTP_400_BAD_REQUEST)
@@ -221,11 +228,15 @@ class PublicPostView(GenericAPIView):
             public_posts = Post.objects.filter(
                 visibility = Visibility.PUBLIC
             )
+            posts = []
+            for post in public_posts:
+                post_with_comments = PostHelper.add_comments_and_count(author = None, post = post)
+                posts.append(post_with_comments)
+                
+            return Response(posts)
 
-            serializer = PostSerializer(public_posts, many=True)
-            return Response(serializer.data)
         except Exception as e:
-            logger.info(e)
+            print(e)
             return HttpResponseNotFound()
 
 # /authors/{AUTHOR_ID}/posts/
@@ -242,7 +253,7 @@ class CreationPostView(GenericAPIView):
     @extend_schema(
         responses=PostSerializerList,
         summary="post_get_authors_posts",
-        tags=["post", RemoteUtil.REMOTE_IMPLEMENTED_TAG]
+        tags=["post", RemoteUtil.REMOTE_IMPLEMENTED_TAG, RemoteUtil.TEAM12_CONNECTED, RemoteUtil.TEAM14_CONNECTED, RemoteUtil.TEAM7_CONNECTED]
     )
     @action(detail=True, methods=['get'], url_name='post_get_author_posts')
     def get(self, request, *args, **kwargs):
@@ -266,9 +277,14 @@ class CreationPostView(GenericAPIView):
             #local -> local
             if target_author.is_local():
                 author = Author.get_author(kwargs['author_id'])
-                posts = Post.objects.filter(author = author).order_by('-published')
-                serializer = PostSerializer(posts, many = True)
-                data = serializer.data
+                posts = Post.objects.filter(author = author, unlisted = False).order_by('-published')
+
+                posts_with_comments = []
+                for post in posts:
+                    post_with_comments = PostHelper.add_comments_and_count(author = None, post = post)
+                    posts_with_comments.append(post_with_comments)
+                
+                data = posts_with_comments
                 data, err = PaginationHelper.paginate_serialized_data(request, data)
 
                 if err is not None:
@@ -285,8 +301,13 @@ class CreationPostView(GenericAPIView):
         if request.user.is_authenticated_node:
             author = Author.objects.get(official_id = kwargs['author_id'])
             posts = Post.objects.filter(author = author).order_by('-published')
-            serializer = PostSerializer(posts, many = True)
-            data = serializer.data
+
+            posts_with_comments = []
+            for post in posts:
+                post_with_comments = PostHelper.add_comments_and_count(author = None, post = post)
+                posts_with_comments.append(post_with_comments)
+            
+            data = posts_with_comments
             data, err = PaginationHelper.paginate_serialized_data(request, data)
 
             if err is not None:
@@ -346,7 +367,6 @@ class CreationPostView(GenericAPIView):
         except Exception as e:
             logger.info(e)
             return HttpResponseNotFound()
-
 class SharePostView(GenericAPIView):
     serializer_class = SharePostSerializer
     @extend_schema(
@@ -383,12 +403,17 @@ class SharePostView(GenericAPIView):
                     return Response(f"Error getting post id: {kwargs['post_id']}", status.HTTP_400_BAD_REQUEST)
             #local getting a remote post
             else:
-                node_config = base.REMOTE_CONFIG.get(target_author.host)
-                response = node_config.get_post_by_post_id(request.path.split('/share')[0])
-                if response.status_code < 200 or response.status_code > 300:
+                try:
+                    node_config = base.REMOTE_CONFIG.get(target_author.host)
+                    post, response = node_config.get_post_by_post_id(request.path.split('/share')[0])
+                    if response.status_code < 200 or response.status_code > 300:
+                        return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                except Exception as e:
+                    print(f'{self}: put: error getting remote post: error: {e}')
+                    post_id = request.path.split('/share')[0]
+                    print(f'{self}: put: error getting remote post: remote post: {post_id} @ node: {node_config}')
                     return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-                post = json.loads(response.content)
+
 
             requesting_author = Author.get_author(self.request.user.get_id())
             followers = FollowUtil.get_followers(requesting_author)
@@ -401,10 +426,112 @@ class SharePostView(GenericAPIView):
                     inbox = Inbox.objects.get(author = follower)
                     inbox.add_to_inbox(post)
                 else:
-                    node_config = base.REMOTE_CONFIG.get(follower.host)
-                    response = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = post)
-                    if response.status_code < 200 or response.status_code > 300:  
-                        return Response(json.loads(response.content), status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    try:
+                        node_config = base.REMOTE_CONFIG.get(follower.host)
+                        response = node_config.send_to_remote_inbox(target_author_url = follower.get_url(), data = post)
+                        if response.status_code < 200 or response.status_code > 300:
+                            return Response(json.loads(response.content), status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    except Exception as e:
+                        print(f'{self}: put: error with remote authors (author: {follower}): {e} from node: {follower.host}')
 
             return Response("Successfully added to all followers inbox", status = status.HTTP_200_OK)
+
+
+class FollowingPostView(GenericAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.all()
+
+    @extend_schema(
+        responses=PostSerializerList,
+        summary="post_get_authors_following_posts",
+        tags=["post", "follows"]
+    )
+    @action(detail=True, methods=['get'], url_name='post_get_authors_following_post')
+    def get(self, request, *args, **kwargs):
+        try:
+            requesting_author = Author.get_author(kwargs['author_id'])
+        except:
+            return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+        followed_authors = FollowUtil.get_following_authors(requesting_author)
+        posts = []
+
+        # these authors could be local or remote
+        for followed_author in followed_authors:
+            if followed_author.is_local():
+                authors_posts = Post.objects.filter(author = followed_author, unlisted = False).order_by('-published')
+
+                for post in authors_posts:
+                    post_with_comments = PostHelper.add_comments_and_count(author = requesting_author, post = post)
+                    posts.append(post_with_comments)
+
+            else:
+                try:
+                    node_config = base.REMOTE_CONFIG.get(followed_author.host)
+                    authors_posts_path = f'/authors/{followed_author.get_id()}/posts/'
+                    response = node_config.get_authors_posts(request, authors_posts_path)
+
+                    posts = posts + response.data['items']
+                except Exception as e:
+                    continue
+
+        return Response(posts, status = status.HTTP_200_OK)
+
+
+class ImagePostView(GenericAPIView):
+    renderer_classes = [JPEGRenderer, PNGRenderer]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.all()
+
+    @extend_schema(
+        responses=PostSerializerList,
+        summary="post_get_image_post",
+        tags=["post",]
+    )
+    @action(detail=True, methods=['get'], url_name='post_get_image_post')
+    def get(self, request, *args, **kwargs):
+        node: Author = request.user
+        if not node.is_authenticated:
+            return HttpResponseNotFound()
+        
+        if node.is_authenticated_user:
+            try:
+                target_author = Author.get_author(kwargs['author_id'])
+            except:
+                return Response(f"Error getting author id: {kwargs['author_id']}", status.HTTP_400_BAD_REQUEST)
+
+            #local -> local
+            if target_author.is_local():
+                try:
+                    post = Post.objects.get(official_id=kwargs['post_id'])
+                    if not post.content:
+                        return Response("This is not an image post", status = status.HTTP_400_BAD_REQUEST) 
+                    
+                    header, data = post.content.split(';base64,')
+                    imgdata = base64.b64decode(data)
+                    return Response(imgdata, status = status.HTTP_200_OK, content_type= post.contentType)
+
+                except Exception as e:
+                    print(e)
+                    return HttpResponseNotFound()
+            else:
+                node_config = base.REMOTE_CONFIG.get(target_author.host) 
+                response = node_config.get_image_post(request.path)
+                return response
+
+
+        # remote -> local
+        if request.user.is_authenticated_node:
+            post = Post.objects.get(official_id=kwargs['post_id'])
+            if not post.content:
+                return Response("This is not an image post", status = status.HTTP_400_BAD_REQUEST) 
+            
+            header, data = post.content.split(';base64,')
+            imgdata = base64.b64decode(data)
+
+            return Response(imgdata, status = status.HTTP_200_OK, content_type= post.contentType)
 

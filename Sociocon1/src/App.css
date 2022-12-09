@@ -5,8 +5,29 @@ body{
 .home{
   display: flex;
   height: 100vh;
-  max-width: 1300px;
-  margin-left:auto;
+  /* max-width: 1300px; */
+  /* margin-left:auto;
   margin-right:auto;
-  padding: 0 10px;
+  padding: 0 10px; */
 }
+
+/* .app {
+  background-color: ;
+} */
+
+/* .App {
+  color: var(--text-primary);
+  background-color: var(--background);
+  font-size: large;
+  font-weight: bold;
+  padding: 20px;
+  height: calc(100vh - 40px);
+  transition: all .5s;
+}
+button {
+  color: var(--text-primary);
+  background-color: var(--background);
+  border: 2px var(--text-primary) solid;
+  float: right;
+  transition: all .5s;
+} */

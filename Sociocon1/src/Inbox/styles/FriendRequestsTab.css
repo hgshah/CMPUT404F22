@@ -31,7 +31,7 @@
 }
 
 .accepted_btn .follow_back_btn {
-    background-color: rgb(159, 185, 31);
+    background-color: #C4A484;
     color: black;
     font-weight: bold;
     font-size: 15px;
@@ -39,7 +39,7 @@
 }
 
 .request_btns .accept_btn:hover {
-    background-color: rgba(159, 185, 31, 0.693);
+    background-color: #c4a484be;
 }
 
 .request_btns .decline_btn:hover {
@@ -47,8 +47,9 @@
 }
 
 .accepted_btn .follow_back_btn:hover {
-    background-color: rgba(211, 211, 211, 0.616);
+    background-color: #c4a484be;
 }
+
 
 .request_list {
     margin-bottom: 5%;
@@ -56,4 +57,35 @@
 
 .accepted_list {
     margin-bottom: 5%;
+}
+
+.rf_btn .unbefriend_btn {
+    background-color: red;
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+    text-transform: capitalize;
+}
+
+.rf_btn .unbefriend_btn:hover {
+    background-color: rgba(211, 211, 211, 0.616);
+}
+
+.rf_btn {
+    float: right;
+    margin-right: 1%;
+}
+
+.rf_list {
+    margin-bottom: 5%;
+}
+
+.incoming_action {
+    font-weight: bold;
+    color: #C4A484;
+}
+
+.follow_action {
+    font-weight: bold;
+    color: green;
 }

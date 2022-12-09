@@ -1,3 +1,21 @@
 .MessagesTab {
     font-size: 20px;
 }
+
+.MessagesTab .search_btn {
+    background-color: #C4A484;
+    color: black;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: capitalize;
+    margin-left: 1%;
+}
+
+.MessagesTab .get_btn {
+    background-color: #C4A484;
+    color: black;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: capitalize;
+    margin: 1%;
+}

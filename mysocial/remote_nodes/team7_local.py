@@ -14,7 +14,7 @@ from follow.serializers.follow_serializer import FollowRequestSerializer
 from mysocial.settings import base
 from post.serializer import PostSerializer
 from remote_nodes.local_default import LocalDefault
-
+from comment.serializers import CommentSerializer
 
 class Team7Local(LocalDefault):
     domain = '127.0.0.1:8007'
@@ -51,6 +51,16 @@ class Team7Local(LocalDefault):
         "published": "published",
     }
 
+    comment_remote_fields = {
+        "_id": "official_id",
+        "type": "type",
+        "author": "author",
+        "comment": "comment",
+        "contentType": "contentType",
+        "published": "published",
+        "url": "url"
+    }
+
     def __init__(self):
 
         """
@@ -60,14 +70,20 @@ class Team7Local(LocalDefault):
                                     auth=(self.username, self.password))
         """
         self.origin = f'{BaseUtil.get_http_or_https()}{base.CURRENT_DOMAIN}'
-        self.headers = {
-            'Origin': self.origin,
-        }
 
         super().__init__()
 
+    @property
+    def headers(self):
+        return {
+            'Origin': self.origin,
+        }
+
     def get_base_url(self):
         return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}/service'
+
+    def convert_to_valid_author_url(self, author_id: str) -> str:
+        return f'{self.get_base_url()}/authors/{author_id}'
 
     @classmethod
     def create_node_credentials(cls):
@@ -110,7 +126,11 @@ class Team7Local(LocalDefault):
         return None
 
     def get_author_via_url(self, author_url: str) -> Author:
-        response = requests.get(author_url)  # no password
+        try:
+            response = requests.get(author_url)  # no password
+        except Exception as e:
+            print(f'{self}: get_author_via_url: possibly no connection: {e}')
+            return None
 
         if response.status_code == 200:
             author_json = json.loads(response.content.decode('utf-8'))
@@ -134,7 +154,7 @@ class Team7Local(LocalDefault):
                 'type': 'follow',
                 'actor': {'url': author_actor.get_url()},
                 'object': {'url': author_target.get_url()},
-                'hasAccepted': False,
+                'hasAccepted': True,
                 'localUrl': f'{author_actor.get_url()}/followers/{author_target.get_id()}/',
                 'id': None
             }  # <- GOOD
@@ -193,6 +213,44 @@ class Team7Local(LocalDefault):
             return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
 
 
+    def get_comments_for_post(self, comments_path, author = None, request = None):
+        url = f'{self.get_base_url()}{comments_path}'
+
+        try:
+            response = requests.get(url, auth=(self.username, self.password))
+            if response.status_code < 200 or response.status_code > 300:
+                return Response("Failed to get comments for post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        except Exception as e:
+            return Response(f"Failed to get comments for post from remote server, error: {e}",
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        data = []
+        comment_data = json.loads(response.content.decode('utf-8'))['comments']
+
+        for comment in comment_data:
+            data.append(self.convert_team7_comment(url, comment))
+        
+        data, err = PaginationHelper.paginate_serialized_data(request, data)
+
+        if err is not None:
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'type': 'posts', 'items': data}, status=status.HTTP_200_OK)
+    
+    def create_comment_on_post(self, comments_path, data, extra_data = None):
+        url = f'{self.get_base_url()}{comments_path}'
+
+        data = self.create_team7_comment(data)
+        response = requests.post(url = url, data = json.dumps(data))
+        
+        if response.status_code < 200 or response.status_code > 300:
+            return Response(
+                f"Failed to get post from remote server, error {json.loads(response.content)}",
+                status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response("Successfully created comment to team 7!", status=status.HTTP_200_OK)
+
     def convert_team7_post(self, url, post_data):
         post_data["url"] = url
 
@@ -201,3 +259,19 @@ class Team7Local(LocalDefault):
             return serializer.data
         else:
             return serializer.errors
+
+    def convert_team7_comment(self, url, comment):
+        comment["url"] = url
+
+        serializer = CommentSerializer(data = comment)
+        if serializer.is_valid():
+            return serializer.data
+        else:
+            return serializer.errors
+
+
+    def create_team7_comment(self, data):
+        comment = {
+            "comment": data['comment']
+        }
+        return comment

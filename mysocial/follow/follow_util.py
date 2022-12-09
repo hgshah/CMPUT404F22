@@ -1,6 +1,8 @@
 import logging
+import types
 
-from rest_framework.exceptions import ValidationError
+from django.http.response import HttpResponse, HttpResponseNotFound
+from rest_framework.request import Request
 
 from authors.models.author import Author
 from authors.util import AuthorUtil
@@ -52,6 +54,53 @@ class FollowUtil:
 
         return author_list
 
+    @classmethod
+    def get_follow_object(cls, request: Request, target_id: str, follower_id: str) -> (Follow, HttpResponse):
+        """Helper function to getting a follow regardless of local or remote"""
+        try:
+            target = Author.get_author(official_id=target_id)
+        except Follow.DoesNotExist:
+            return None, HttpResponseNotFound("User not exist on our end")
+        except Exception as e:
+            print(f"{cls}: {e}")
+            return None, HttpResponseNotFound("User not exist on our end")
+
+        try:
+            follower = Author.get_author(official_id=follower_id)
+        except Follow.DoesNotExist:
+            return None, HttpResponseNotFound(
+                "The given follower does not seem to exist as a user in any connected nodes")
+        except Exception as e:
+            print(f"{cls}: {e}")
+            return None, HttpResponseNotFound("The given follower does not seem to exist as a user")
+
+        if target.is_local():
+            # trust our data
+            try:
+                follow = Follow.objects.get(target=target.get_url(), actor=follower.get_url())
+
+                if follow.get_author_target() != request.user and not follow.has_accepted:
+                    return None, HttpResponseNotFound("User does not follow the following author on our end")
+
+                return follow, None
+            except Follow.DoesNotExist:
+                return None, HttpResponseNotFound("User does not follow the following author on our end")
+            except Exception as e:
+                print(f"{cls}: {e}")
+                return None, HttpResponseNotFound("User does not follow the following author on our end")
+        else:
+            # trust THEIR data
+            node_config: NodeConfigBase = base.REMOTE_CONFIG.get(target.host)
+            if node_config is None:
+                print(f"{cls}: get: unknown host: {target.host}")
+                return None, HttpResponseNotFound()
+
+            follow = node_config.get_remote_follow(target, follower)
+            if follow is None:
+                return None, HttpResponseNotFound("User does not follow the following author on our end")
+
+            return follow, None
+
     @staticmethod
     def are_followers(follower: Author, target: Author) -> bool:
         """
@@ -61,35 +110,42 @@ class FollowUtil:
         :param target:
         :return:
         """
-        try:
-            Follow.objects.get(actor=follower.get_url(), target=target.get_url(), has_accepted=True)
-            return True  # did not return a does not exist error
-        except Follow.DoesNotExist:
+        fake_request = types.SimpleNamespace()
+        fake_request.user = target
+        follow, err = FollowUtil.get_follow_object(request=fake_request, target_id=target.get_id(), follower_id=follower.get_id())
+        if err is not None:
             return False
-        except Exception as e:
-            logger.error(f"FollowUtil: are_real_friends: unknown error: {e}")
+        return follow.has_accepted
 
     @staticmethod
-    def get_real_friends(actor: Author):
+    def get_real_friends(target: Author):
         """
         Get all real friends or mutual followers for target Author. Be careful because this gets both remote Author and
         local Author. Check if it's a local author by using author.is_local()
 
-        :param actor:
+        :param target:
         :return: List of Authors
 
         Remember to catch errors!
         """
-        # reference: https://stackoverflow.com/a/9727050/17836168
-        # to get real friends, get all my followers (A) and get everyone who follows me (B)
-        # then, intersect at A and B, those are real friends
-        follower_ids = Follow.objects.values_list('actor', flat=True).filter(target=actor.get_url(), has_accepted=True)
+        follower_list = Follow.objects.filter(target=target.get_url(), has_accepted=True)
+        friends = []
+        for follower_follow_object in follower_list:
+            follower = follower_follow_object.get_author_actor()
+            if FollowUtil.are_followers(target, follower):
+                friends.append(follower)
+        return friends
+
+    @staticmethod
+    def are_real_friends(actor: Author, target: Author) -> bool:
+        return FollowUtil.are_followers(actor, target) and FollowUtil.are_followers(target, actor)
+    
+    @staticmethod
+    def get_following_authors(actor: Author):
         following_ids = Follow.objects.values_list('target', flat=True).filter(actor=actor.get_url(), has_accepted=True)
-        # reference: https://stackoverflow.com/a/6369558/17836168
-        friend_ids = set(follower_ids).intersection(following_ids)
 
         author_list = []
-        for author_url in friend_ids:
+        for author_url in following_ids:
             author, err = AuthorUtil.from_author_url_to_author(author_url)
             if err is None:
                 author_list.append(author)
@@ -98,13 +154,3 @@ class FollowUtil:
 
         return author_list
 
-    @staticmethod
-    def are_real_friends(actor: Author, target: Author) -> bool:
-        try:
-            Follow.objects.get(actor=actor.get_url(), target=target.get_url(), has_accepted=True)
-            Follow.objects.get(actor=target.get_url(), target=actor.get_url(), has_accepted=True)
-            return True  # did not return a does not exist error
-        except Follow.DoesNotExist:
-            return False
-        except Exception as e:
-            logger.error(f"FollowUtil: are_real_friends: unknown error: {e}")

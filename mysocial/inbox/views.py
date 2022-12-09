@@ -226,20 +226,26 @@ class InboxView(GenericAPIView):
             return Response(f"Could not get local author {requesting_author_id}", status = status.HTTP_400_BAD_REQUEST)
 
         # step two
+        like_data = Like(author = json_author, author_id = requesting_author_id, object = request.data.get('object'), object_type = LikeType.POST) 
+
+        # step 2.A
+        like_data = LikeSerializer(like_data).data
+        like_data["actor"] = AuthorSerializer(requesting_author).data["url"]
+        
+        # author of the post 
+        extra_data = {
+            "displayName": target_author.display_name
+        }
+        # step 3
+        response = node_config.like_a_post(data = like_data, target_author_url = target_author.get_url(), extra_data = extra_data)
+
+        if response.status_code < 200 or response.status_code > 200:
+            return Response(f"Failed to like a post: {target_author.display_name}", status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
         like_data = self.create_like(request, json_author = json_author, requesting_author_id = str(requesting_author_id))
         if like_data is None:
             return Response(f"Could not create Like object. Maybe you tried to like something twice", status = status.HTTP_400_BAD_REQUEST)
-
-        # step 2.A
-        like_data["actor"] = AuthorSerializer(requesting_author).data["url"]
-
-        # step 3
-        response = node_config.send_to_remote_inbox(data = like_data, target_author_url = target_author.get_url())
-
-        if response < 200 or response > 200:
-            return Response(f"Failed to send to remote inbox for author: {target_author.display_name}", status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response(f"Successfully added 'LIKE' to {target_author}", status = status.HTTP_200_OK)
+        return response
     
     def local_likes_local(self, request, target_author):
         '''

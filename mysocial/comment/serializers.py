@@ -1,8 +1,16 @@
 from rest_framework import serializers
-from authors.serializers.author_serializer import AuthorSerializer
 from post.serializer import PostSerializer 
 from .models import Comment, ContentType
 from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_schema_serializer
+
+from rest_framework import serializers
+from comment.models import Comment
+from authors.models.author import Author
+from urllib.parse import urlparse
+from mysocial.settings import base
+import pathlib
+from post.models import Post
+from authors.serializers.author_serializer import AuthorSerializer
 
 COMMENT_SERIALIZER_EXAMPLE = {
         "type": "comment",
@@ -32,37 +40,75 @@ COMMENT_SERIALIZER_EXAMPLE = {
 class CommentSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     published = serializers.DateTimeField()
-    author = serializers.SerializerMethodField()
     contentType = serializers.ChoiceField(ContentType)
     url = serializers.SerializerMethodField()
-
-    @extend_schema_field(AuthorSerializer)
-    def get_author(self, obj):
-        author = AuthorSerializer(obj.author).data
-        return author
     
+    def get_id(self, obj) -> str:
+        return str(obj.official_id)
+
+    def get_url(self, obj: Comment) -> str:
+        return obj.get_url()
+
     @extend_schema_field(PostSerializer)
     def get_post(self, obj):
         post = PostSerializer(obj.post).data
         return post
 
-    def get_id(self, obj: Comment):
-        return obj.get_id()
+    def to_internal_value(self, data: dict) -> Comment:
+        """
+        Does not work with remote Author
+        :param data:
+        :return: Access serializers.validated_data for deserialized version of the json converted to Author
+        """
+        url = data['url']
+        # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
+        _, host, path, _, _, _ = urlparse(url)
 
-    def get_url(self, obj: Comment):
-        return obj.get_url()
+        try:
+            if host == base.CURRENT_DOMAIN:
+                local_id = pathlib.PurePath(path).name
+                # deserialize a local post
+                comment = Comment.objects.get(official_id = local_id)
+            else:
+                # deserialize a remote author; take not it's missing some stuff so check with is_local()
+                comment = Comment()
+                node_config = base.REMOTE_CONFIG.get(host)
+                if node_config is None:
+                    print(f"CommentSerializer: Host not found: {host}")
+                    return serializers.ValidationError(f"CommentSerializer: Host not found: {host}")
+
+                comment_remote_fields: dict = node_config.comment_remote_fields
+        
+                for remote_field, local_field in comment_remote_fields.items():
+                    if remote_field not in data:
+                        continue
+                    elif remote_field == 'author':
+                        author = Author.get_author(official_id=data['author']['id'], should_do_recursively=True)
+                        setattr(comment, local_field, AuthorSerializer(author).data)
+                    else:
+                        setattr(comment, local_field, data[remote_field])
+
+        except Exception as e:
+            print(f"CommentSerializer: failed serializing {e}")
+            raise serializers.ValidationError(f"CommentSerializer: failed serializing {e}")
+
+        post = Post.objects.first()
+        setattr(comment, 'post', post) # looool, we don't actually include that post that the comment is on so im faking it, its just a get so i don't think anything happens??
+        return comment
 
     class Meta:
         model = Comment
         fields = ('type', 'author', 'comment', 'contentType', 'published', 'id', 'url')
 
 class CreateCommentSerializer(serializers.ModelSerializer):
+    actor = serializers.CharField(allow_blank = True, required = False)
+
     def create(self, validated_data):
         comment = Comment.objects.create(**validated_data)
         return comment
     class Meta:
         model = Comment
-        fields =('comment', 'contentType')
+        fields =('comment', 'contentType', 'actor')
 
 @extend_schema_serializer(
     examples=[

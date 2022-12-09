@@ -44,6 +44,18 @@ class AuthorSerializer(serializers.ModelSerializer):
     host = serializers.SerializerMethodField('get_host')
     preferredName = serializers.SerializerMethodField('get_preferred_name')
 
+    SPECIAL_SHOULD_TRUST_LOCAL_TAG = 'should_trust_local'
+
+    # check node_config_base.py for duplicate; can't ref due to circular dependency
+    CHANGEABLE_FIELDS = {
+        'displayName': 'display_name',
+        'github': 'github',
+        'profileImage': 'profile_image',
+        'email': 'email',
+        'username': 'username',
+        'password': 'password',
+    }
+
     @staticmethod
     def get_type(model: Author) -> str:
         return model.get_serializer_field_name()
@@ -71,14 +83,34 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data: dict) -> Author:
         """
-        Does not work with remote Author
+        Converts the give author url to an author, either remote or local.
+
+        If data contains a True boolean SPECIAL_SHOULD_TRUST_LOCAL_TAG, the local author's fields will be
+        overwritten. This saves the author automatically.
+
         :param data:
         :return: Access serializers.validated_data for deserialized version of the json converted to Author
         """
 
-        for required_field in AuthorSerializer.Meta.required_fields:
-            if required_field not in data:
-                raise serializers.ValidationError(f'AuthorSerializer: missing field: {required_field}')
+        # validation, we need url!!!
+        if 'url' not in data:
+            # try to get url via host
+            if 'host' in data and 'id' in data:
+                host = data['host']
+                # there's a better solution but since this is a one-off, I won't do that
+                if '127.0.0.1' in base.CURRENT_DOMAIN and host == 'https://true-friends-404.herokuapp.com':
+                    host = '127.0.0.1:8012'
+                    data['host'] = host
+                elif 'true-friends-404.herokuapp.com' in host:
+                    host = 'true-friends-404.herokuapp.com'
+                    data['host'] = host
+
+                author_id = data['id']
+                data['url'] = f'{BaseUtil.get_http_or_https()}{host}/authors/{author_id}'
+                data_url = data['url']
+
+            if 'url' not in data:
+                raise serializers.ValidationError({'url': 'missing_field'})
 
         url = data['url']
         # by Philipp Claßen from https://stackoverflow.com/a/56476496/17836168
@@ -89,13 +121,29 @@ class AuthorSerializer(serializers.ModelSerializer):
                 local_id = pathlib.PurePath(path).name
                 # deserialize a local author
                 author = Author.objects.get(official_id=local_id)
+
+                # trust the fields given
+                should_trust = bool(data.get(AuthorSerializer.SPECIAL_SHOULD_TRUST_LOCAL_TAG))
+                if should_trust:
+                    for client_field, server_field in AuthorSerializer.CHANGEABLE_FIELDS.items():
+                        if client_field in data:
+                            if server_field == 'password':
+                                author.set_password(data[client_field])
+                            else:
+                                setattr(author, server_field, data[client_field])
+
+                    # saving for should trust
+                    try:
+                        author.save()
+                    except Exception as e:
+                        raise serializers.ValidationError({'non_field_errors': str(e)})
             else:
                 # deserialize a remote author; it's missing some stuff so check with is_local()
                 author = Author()
                 node_config = base.REMOTE_CONFIG.get(host)
                 if node_config is None:
                     print(f"AuthorSerializer: Host not found: {host}")
-                    raise serializers.ValidationError(f"AuthorSerializer: Host not found: {host}")
+                    raise serializers.ValidationError({host: 'missing field'})
                 remote_fields: dict = node_config.remote_author_fields
 
                 for remote_field, local_field in remote_fields.items():
@@ -128,9 +176,15 @@ class AuthorSerializer(serializers.ModelSerializer):
                     author_id = data['id']
                     entry = f'{BaseUtil.get_http_or_https()}{node_config.domain}/service/authors/{author_id}'
                     setattr(author, 'url', entry)
+
+                # special processing for team12
+                if node_config.team_metadata_tag == 'team12':
+                    author_url = data['url']
+                    setattr(author, 'url', f'{author_url}/')
+                    author.username = author.display_name
         except Exception as e:
             print(f"AuthorSerializer: failed serializing: {e}")
-            raise serializers.ValidationError(f"AuthorSerializer: failed serializing: {e}")
+            raise serializers.ValidationError({'non_field_errors': str(e)})
 
         return author
 
@@ -138,12 +192,15 @@ class AuthorSerializer(serializers.ModelSerializer):
         model = Author
         fields = ('type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage', 'preferredName')
 
-        # custom fields
-        required_fields = ('url',)
-
     @classmethod
     def deserializer_author_list(cls, response_json: str):
-        author_json = json.loads(response_json)
+        if isinstance(response_json, str):
+            author_json = json.loads(response_json)
+        elif isinstance(response_json, dict) or isinstance(response_json, list):
+            author_json = response_json
+        else:
+            print(f'AuthorSerializer: deserializer_author_list: unknown type ({type(response_json)}): {str(response_json)}')
+            return []
 
         if isinstance(author_json, dict):
             author_json = author_json.get('items')

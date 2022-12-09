@@ -1,7 +1,9 @@
 import logging
 
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.http.response import HttpResponse, HttpResponseNotFound
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -27,6 +29,7 @@ logger = logging.getLogger(__name__)
 class AuthorView(GenericViewSet):
     # removes the extra outer array enveloping the real request return structure
     pagination_class = None
+    serializer_class = AuthorSerializer
 
     def get_queryset(self):
         return None
@@ -39,7 +42,8 @@ class AuthorView(GenericViewSet):
         tags=["authors",
               RemoteUtil.REMOTE_IMPLEMENTED_TAG,
               RemoteUtil.TEAM14_CONNECTED,
-              RemoteUtil.TEAM7_CONNECTED
+              RemoteUtil.TEAM7_CONNECTED,
+              RemoteUtil.TEAM12_CONNECTED,
               ]
     )
     @action(detail=True, methods=['get'], url_name='retrieve_all')
@@ -110,7 +114,8 @@ class AuthorView(GenericViewSet):
             "authors",
             RemoteUtil.REMOTE_IMPLEMENTED_TAG,
             RemoteUtil.TEAM14_CONNECTED,
-            RemoteUtil.TEAM7_CONNECTED
+            RemoteUtil.TEAM7_CONNECTED,
+            RemoteUtil.TEAM12_CONNECTED,
         ]
     )
     def retrieve(request: Request, author_id: str) -> HttpResponse:
@@ -146,6 +151,58 @@ class AuthorView(GenericViewSet):
         if node_config is None:
             return HttpResponseNotFound()
         return node_config.get_author_request(author_id)
+
+    @staticmethod
+    @extend_schema(
+        parameters=RemoteUtil.REMOTE_NODE_SINGLE_PARAMS,
+        responses=AuthorSerializer,
+        summary="Update author profile",
+        request=inline_serializer(
+            name='Author PUT',
+            fields={
+                'displayName': serializers.CharField(),
+                'github': serializers.CharField(),
+                'profileImage': serializers.CharField(),
+                'email': serializers.CharField(),
+                'username': serializers.CharField(),
+                'password': serializers.CharField(),
+            }
+        ),
+        tags=["authors"]
+    )
+    def update_profile(request: Request, author_id: str) -> HttpResponse:
+        """
+        Update author profile.
+
+        **IT SAYS ALL FIELDS ARE REQUIRED BUT IT'S NOT!!!**
+
+        This endpoint has special properties:
+        - Only for local use
+        - You can only edit your own profile (returns 401 and 403)
+        - This is very fault-tolerant endpoint when it comes to input, it will ignore misspelled and extra inputs
+            - It returns a 400 error for bad inputs like duplicate usernames
+        """
+        if not request.user.is_authenticated:
+            return Response(status=401)
+
+        try:
+            author = Author.get_author(official_id=author_id, should_do_recursively=False)
+            if request.user.official_id != author.official_id:
+                return HttpResponseForbidden()
+
+            author_dict: dict = request.data
+            author_dict['url'] = author.get_url()
+            author_dict[AuthorSerializer.SPECIAL_SHOULD_TRUST_LOCAL_TAG] = True
+            author_deserializer = AuthorSerializer(data=author_dict)
+            if not author_deserializer.is_valid():
+                print(f'AuthorSerializer: put: {str(author_deserializer.errors)}')
+                return HttpResponseBadRequest(str(author_deserializer.errors))
+            serializer = AuthorSerializer(author_deserializer.validated_data)
+            return Response(serializer.data)
+        except Author.DoesNotExist:
+            return HttpResponseNotFound()
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
 
 
 class AuthorSelfView(APIView):
@@ -187,7 +244,8 @@ class RemoteNodeView(GenericAPIView):
             "remote debug",
             RemoteUtil.REMOTE_IMPLEMENTED_TAG,
             RemoteUtil.TEAM14_CONNECTED,
-            RemoteUtil.TEAM7_CONNECTED
+            RemoteUtil.TEAM7_CONNECTED,
+            RemoteUtil.TEAM12_CONNECTED,
         ],
         summary="Check node connection",
     )

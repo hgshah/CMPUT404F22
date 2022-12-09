@@ -166,16 +166,44 @@ class RemoteUtil:
 
 ## Workflow
 
-1. Work on a branch based on staging, let's call this *current-branch*.
-2. If I want to test my changes locally, I can run `python manage.py runserver --settings mysocial.settings.production`.
-3. If I want to test my changes in heroku, I push my changes to my personal main fork by running the git.
-   command `git push your-fork-origin current-branch:main`. (like `git push amanda-staging amanda-staging:main`)
+**What's the difference between staging and production?**
+
+When pushing to staging, you deploy two mirror servers. It helps you test out before pushing to production.
+
+When pushing to production, it only deploys to Socioecon. Make sure nothing breaks when you do this.
+
+### Pushing to staging
+
+The workflow for deploying to staging is:
+
+1. Make sure you have the git origin url to staging. If not,
+   do `git add remote staging1 git@github.com:TurnipXenon/cmput404-project-personal-staging.git`
+2. Work on a branch based on staging, let's call this *current-branch*.
+3. If you want to test your changes locally, you can
+   run `python manage.py runserver --settings mysocial.settings.production`.
+4. If you want to push your changes to heroku, you push your changes to staging by running the git
+   command `git push staging current-branch:main`. (like `git push staging1 staging1:main`)
     - This follows the format: `git push origin diff-branch:main` which pushes your local `diff-branch` to the
       branch `main` at the remote repository `origin`.
     - If this is confusing and prone to errors, you may just push your differently-named branch to your fork's
       repository and do a pull request that merges to main.
     - If you're manually deploying, like the instruction in the setup, go to your app's Deploy tab and manually deploy.
-    - I can use the same branch to push to our main repo like `git push origin current-branch`.
+    - You can use the same branch to push to our main repo like `git push origin current-branch`.
+
+### Pushing to production
+
+1. Make sure you have the git origin url to production. If not,
+   do `git remote add production https://git.heroku.com/socioecon.git`
+2. If you want to push your changes to heroku, you push your changes to production by running the git
+   command `git push production current-branch:master`.
+
+Reference:
+```bash
+git remote add production https://git.heroku.com/socioecon.git
+git checkout staging
+git pull origin staging
+git push production staging:master
+```
 
 ## Adding another team to our server
 

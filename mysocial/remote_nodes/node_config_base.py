@@ -13,6 +13,7 @@ from authors.serializers.author_serializer import AuthorSerializer
 from follow.models import Follow
 from follow.serializers.follow_serializer import FollowRequestSerializer
 from common.base_util import BaseUtil
+import base64
 
 
 class NodeConfigBase:
@@ -31,7 +32,11 @@ class NodeConfigBase:
     team_metadata_tag = 'default'
     author_serializer = AuthorSerializer
 
-    """Mapping: remote to local"""
+    """
+    Mapping: remote to local
+    
+    Check author_serializer.py for duplicate; can't ref due to circular dependency
+    """
     remote_author_fields = {
         'id': 'official_id',
         'url': 'url',
@@ -78,6 +83,9 @@ class NodeConfigBase:
 
     def get_base_url(self):
         return f'{BaseUtil.get_http_or_https()}{self.__class__.domain}'
+
+    def convert_to_valid_author_url(self, author_id: str) -> str:
+        return f'{self.get_base_url()}/authors/{author_id}'
 
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""
@@ -134,7 +142,11 @@ class NodeConfigBase:
         return HttpResponseNotFound()
 
     def get_author_via_url(self, author_url: str) -> Author:
-        response = requests.get(author_url, auth=(self.username, self.password))
+        try:
+            response = requests.get(author_url, auth=(self.username, self.password))
+        except Exception as e:
+            print(f'{self}: get_author_via_url: possibly no connection: {e}')
+            return None
 
         if response.status_code == 200:
             author_json = json.loads(response.content.decode('utf-8'))
@@ -230,7 +242,12 @@ class NodeConfigBase:
 
     def get_authors_liked_on_post(self, object_id):
         url = f'{self.get_base_url()}{object_id}'
-        return requests.get(url = url, auth = (self.username, self.password))
+        response =  requests.get(url = url, auth = (self.username, self.password))
+
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to get author likes for post on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
     def get_authors_liked_on_comment(self, object_id):
         url = f'{self.get_base_url()}{object_id}'
@@ -240,14 +257,20 @@ class NodeConfigBase:
         url = f'{target_author_url}/liked'
         return requests.get(url = url, auth = (self.username, self.password))
 
-    def get_post_by_post_id(self, post_url):
-        url = f'{self.get_base_url()}{post_url}'
-        response =  requests.get(url = url, auth = (self.username, self.password))
+    def get_post_by_post_id(self, post_url) -> (dict, Response):
+        url = post_url  # for debugging
+        try:
+            url = f'{self.get_base_url()}{post_url}'
+            response =  requests.get(url = url, auth = (self.username, self.password))
 
-        if response.status_code < 200 or response.status_code > 300:
-            return Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if response.status_code < 200 or response.status_code > 300:
+                print(response.text)
+                return None, Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response(json.loads(response.content), status = status.HTTP_200_OK)
+            return json.loads(response.text), Response(json.loads(response.text), status = status.HTTP_200_OK)
+        except Exception as e:
+            print(f'{self}: get_post_by_id: @url: {url}: error: {e}')
+            return None, Response("Failed to get post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_authors_posts(self, request, author_posts_path):
         url = f'{self.get_base_url()}{author_posts_path}'
@@ -258,6 +281,40 @@ class NodeConfigBase:
 
         return Response(json.loads(response.content), status = status.HTTP_200_OK)
 
-    def get_comments_for_post(self, comments_path):
+    def get_comments_for_post(self, comments_path, author = None, request = None):
         url = f'{self.get_base_url()}{comments_path}'
-        return requests.get(url = url, auth = (self.username, self.password))
+        response = requests.get(url = url, auth = (self.username, self.password))
+
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to get author's post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(json.loads(response.content), status = status.HTTP_200_OK)
+    
+    def create_comment_on_post(self, comments_path, data, extra_data = None):
+        url = f'{self.get_base_url()}{comments_path}'
+        response =  requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to create a comment on remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response(json.loads(response.content), status = status.HTTP_200_OK)
+
+    def get_image_post(self, image_path):
+        url = f'{self.get_base_url()}{image_path}'
+        response =  requests.get(url = url, auth = (self.username, self.password))
+
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to get image post from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        return Response(response.content, status = status.HTTP_200_OK, content_type= response.headers['Content-Type'])
+    
+    def like_a_post(self, data, target_author_url, extra_data = None):
+        if target_author_url is None:
+            return 404
+        url = f'{target_author_url}/inbox'
+        response = requests.post(url = url, data = json.dumps(data), auth = (self.username, self.password), headers = {'content-type': 'application/json'})
+        
+        if response.status_code < 200 or response.status_code > 300:
+            return Response("Failed to create like from remote server", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        return Response(response.content, status = status.HTTP_200_OK, content_type= response.headers['Content-Type'])
+
