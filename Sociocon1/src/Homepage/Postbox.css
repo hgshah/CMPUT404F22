@@ -1,12 +1,19 @@
 .postbox{
-    padding-bottom: 10px;
-    border-bottom: 8px solid var(--home-background) ;
-    padding-right: 10px;
+  box-shadow: 1px 2px 9px #c48d4f;
+  margin: 4em;
+  padding: 1em;
 }
-
 .postbox_input {
     padding: 20px;
     display: flex;
+    text-align: right;
+    
+}
+.postbox_body {
+    padding: 20px;
+    display: flex;
+    text-align: right;
+    
 }
 
 .postbox_input > input{
@@ -14,10 +21,31 @@
     margin-left: 20px;
     font-size: 20px;
     border:none;
+    text-align: center;
+    
+}
+.postbox_body > input{
+    flex:1;
+    margin-left: 20px;
+    font-size: 20px;
+    border:none;
+    text-align: center;
+    
+    
 }
 
+
+.postbox_submit{
+    text-align: center;
+}
+.postbox_footer2{
+    text-align: left;
+    margin-left: 2px;
+}
+
+
 .postbox_button{
-    background-color: var(--home-color) !important;
+    background-color: burlywood !important;
     border: none !important;
     color: black !important;
     font-weight: 900 !important;
@@ -37,7 +65,7 @@
 h3{
     margin-top: 2px;
     font-size: large;
-    color: darkolivegreen;
+    color: black;
     font-style: italic;
     text-align: center;
   }

@@ -133,6 +133,10 @@ class Team14Local(LocalDefault):
             print(f'{self}: get_follow_request: get failed: {response.status_code}')
             return None
 
+    def delete_local_follow_remote(self, author_target: Author, author_actor: Author) -> dict:
+        super().delete_local_follow_remote(author_target, author_actor)
+        return {'message': 'success'}  # not really lol
+
     def get_all_author_jsons(self, params: dict):
         """Returns a list of authors as json"""
         url = f'{self.get_base_url()}/authors/'

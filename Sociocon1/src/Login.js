@@ -178,7 +178,7 @@ function Login() {
 
   return (
     <div className="form">
-      <h2> LOGIN - TEAM 10 </h2> 
+      <h2> LOGIN - Sociocecon </h2> 
       <form >
         <div className="input-container">
           <Card>

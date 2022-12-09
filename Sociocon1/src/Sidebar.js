@@ -19,7 +19,7 @@ function Sidebar(){
     {/* Sidebar option*/}
       
       
-      <LogoIcon className="sidebar_logoicon"  /> 
+      <LogoIcon fontSize="large" className="sidebar_logoicon"  /> 
       <div className="list">
          
              <a href="/login"> <LoginIcon/> Login </a> <br></br>

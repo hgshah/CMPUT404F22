@@ -4,6 +4,9 @@
     align-items: flex-start;
     border-bottom: 1px solid var(--home-background) ;
     padding-bottom: 10px;
+    box-shadow: 1px 2px 9px #c48d4f;
+    margin: 4em;
+    padding: 1em;
 }
 .post_body{
     flex: 1;
@@ -46,9 +49,9 @@
     font-size: small;
 }
 .postdel_button{
-    background-color: grey !important;
+    background-color: burlywood !important;
     border: none !important;
-    color: white !important;
+    color: black !important;
     font-weight: 900 !important;
     text-transform: inherit !important;
     height: 40px !important;
@@ -68,6 +71,7 @@
     text-transform: capitalize;
     font-size: 15px;
     font-weight: bold;
+    
 }
 
 .follow_span .follow_btn:hover {

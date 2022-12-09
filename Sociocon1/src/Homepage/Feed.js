@@ -101,6 +101,7 @@ function Feed({}) {
         
       {/* header*/}
       <Postbox authorid = {authorid} />
+      <h3> Public Posts</h3>
       
       {
                         p_post.map((posts) => {

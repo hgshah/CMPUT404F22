@@ -534,7 +534,7 @@ class FollowersIndividualView(GenericAPIView):
         follow_json = follow_serializer.data
         return Response(follow_json)
 
-    @staticmethod
+    @classmethod
     @extend_schema(
         summary="Decline or delete follow request",
         tags=[
@@ -545,7 +545,7 @@ class FollowersIndividualView(GenericAPIView):
             200: OpenApiResponse(response=FollowRequestSerializer)
         }
     )
-    def delete(request: Request, target_id: str, follower_id: str):
+    def delete(cls, request: Request, target_id: str, follower_id: str):
         """
         The following can remove the follower in the follow list of an author:
         - The follower (actor)
@@ -562,31 +562,35 @@ class FollowersIndividualView(GenericAPIView):
         if follow is None:
             return error_response
         follow: Follow = follow  # type hint
-        target = follow.get_author_target()
-        actor = follow.get_author_actor()
 
-        if target != request.user and actor != request.user and not request.user.is_authenticated_node:
-            # you're not allowed!
-            return HttpResponseForbidden()
+        # the wild world
+        try:
+            target = follow.get_author_target()
+            actor = follow.get_author_actor()
 
-        # protection against bad server
-        if request.user.is_authenticated_node:
-            host = request.user.host
-            if host != target.host and host != actor.host:
+            if target != request.user and actor != request.user and not request.user.is_authenticated_node:
+                # you're not allowed!
                 return HttpResponseForbidden()
 
-        # we gotta make sure, remote server isn't sending us inbox anymore!
-        if not target.is_local():
-            node_config: NodeConfigBase = base.REMOTE_CONFIG.get(target.host)
-            if node_config is None:
-                print(f"FollowersIndividualView: delete: cannot find node_config: {target.host}")
-                return HttpResponseNotFound()
-            # todo
-            response = node_config.delete_local_follow_remote(author_target=follow.get_author_target(),
-                                                              author_actor=follow.get_author_actor())
-            if response is int:
-                print(f"Delete: unknown status code: {response}")
-                return HttpResponseBadRequest("Struggling to communicate with the other server T.T")
+            # protection against bad server
+            if request.user.is_authenticated_node:
+                host = request.user.host
+                if host != target.host and host != actor.host:
+                    return HttpResponseForbidden()
+
+            # we gotta make sure, remote server isn't sending us inbox anymore!
+            if not target.is_local():
+                node_config: NodeConfigBase = base.REMOTE_CONFIG.get(target.host)
+                if node_config is None:
+                    print(f"FollowersIndividualView: delete: cannot find node_config: {target.host}")
+                    return HttpResponseNotFound()
+                # todo
+                response = node_config.delete_local_follow_remote(author_target=follow.get_author_target(),
+                                                                  author_actor=follow.get_author_actor())
+                if response is int:
+                    print(f"{cls}: delete: unknown status code: {response}")
+        except Exception as e:
+            print(f'{cls}: delete: unknown error: {e}')
 
         follow_serializer = FollowRequestSerializer(follow)
         follow_json = follow_serializer.data
