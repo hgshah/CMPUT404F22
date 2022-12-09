@@ -21,7 +21,7 @@ import axios from 'axios'
 import Login from '../Login';
 import EditPost from '../Homepage/EditPost';
 import { Card } from 'antd';
-function InboxPosts({displayName, title, description, text, image, avatar, visibility,contenttype, purl, commenturl, post_authorid}) {
+function InboxPosts({displayName, title, description, text, image, avatar, visibility,contenttype, purl, commenturl, post_authorid, host}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
     const token = localStorage.getItem("token")
@@ -360,6 +360,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
                 <div className='visibility'>
                     <h4>
                          {visibility} 
+                         {host}
                     </h4>
                 </div>
                 <div className = "post_headerdis">

@@ -230,20 +230,20 @@ export default function Info() {
     useEffect(() => {
 
         async function getGitactivity() {
-            await axios.get('https://api.github.com/users/' + disName  , {
+            await axios.get('https://api.github.com/repos/hgshah/cmput404-project/commits'  , {
                 
             }).then((response) => {
                 // console.log(response.data.github)
-                console.log(response.data.length)
+                console.log(response.data[0].commit)
                 setGithubActivity(response.data.bio)
-                setGithubrepos(response.data.length)
+                setGithubrepos(response.data.commit)
             })
             
         }
   
         getGitactivity()
         
-    }, [GithubAct])
+    },[])
 
     function Goto() {
         navigate('https://api.github.com/users/' + disName )

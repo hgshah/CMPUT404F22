@@ -1,6 +1,7 @@
 // link: https://github.com/CleverProgrammers/twitter-clone
 // author: CleverProgrammer: https://www.youtube.com/c/CleverProgrammer/videos
 // license: https://www.apache.org/licenses/LICENSE-2.0
+// link for css shadow box: https://bobbyhadz.com/blog/react-box-shadow#:~:text=To%20set%20a%20box-shadow%20in%20React%3A%201%20Set,add%20a%20shadow%20effect%20around%20the%20element%27s%20frame.
 import { Button, TextField } from '@mui/material'
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
@@ -10,8 +11,8 @@ import {useNavigate} from 'react-router-dom'
 // import ReactMarkdown from 'react-markdown'
 import { upload } from '@testing-library/user-event/dist/upload';
 import { Card } from 'antd';
-
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function Postbox ({}) {
     const [title, setPostTitle] = useState('');
     const [description, setPostBody] = useState('');
@@ -26,6 +27,7 @@ function Postbox ({}) {
     const token = localStorage.getItem("token")
     const ibase64 = localStorage.getItem("image")
     const [profilePic, setProfilePic] = useState()
+    
      // const handleClick = () => {
     //     //  "message" stores input field value
     //     setPostMessage(postMessage);
@@ -194,7 +196,7 @@ function Postbox ({}) {
          setPimage(base64)
          
     }   
-  
+    const notify = () => toast("Wow so easy!");
     const toB64 = (pimage) => {
             return new Promise ((resolve,reject)=>{
                 const filereader = new FileReader();
@@ -226,23 +228,37 @@ function Postbox ({}) {
     
   return (
     <div className='postbox'>
-        <h4>Make a new post</h4>
+        <h4>  Make a new post </h4>
+         
         <form> 
             
             <div className="postbox_input">
+                
                 {/* <Avatar src = {profilepic} /> */}
-                <Card>
-                    <input 
-                    onChange={e => setPostTitle(e.target.value)} 
-                    value={title} 
-                    placeholder='Enter post title' 
-                    type = "text"
-                    name = "title"
-                    />
+                
+                    <div className='postbox_title'>
+                        <input 
+                        onChange={e => setPostTitle(e.target.value)} 
+                        value={title} 
+                        placeholder='Enter post title' 
+                        type = "text"
+                        name = "title"
+                        />
+                    </div>
+                     <br/>
+                     <div className='postbox_body'>
+                        <TextField  
+                        onChange={e => setPostBody(e.target.value)}
+                        value={description} 
+                        placeholder='Enter post body' 
+                        type = "text"
+                        name = "description"
+                        
+                        />
+                     </div>
                     
                     
-                </Card>
-                <label for="set-visibility"></label>
+                    <label for="set-visibility"></label>
                     {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
                         author: https://developer.mozilla.org/en-US/
                         License: https://creativecommons.org/licenses/by-sa/4.0/*/}
@@ -251,18 +267,7 @@ function Postbox ({}) {
                         <option  value="public">Public</option>
                         <option value = "friends">Friends</option>
                     </select>
-                
-            </div>
-            <div className='postbody'>
-                <Card>
-                    <TextField 
-                    onChange={e => setPostBody(e.target.value)}
-                    value={description} 
-                    placeholder='Enter post body' 
-                    type = "text"
-                    name = "description"
-                    
-                    /> <br></br>
+                     <br></br>
                     
                     <select value={url} onChange={e => setUrl(e.target.value)} name="contentType" id="ContentType">
                         <option  value="" >select if url</option>
@@ -282,7 +287,14 @@ function Postbox ({}) {
                         <option value = "image/png;base64">image/png;base64</option>
                         <option value = "image/jpeg;base64">image/jpeg;base64</option>
                     </select>
-                </Card>
+                    
+                
+                
+                
+            </div>
+            <div className='postbody'>
+            
+                
             
                 
             </div>
@@ -301,7 +313,6 @@ function Postbox ({}) {
             <Button onClick = {AddPostInfo}  className = "postbox_button" >Post</Button>
             
         </form>
-      
     </div>
    
   )

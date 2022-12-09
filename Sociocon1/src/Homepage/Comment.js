@@ -18,6 +18,7 @@ function Comment({pcurl}) {
   const [pcomment, setPostComment] = useState('');
   const [cname, setPostName] = useState('');
   const token = localStorage.getItem("token")
+  const hosturl = localStorage.getItem("hosturl")
 //   const Show_Comments = async () => {
         
 //     await axios({
@@ -39,24 +40,26 @@ function Comment({pcurl}) {
 useEffect(() => {
   async function getAllComments(){
       try {
+              if(hosturl==="socioecon.herokuapp.com"){
+                const p_comments = await axios.get(
+                  pcurl + '/comments',
 
-              const p_comments = await axios.get(
-                pcurl + '/comments',
+                    {headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token}},
+                    
+                    )
+                    const icpost = []
+                    const icpostname = []
+                    for(let i = 0; i<1; i++){
+                        
+                       icpost.push(p_comments.data.items[i].comment)
+                       icpostname.push(p_comments.data.items[i].author.preferredName)
+                    }
+                console.log(icpost)
+                console.log(icpostname)
+                setPostComment(icpost)
+                setPostName(icpostname)
+              } 
               
-                  {headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token}},
-                  
-                  )
-                  const icpost = []
-                  const icpostname = []
-                  for(let i = 0; i<1; i++){
-                      
-                     icpost.push(p_comments.data.items[i].comment)
-                     icpostname.push(p_comments.data.items[i].author.preferredName)
-                  }
-              console.log(icpost)
-              console.log(icpostname)
-              setPostComment(icpost)
-              setPostName(icpostname)
       }
       
       catch(error){
@@ -70,24 +73,28 @@ useEffect(() => {
 useEffect(() => {
   async function getAllComments(){
       try {
-
-              const p_comments = await axios.get(
-                pcurl + '/comments',
+              if (hosturl === "cmput404-social.herokuapp.com") {
+                const p_comments = await axios.get(
+                  pcurl + '/comments',
+                
+                    {headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token}},
+                    
+                    )
+                    const icpost = []
+                    const icpostname = []
+                    for(let i = 0; i<1; i++){
+                        
+                       icpost.push(p_comments.data.comments[i].comment)
+                       icpostname.push(p_comments.data.comments[i].author.displayName)
+                    }
+                console.log(icpost)
+                console.log(icpostname)
+                setPostComment(icpost)
+                setPostName(icpostname)
+              }else {
+                throw new TypeError("not equel")
+              }
               
-                  {headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token}},
-                  
-                  )
-                  const icpost = []
-                  const icpostname = []
-                  for(let i = 0; i<1; i++){
-                      
-                     icpost.push(p_comments.data.comments[i].comment)
-                     icpostname.push(p_comments.data.comments[i].author.displayName)
-                  }
-              console.log(icpost)
-              console.log(icpostname)
-              setPostComment(icpost)
-              setPostName(icpostname)
       }
       
       catch(error){
@@ -100,24 +107,28 @@ useEffect(() => {
 useEffect(() => {
   async function getAllComments(){
       try {
-
-              const p_comments = await axios.get(
-                pcurl + '/comments',
+              if(hosturl ==="true-friends-404.herokuapp.com"){
+                const p_comments = await axios.get(
+                  pcurl + '/comments',
+                
+                    {headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token}},
+                    
+                    )
+                    const icpost = []
+                    const icpostname = []
+                    for(let i = 0; i<1; i++){
+                        
+                       icpost.push(p_comments.data[i].comment)
+                       icpostname.push(p_comments.data[i].author.username)
+                    }
+                console.log(icpost)
+                console.log(icpostname)
+                setPostComment(icpost)
+                setPostName(icpostname)
+              } else {
+                throw new TypeError("not equel")
+              }
               
-                  {headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token}},
-                  
-                  )
-                  const icpost = []
-                  const icpostname = []
-                  for(let i = 0; i<1; i++){
-                      
-                     icpost.push(p_comments.data[i].comment)
-                     icpostname.push(p_comments.data[i].author.username)
-                  }
-              console.log(icpost)
-              console.log(icpostname)
-              setPostComment(icpost)
-              setPostName(icpostname)
       }
       
       catch(error){
@@ -130,24 +141,28 @@ useEffect(() => {
 useEffect(() => {
   async function getAllComments(){
       try {
-
-              const p_comments = await axios.get(
-                pcurl + '/comments',
+              if(hosturl ==="social-distribution-14degrees.herokuapp.com"){
+                const p_comments = await axios.get(
+                  pcurl + '/comments',
+                
+                    {headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token}},
+                    
+                    )
+                    const icpost = []
+                    const icpostname = []
+                    for(let i = 0; i<1; i++){
+                       
+                       icpost.push(p_comments.data[i].comment)
+                       icpostname.push(p_comments.data[i].author.display_name)
+                    }
+                console.log(icpost)
+                console.log(icpostname)
+                setPostComment(icpost)
+                setPostName(icpostname)
+              } else {
+                throw new TypeError("not equel")
+              }
               
-                  {headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token}},
-                  
-                  )
-                  const icpost = []
-                  const icpostname = []
-                  for(let i = 0; i<1; i++){
-                     
-                     icpost.push(p_comments.data[i].comment)
-                     icpostname.push(p_comments.data[i].author.display_name)
-                  }
-              console.log(icpost)
-              console.log(icpostname)
-              setPostComment(icpost)
-              setPostName(icpostname)
       }
       
       catch(error){

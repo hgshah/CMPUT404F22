@@ -7,9 +7,37 @@ import { TextField } from '@mui/material'
 export default function RemPosts() {
     const [remid, setRemid] = useState('')
     const [rp_inbox, setRPInbox] = useState([])
+    const [p_host, setPhost] = useState([])
     const token = localStorage.getItem("token")
     const rempostid = localStorage.getItem("rempostid")
 
+    useEffect(() => {
+        async function getHost(){
+            try {
+                    const p_host = await axios.get(
+                        "https://socioecon.herokuapp.com/authors/" + rempostid ,
+                    
+                        {headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token}},
+                        
+                        )
+                        const iposthost = []
+                        
+                        
+                            
+                           
+                        
+                    
+                    localStorage.setItem("hosturl", p_host.data.host)
+                    setPhost(p_host.data.host)
+            }
+            
+            catch(error){
+                console.log(error)
+            }
+            
+        }
+        getHost()
+    }, [])
     useEffect(() => {
         async function getAllInbox(){
             try {

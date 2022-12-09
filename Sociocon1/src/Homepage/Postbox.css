@@ -1,7 +1,7 @@
 .postbox{
-    padding-bottom: 10px;
-    border-bottom: 8px solid var(--home-background) ;
-    padding-right: 10px;
+  box-shadow: 1px 2px 9px #f4aab9;
+  margin: 4em;
+  padding: 1em;
 }
 
 .postbox_input {

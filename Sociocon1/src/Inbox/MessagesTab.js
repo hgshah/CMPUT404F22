@@ -8,6 +8,9 @@ import  ReactDOM from 'react-dom';
 import { Alert, TextField, Button } from '@mui/material';
 import { lightGreen } from '@mui/material/colors';
 import { Card } from 'antd';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import 'react-notifications/lib/notifications.css';
 export default function MessagesTab() {
   const [authorlist, setAuthorList] = useState([])
   const [post, setPost] = useState([])
@@ -79,8 +82,6 @@ const Show_PostList = async (rem) => {
       const remlist = []
       for(let i = 0; i<=response.data.items.length; i++){
 
-        
-        
         // console.log("name: ", response.data.items[i].author.preferredName)
         // console.log("post title: ",response.data.items[i].title)
         // console.log("post descp: ", response.data.items[i].description)
@@ -96,10 +97,11 @@ function handle() {
   alert("checking posts")
 }
 
+
   return (
     <div className='MessagesTab'>
      
-        
+    
         <select value={teamname} onChange={e => setTeamname(e.target.value)} name="teamname" id="teamname">
                     <option  value="" >choose team</option>
                     <option  value="team7">team7</option>
@@ -136,7 +138,6 @@ function handle() {
        
         
         {/* <input value = {authorlist} /> */}
-        
         
     </div>
   )
