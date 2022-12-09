@@ -11,8 +11,6 @@ import {useNavigate} from 'react-router-dom'
 // import ReactMarkdown from 'react-markdown'
 import { upload } from '@testing-library/user-event/dist/upload';
 import { Card } from 'antd';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 function Postbox ({}) {
     const [title, setPostTitle] = useState('');
     const [description, setPostBody] = useState('');
@@ -196,7 +194,6 @@ function Postbox ({}) {
          setPimage(base64)
          
     }   
-    const notify = () => toast("Wow so easy!");
     const toB64 = (pimage) => {
             return new Promise ((resolve,reject)=>{
                 const filereader = new FileReader();
