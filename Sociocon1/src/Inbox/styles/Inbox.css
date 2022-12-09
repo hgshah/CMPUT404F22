@@ -95,7 +95,7 @@ ul.choose li:hover {
 }
 
 ul.choose li.current {
-  background: rgb(159, 185, 31);
+  background: burlywood;
 }
 
 .Tabs {

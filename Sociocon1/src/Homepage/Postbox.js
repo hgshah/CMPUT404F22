@@ -230,13 +230,13 @@ function Postbox ({}) {
     <div className='postbox'>
         <h4>  Make a new post </h4>
          
-        <form> 
+        
             
             <div className="postbox_input">
                 
                 {/* <Avatar src = {profilepic} /> */}
-                
-                    <div className='postbox_title'>
+
+                        <label>Title</label>
                         <input 
                         onChange={e => setPostTitle(e.target.value)} 
                         value={title} 
@@ -244,21 +244,20 @@ function Postbox ({}) {
                         type = "text"
                         name = "title"
                         />
-                    </div>
-                     <br/>
-                     <div className='postbox_body'>
-                        <TextField  
-                        onChange={e => setPostBody(e.target.value)}
-                        value={description} 
-                        placeholder='Enter post body' 
-                        type = "text"
-                        name = "description"
-                        
-                        />
-                     </div>
-                    
-                    
-                    <label for="set-visibility"></label>
+                
+            </div>
+            <div className='postbox_body'>
+            <label>Description</label>
+                            <input 
+                            onChange={e => setPostBody(e.target.value)}
+                            value={description} 
+                            placeholder='Enter post body' 
+                            type = "text"
+                            name = "description"
+                            />
+            </div>
+            <div className='poxtbox_footer'>
+            <label for="set-visibility"> Visibility </label>
                     {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
                         author: https://developer.mozilla.org/en-US/
                         License: https://creativecommons.org/licenses/by-sa/4.0/*/}
@@ -267,13 +266,13 @@ function Postbox ({}) {
                         <option  value="public">Public</option>
                         <option value = "friends">Friends</option>
                     </select>
-                     <br></br>
-                    
+                     
+                    <label> Url </label>
                     <select value={url} onChange={e => setUrl(e.target.value)} name="contentType" id="ContentType">
                         <option  value="" >select if url</option>
                         <option  value="url">url</option>
-                    </select>
-                    <label for="set-contentType"></label>
+                    </select> 
+                    <label for="set-contentType"> Content Type</label>
                     {/* // Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select 
                         author: https://developer.mozilla.org/en-US/
                         License: https://creativecommons.org/licenses/by-sa/4.0/*/}
@@ -287,32 +286,29 @@ function Postbox ({}) {
                         <option value = "image/png;base64">image/png;base64</option>
                         <option value = "image/jpeg;base64">image/jpeg;base64</option>
                     </select>
-                    
-                
-                
                 
             </div>
-            <div className='postbody'>
-            
-                
-            
-                
+            <br></br>
+            <div className='postbox_footer2'>
+                <input 
+                    onChange={e => uploadImage(e)}
+                    type = "file"
+                    name = "post image"
+                    />
             </div>
-
             {/* <input value={postImage} onchange = {e => setPostImage(e.target.value)} className="postbox_inputimage" placeholder='Enter a image url' type = "text" /> <br></br> */}
             {/* // link: https://www.youtube.com/watch?v=xtQ74HKTOwY */}
-            <input 
-                onChange={e => uploadImage(e)}
-                type = "file"
-                name = "post image"
-                />
-             <img src = {pimage} height = "200px"/> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            
+             {/* <img src = {pimage} height = "200px"/> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
             {/* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/
                 // license:  https://creativecommons.org/licenses/by-sa/4.0/ */}
-            <Button onClick = {AddPostInfo}  className = "postbox_button" >Post</Button>
+            <div className='postbox_submit'>
+                <Button onClick = {AddPostInfo}  className = "postbox_button" >Post</Button>
+            </div>
             
-        </form>
+            
+        
     </div>
    
   )

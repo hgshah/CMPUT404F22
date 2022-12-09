@@ -1,6 +1,6 @@
 body{
-    --home-color: rgb(159, 185, 31);
-    --home-background:#6E6E6E;
+    --home-color: black;
+    --home-background:burlywood;
   }
   .home{
     display: flex;

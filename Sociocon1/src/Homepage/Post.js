@@ -308,6 +308,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                             style={{backgroundColor: following ? "rgb(211, 211, 211)" : "rgb(159, 185, 31)"}} >
                                 {/* {following ? "Following" : "Follow"} */}
                                 {followButtonText}
+
                             </Button>
                             {/* hardcode */}
                             {/* <input 
