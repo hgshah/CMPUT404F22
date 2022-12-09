@@ -105,21 +105,6 @@ export default function FriendRequestsTab() {
         // console.log(followingBack)
         // console.log(response.data)
     })
-    //if user is already following back
-    // } else {
-    //   //auth id = id of user that is losing the follower, the next id is of the user that is un be-friending
-    //   await axios.delete('https://socioecon.herokuapp.com/authors/'+ auth_id + '/followers/' + authorid, {
-    //     headers: {"Authorization": "Token " + token}
-    //   }).then((response) => {
-    //     // console.log(followingBack)
-    //     setFollowingBack(!followingBack);
-    //     setAccButtonText('Follow Back')
-    //     // console.log(followingBack)
-    //     // console.log(response.data)
-    //   }).catch((error) => {
-    //     console("ERROR followBackClicked else: ", error.data)
-    //   })
-    // }
   }
 
   const unbefriendClicked = async(rf_id) => {
@@ -130,7 +115,7 @@ export default function FriendRequestsTab() {
         // setFollowingBack(!followingBack);
         // setAccButtonText('Follow Back')
         // console.log(followingBack)
-        // console.log(response.data)
+        console.log(response.data)
       }).catch((error) => {
         console("ERROR followBackClicked else: ", error.data)
       })
@@ -234,11 +219,6 @@ export default function FriendRequestsTab() {
       // console.log("FINAL RESULT: ", result)
       return result
     }
-
-    // await getAllRequests();
-    // await getAcceptedRequests();
-    // await getRealFriends();
-    // getNotFollowingBack();
 
     Promise.all([getAllRequests(), getAcceptedRequests(), getRealFriends()]).then((values) => {
       console.log("VALUES: ", values)
