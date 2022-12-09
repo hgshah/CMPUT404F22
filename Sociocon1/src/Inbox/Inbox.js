@@ -11,35 +11,11 @@ import TabDesc from "./TabDesc";
 import Tabs from "./Tabs";
 import RemPosts from "./RemPosts"
 
-// const tabList = [
-//     {
-//       id: 'all',
-//       label: 'All',
-//     },
-//     {
-//       id: 'mentions',
-//       label: 'Mentions',
-//     },
-//   ]
-
 export default function Inbox() {
     //initial selected tab will be activity
-    const [currentTab, setCurrentTab] = useState("requests");
+    const [currentTab, setCurrentTab] = useState("activity");
     const preferredName = localStorage.getItem("preferredName")
     
-    // Handle when user changes tabs
-    function handleActivityTab() {
-        setCurrentTab("activity")
-    }
-
-    function handleRequestsTab() {
-        setCurrentTab("requests")
-    }
-
-    function handleMessagesTab() {
-        setCurrentTab("messages")
-    }
-
     return (
     <div>
         <Sidebar/>
@@ -57,13 +33,6 @@ export default function Inbox() {
                 <TabDesc id="requests" title="Friend Requests" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
                 <TabDesc id="authorlist" title="AuthorList" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
                 <TabDesc id="remposts" title="RemPosts" currentTab={currentTab} setCurrentTab={setCurrentTab}/>
-                {/* <li className={currentTab === "activity" ? "current" : ""}
-                onClick={handleActivityTab}>Activity</li>
-                <li className={currentTab === "requests" ? "current" : ""}
-                onClick={handleRequestsTab}>Friend Requests</li>
-                <li className={currentTab === "messages" ? "current" : ""}
-                onClick={handleMessagesTab}>Messages</li> */}
-                
             </ul>
             <div className="outlet">
                 <Tabs id="activity" currentTab={currentTab}>
@@ -79,9 +48,6 @@ export default function Inbox() {
                 <Tabs id="remposts" currentTab={currentTab}>
                     <RemPosts/>
                 </Tabs>
-                {/* {currentTab === "activity" ? <ActivityTab /> : ""}
-                {currentTab === "requests" ? <FriendRequestsTab /> : ""}
-                {currentTab === "messages" ? <MessagesTab /> : ""} */}
             </div>
         </div>
         {/* <News/> */}

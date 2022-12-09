@@ -2,14 +2,14 @@ body{
     --home-color: rgb(159, 185, 31);
     --home-background:#e6ecf0;
   }
-  .inbox{
+  /* .inbox{
     display: flex;
     height: 100vh;
     max-width: 1300px;
     margin-left:auto;
     margin-right:auto;
     padding: 0 10px;
-  }
+  } */
 
   /* * {
     box-sizing: border-box;
@@ -32,11 +32,12 @@ body{
   left: 25%;
   width: 50%;
   flex: 0.8;
-  border: 1px solid;
+  border: 5px solid lavender;
   height: auto;
   overflow-y:scroll;
-  padding-top: 0px;
-  padding-bottom: 10px;
+  /* padding-top: 0px;
+  padding-bottom: 10px; */
+  padding: 20px;
   margin: 0.5rem auto 1.5rem;
   border-radius: 2rem;
 }
@@ -63,7 +64,7 @@ ul.choose {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 1px solid #000000;
+  border: 2px solid #000000;
   border-radius: 2rem;
   padding-left: 0px;
   @media (max-width: 768px) {
@@ -91,7 +92,7 @@ ul.choose li:last-child {
 }
 
 ul.choose li:hover {
-  background: rgba(28, 133, 219, 0.15);
+  background: rgba(222, 184, 135, 0.251);
 }
 
 ul.choose li.current {

@@ -22,10 +22,10 @@ function Sidebar(){
       <LogoIcon fontSize="large" className="sidebar_logoicon"  /> 
       <div className="list">
          
-             <a href="/login"> <LoginIcon/> Login </a> <br></br>
-             <a href="/home"> <HomeIcon/> Home </a> <br></br>
-             <a href="/profile"> <ProfileIcon/> Profile </a> <br></br>
-             <a href="/inbox"> <InboxIcon/> Inbox </a> 
+            <Button> <a href="/login" className="login_link"> <LoginIcon/> Login </a> </Button> <br></br>
+            <Button><a href="/home" className="home_link"> <HomeIcon/> Home </a> </Button> <br></br>
+            <Button><a href="/profile" className="profile_link"> <ProfileIcon/> Profile </a> </Button> <br></br>
+            <Button><a href="/inbox" className="inbox_link"> <InboxIcon/> Inbox </a> </Button>
          
             
          

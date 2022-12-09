@@ -34,9 +34,41 @@
 }
 
 .list{
-    color: var(--home-color);
+    /* color: var(--home-color); */
     font-size: 30px !important;
     margin-left: 20px;
     margin-bottom: 20px;
 }
 
+.login_link {
+    color: #C4A484;
+    background-color: black;
+    border-radius: 30px;
+    padding: 18px 42px;
+    font-weight: bold;
+    border: 8px solid #a98663;
+}
+.home_link {
+    color: #C4A484;
+    background-color: black;
+    border-radius: 30px;
+    padding: 18px 42px;
+    font-weight: bold;
+    border: 8px solid #a98663;;
+}
+.profile_link {
+    color: #C4A484;
+    background-color: black;
+    border-radius: 30px;
+    padding: 18px 32px;
+    font-weight: bold;
+    border: 8px solid #a98663;;
+}
+.inbox_link {
+    color: #C4A484;
+    background-color: black;
+    border-radius: 30px;
+    padding: 18px 40px;
+    font-weight: bold;
+    border: 8px solid #a98663;;
+}

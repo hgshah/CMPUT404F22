@@ -256,7 +256,12 @@ export default function Info() {
                 <br></br>
                 <h1>My Profile</h1>
                 <br></br>
-                <img className='profilePicture' src={profilePic} alt=""/>
+                <div className='pp_overlay'>
+                    <img className='profilePicture' src={profilePic} alt=""/>
+                    <div class="overlay_name">
+                        <div class="text">{displayedName}</div>
+                    </div>
+                </div>
                 <br></br>
 
                 <InputText

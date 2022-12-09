@@ -3,7 +3,7 @@
     border-right: 1px solid var(--home-background);
     min-width: fit-content;
     overflow-y:scroll;
-    border-radius: 2rem; 
+    border-radius: 2rem;
     /* background-color: rgba(15, 202, 71, 0.238); */
     /* margin-right: 15px; */
 }
@@ -13,6 +13,7 @@
     text-align: center;
     border: 5px solid lavender;
     border-radius: 2rem;
+    /* border-bottom-left-radius: 2rem; */
 }
 
 /* h1 {
@@ -25,7 +26,17 @@
     border-radius: 50%;
     object-fit: cover;
     border:rgb(159, 185, 31);
+    transition: .5s ease;
+    opacity: 1;
+    margin-left: 160%
+    
 }
+
+.pp_overlay {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+  }
 
 .display_socials {
     text-align: center;
@@ -44,7 +55,7 @@ table {
 }
 
 .editUsername {
-    color: rgb(159, 185, 31);
+    color: #C4A484;
     padding-left: 10px;
 }
 
@@ -92,6 +103,7 @@ body.active-modal {
     background-color: rgb(255, 0, 0);
     color: black;
     font-weight: bold;
+    border-radius: 2rem
 }
 
 .profileHeader .delete_pp:hover {
@@ -121,3 +133,33 @@ body.active-modal {
     font-size: x-large;
     margin-right: 50%;
 }
+
+.overlay_name {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%)
+  }
+
+.text {
+    background-color: #C4A484;
+    border-radius: 2rem;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 16px 32px;
+    margin-bottom: 50%;
+
+  }
+
+
+  .pp_overlay:hover .profilePicture {
+    opacity: 0.3;
+  }
+  
+  .pp_overlay:hover .overlay_name {
+    opacity: 1;
+  }

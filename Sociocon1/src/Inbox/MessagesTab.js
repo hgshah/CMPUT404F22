@@ -109,7 +109,7 @@ function handle() {
                     <option value = "team14">team14</option>  
                     <option value = "team10">team10</option>  
                 </select> <br/>
-                <Button onClick={Show_AuthorList} >Get </Button> <br/>
+                <Button onClick={Show_AuthorList} className="get_btn" >Get </Button> <br/>
         <input 
                         onChange={e => setRemid(e.target.value)} 
                         value={remid} 
@@ -117,7 +117,7 @@ function handle() {
                         type = "text"
                         name = "rempost"
                 />
-                <Button onClick = {localStorage.setItem("rempostid", remid)}> Search </Button>
+                <Button onClick = {localStorage.setItem("rempostid", remid)} className="search_btn" > Search </Button>
         
         
         {
