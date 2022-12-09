@@ -40,7 +40,7 @@ function Comment({pcurl}) {
 useEffect(() => {
   async function getAllComments(){
       try {
-              if(hosturl==="socioecon.herokuapp.com"){
+              
                 const p_comments = await axios.get(
                   pcurl + '/comments',
 
@@ -58,7 +58,7 @@ useEffect(() => {
                 console.log(icpostname)
                 setPostComment(icpost)
                 setPostName(icpostname)
-              } 
+              
               
       }
       
@@ -73,7 +73,7 @@ useEffect(() => {
 useEffect(() => {
   async function getAllComments(){
       try {
-              if (hosturl === "cmput404-social.herokuapp.com") {
+              
                 const p_comments = await axios.get(
                   pcurl + '/comments',
                 
@@ -91,9 +91,8 @@ useEffect(() => {
                 console.log(icpostname)
                 setPostComment(icpost)
                 setPostName(icpostname)
-              }else {
-                throw new TypeError("not equel")
-              }
+              
+              
               
       }
       
@@ -107,7 +106,7 @@ useEffect(() => {
 useEffect(() => {
   async function getAllComments(){
       try {
-              if(hosturl ==="true-friends-404.herokuapp.com"){
+              
                 const p_comments = await axios.get(
                   pcurl + '/comments',
                 
@@ -125,9 +124,7 @@ useEffect(() => {
                 console.log(icpostname)
                 setPostComment(icpost)
                 setPostName(icpostname)
-              } else {
-                throw new TypeError("not equel")
-              }
+              
               
       }
       
@@ -141,7 +138,7 @@ useEffect(() => {
 useEffect(() => {
   async function getAllComments(){
       try {
-              if(hosturl ==="social-distribution-14degrees.herokuapp.com"){
+             
                 const p_comments = await axios.get(
                   pcurl + '/comments',
                 
@@ -159,9 +156,7 @@ useEffect(() => {
                 console.log(icpostname)
                 setPostComment(icpost)
                 setPostName(icpostname)
-              } else {
-                throw new TypeError("not equel")
-              }
+              
               
       }
       
