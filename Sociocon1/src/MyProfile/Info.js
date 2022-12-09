@@ -230,11 +230,11 @@ export default function Info() {
     useEffect(() => {
 
         async function getGitactivity() {
-            await axios.get('https://api.github.com/repos/hgshah/cmput404-project/commits'  , {
+            await axios.get('https://api.github.com/users/' + displayedName  , {
                 
             }).then((response) => {
                 // console.log(response.data.github)
-                console.log(response.data[0].commit)
+                console.log(response.data.commit)
                 setGithubActivity(response.data.bio)
                 setGithubrepos(response.data.commit)
             })
@@ -339,10 +339,10 @@ export default function Info() {
             <div className='profile_footer'>
             {/* link:  https://mui.com/material-ui/react-card/ 
             author:https://mui.com/material-ui/react-card/
-            license:  */}
+            license: open source */}
             <React.Fragment>
                 <CardContent>
-                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                <Typography sx={{ fontSize: 15 }} >
                     Github bio
                 </Typography>
                
@@ -352,16 +352,9 @@ export default function Info() {
                     <br/>
                 
                 </Typography>
-                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    Total Commits: {Githubrepos}
-                </Typography>
-                <Typography variant='body2' sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                 {'"Thank you for reading my bio, for more info click learn more"'}
-                </Typography>
+                
                 </CardContent>
-                <CardActions>
-                <Button onClick={Goto} size="small">Learn More</Button>
-                </CardActions>
+                
             </React.Fragment>
             </div>
 

@@ -1,7 +1,7 @@
 // link: https://github.com/CleverProgrammers/twitter-clone
 // author: CleverProgrammer: https://www.youtube.com/c/CleverProgrammer/videos
 // license: https://www.apache.org/licenses/LICENSE-2.0
-
+// this page will show all the posts we get from the backend and show them on the homepage
 import React, {useState, useEffect} from 'react'
 import "./Feed.css"
 import Postbox from './Postbox'
@@ -11,7 +11,6 @@ import Post from './Post'
 import Inbox from "../Inbox/Inbox";
 import axios from 'axios'
 import Comment from './Comment'
-import Test from '../Test';
 import Profile from "../MyProfile/Profile";
 import Login from '../Login';
 import ReactDom from 'react-dom'
@@ -75,19 +74,7 @@ function Feed({}) {
     // link: https://www.youtube.com/watch?v=aRYkCe6JcGM
     // author: https://www.youtube.com/c/GreatAdib
     // license: https://creativecommons.org/
-    // const DeletePostInfo = async (id) => {
-    //     String(id)
-    //     const nid = String(id).slice(-36)
-    //     await axios({
-    //             method:'DELETE',
-    //             url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/' + nid + '/',
-            
-    //     }).then((response) =>{
-    //         console.log(response.data)
-    //         navigate.push('/')
-    //     })
-    // }
-  //const navigate = useNavigate()
+
   return (
     <div className='feed'>
         <div className="feed_header">

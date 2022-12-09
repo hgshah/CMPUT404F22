@@ -1,3 +1,4 @@
+// this page will show all the psots of the searched author in authorlist tab
 import React from 'react'
 import "./styles/RemPosts.css"
 import { useState, useEffect } from 'react'

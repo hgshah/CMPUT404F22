@@ -10,6 +10,12 @@ import MessagesTab from "./MessagesTab";
 import TabDesc from "./TabDesc";
 import Tabs from "./Tabs";
 import RemPosts from "./RemPosts"
+import LogoIcon from "@mui/icons-material/Psychology";
+import HomeIcon from "@mui/icons-material/Home"
+import ProfileIcon from '@mui/icons-material/Person2';
+import InboxIcon from "@mui/icons-material/Mail";
+import LoginIcon from '@mui/icons-material/Login';
+import { Button } from '@mui/material';
 
 export default function Inbox() {
     //initial selected tab will be activity
@@ -18,8 +24,19 @@ export default function Inbox() {
     
     return (
     <div>
-        <Sidebar/>
         
+            <LogoIcon fontSize="large" className="sidebar_logoicon"  /> 
+        <div className="list">
+            
+                <Button> <a href="/login" className="login_link"> <LoginIcon/> Login </a> </Button> <br></br>
+                <Button><a href="/home" className="home_link"> <HomeIcon/> Home </a> </Button> <br></br>
+                <Button><a href="/profile" className="profile_link"> <ProfileIcon/> Profile </a> </Button> <br></br>
+                <Button><a href="/inbox" className="inbox_link"> <InboxIcon/> Inbox </a> </Button>
+            
+                
+            
+
+        </div>
         <div
         
         className="Inbox">

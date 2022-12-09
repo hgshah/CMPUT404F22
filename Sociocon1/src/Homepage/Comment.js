@@ -1,6 +1,7 @@
 // link: https://github.com/azharsaleem18/react-projects/blob/main/2-instagram-app/instagram/src/components/Comments.js
 // author: https://github.com/azharsaleem18
 // license: https://www.apache.org/licenses/LICENSE-2.0
+// this page allows me to get comments on any posts, I am setting 4 different get comments based on how its been formated based on each teams
 import React from 'react'
 import List from '@mui/material/List';
 import  {useState, useEffect} from 'react'

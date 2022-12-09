@@ -6,7 +6,8 @@ import Postbox from '../Homepage/Postbox'
 import "./Profile.css"
 import {Button} from '@mui/material';
 //link :https://www.youtube.com/watch?v=ygV99J2Ehjs
-
+// author: https://www.youtube.com/@edurise8679
+//license: https://creativecommons.org/licenses/
 function Profile() {
   // const defaultDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   // const [theme, setTheme] = useLocalStorage('theme', defaultDark ? 'dark' : 'light');

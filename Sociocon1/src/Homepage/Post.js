@@ -1,6 +1,7 @@
 // link: https://github.com/CleverProgrammers/twitter-clone
 // author: CleverProgrammer: https://www.youtube.com/c/CleverProgrammer/videos
 // license: https://www.apache.org/licenses/LICENSE-2.0
+// this page shows all the component when a post is created, included title, desp, like, share, comment buttons etc
 import React from 'react'
 import {useState, useEffect} from 'react';
 import "./Post.css";
@@ -21,7 +22,7 @@ import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
-import EditPost from './EditPost';
+
 function Post({displayName, title, description, text, image, avatar, visibility,contenttype, purl, post_authorid, comm, published}) {
     const[value, setValue] = useState(""); 
     const authorid = localStorage.getItem("authorid")
@@ -72,10 +73,7 @@ function Post({displayName, title, description, text, image, avatar, visibility,
             method: 'post',
             withCredentials: true ,
             headers: { 'Content-Type': 'application/json', "Authorization": "Token " + token},
-            // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-            // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-            
+
             url: purl + '/',
 
             data: formField
@@ -334,7 +332,9 @@ function Post({displayName, title, description, text, image, avatar, visibility,
                     {title} 
                     
                     </h5>
-                    
+                    {/* link:https://github.com/remarkjs/react-markdown 
+                    author: https://github.com/remarkjs  
+                    license:  https://www.apache.org/licenses/LICENSE-2.0 */}
                     <ReactMarkdown>{description}</ReactMarkdown>
                     
                     

@@ -16,7 +16,7 @@ import { Construction, DataSaverOffTwoTone, LocalConvenienceStoreOutlined, Recei
 //license: https://contactmentor.com/
 //link :https://bobbyhadz.com/blog/react-onclick-redirect
 //author: https://bobbyhadz.com/
-// license: https://bobbyhadz.com/terms-and-conditions
+// license: https://bobbyhadz.com/
 function Login() {
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);

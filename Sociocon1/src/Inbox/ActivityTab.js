@@ -1,3 +1,4 @@
+// this page shows all the shared posts either friends or public with the author
 import React from 'react'
 import "./styles/ActivityTab.css"
 import FriendRequestsTab from './FriendRequestsTab'

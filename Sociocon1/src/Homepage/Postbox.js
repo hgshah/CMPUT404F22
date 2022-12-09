@@ -2,6 +2,9 @@
 // author: CleverProgrammer: https://www.youtube.com/c/CleverProgrammer/videos
 // license: https://www.apache.org/licenses/LICENSE-2.0
 // link for css shadow box: https://bobbyhadz.com/blog/react-box-shadow#:~:text=To%20set%20a%20box-shadow%20in%20React%3A%201%20Set,add%20a%20shadow%20effect%20around%20the%20element%27s%20frame.
+//author: https://bobbyhadz.com/
+//license: https://bobbyhadz.com/
+// the goal for this page is to create a post, which includes, simple post, image post, with url etc
 import { Button, TextField } from '@mui/material'
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
@@ -26,11 +29,7 @@ function Postbox ({}) {
     const ibase64 = localStorage.getItem("image")
     const [profilePic, setProfilePic] = useState()
     
-     // const handleClick = () => {
-    //     //  "message" stores input field value
-    //     setPostMessage(postMessage);
-
-    // };
+    
 
     // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
     // author: https://stackoverflow.com/
@@ -41,9 +40,9 @@ function Postbox ({}) {
     // author: https://www.youtube.com/c/GreatAdib
     //license: https://creativecommons.org/
     const AddPostInfo = async () => {
-// link: https://stackoverflow.com/questions/29108779/how-to-get-selected-value-of-a-dropdown-menu-in-reactjs
-// author:
-// license:
+    // link: https://stackoverflow.com/questions/29108779/how-to-get-selected-value-of-a-dropdown-menu-in-reactjs
+    // author:https://stackoverflow.com/
+    // license:https://creativecommons.org/licenses/by-sa/4.0/
         if(visibility === "Friends"){
             if (commonMark === "text/markdown" || commonMark === "text/plain"){
                 localStorage.removeItem("image")
@@ -55,11 +54,7 @@ function Postbox ({}) {
                 await axios({
                     method: 'post',
                     
-                    // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-                    // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                    // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                    
-                    // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+ 
                     url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
     
                     data: formField
@@ -80,11 +75,7 @@ function Postbox ({}) {
                     await axios({
                         method: 'post',
                         
-                        // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                        
-                        // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+
                         url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
 
                         data: formField
@@ -109,11 +100,7 @@ function Postbox ({}) {
                 await axios({
                     method: 'post',
                     
-                    // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-                    // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                    // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                    
-                    // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+  
                     url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
     
                     data: formField
@@ -131,11 +118,7 @@ function Postbox ({}) {
                     await axios({
                         method: 'post',
                         
-                        // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                        
-                        // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+ 
                         url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
 
                         data: formField
@@ -156,11 +139,7 @@ function Postbox ({}) {
                     await axios({
                         method: 'post',
                         
-                        // url: 'http://localhost:8000/authors/1384c9c1-1e2d-4b7f-868b-4f3c499fe3cd/posts/',
-                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                        // url: 'http://127.0.0.1:8000/authors/9a3123af-c9fa-42ba-a8d4-ca620e56fdb6',
-                        
-                        // url: 'http://127.0.0.1:8000/authors/fdb67522-b0e6-45bb-8896-73972c2147ed/posts/',
+
                         url: 'https://socioecon.herokuapp.com/authors/' + authorid + '/posts/',
 
                         data: formField
@@ -181,7 +160,7 @@ function Postbox ({}) {
     // license: https://creativecommons.org/
     const uploadImage =async (e) => {
          //console.log(e.target.files)
-         const pimage = e.target.files[0]
+         const pimage = e.target.files[0] // getting the selected image
          const base64 =await toB64(pimage)
          pb64 =await toB64(pimage)
          console.log(base64)
@@ -252,6 +231,7 @@ function Postbox ({}) {
                             type = "text"
                             name = "description"
                             style={{height: "250px"}}
+                            
                             />
             </div>
             <div className='poxtbox_footer'>
@@ -295,8 +275,10 @@ function Postbox ({}) {
                     />
             </div>
             {/* <input value={postImage} onchange = {e => setPostImage(e.target.value)} className="postbox_inputimage" placeholder='Enter a image url' type = "text" /> <br></br> */}
-            {/* // link: https://www.youtube.com/watch?v=xtQ74HKTOwY */}
-            
+            {/* // link: https://www.youtube.com/watch?v=xtQ74HKTOwY
+            // author: https://www.youtube.com/@GreatAdib
+            //license: https://creativecommons.org/licenses/ */}
+                
              {/* <img src = {pimage} height = "200px"/> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
             {/* // link: https://stackoverflow.com/questions/38443227/how-to-get-input-text-value-on-click-in-reac
                 // author: https://stackoverflow.com/

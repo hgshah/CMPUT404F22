@@ -13,7 +13,7 @@
 .postbox_body {
     padding: 20px;
     display: flex;
-    text-align: right;
+    text-align: left;
     
 }
 
@@ -22,15 +22,17 @@
     margin-left: 20px;
     font-size: 20px;
     border:none;
-    text-align: center;
+    text-align: left;
     
 }
+
 .postbox_body > input{
     flex:1;
     margin-left: 20px;
     font-size: 20px;
     border:none;
     text-align: center;
+
     
     
 }

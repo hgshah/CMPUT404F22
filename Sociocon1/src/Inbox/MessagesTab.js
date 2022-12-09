@@ -1,8 +1,8 @@
+// this page shows list of authors we want to search from any team and look at thier post
 import React from 'react'
 import "./styles/MessagesTab.css"
 import {useState, useEffect} from 'react';
 import axios from 'axios'
-import RPost from './RPost';
 import { render } from '@testing-library/react';
 import  ReactDOM from 'react-dom';
 import { Alert, TextField, Button } from '@mui/material';

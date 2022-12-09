@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom';
 import { Send } from '@mui/icons-material';
 import axios from 'axios'
 import Login from '../Login';
-import EditPost from '../Homepage/EditPost';
+
 import { Card } from 'antd';
 function InboxPosts({displayName, title, description, text, image, avatar, visibility,contenttype, purl, commenturl, post_authorid, host}) {
     const[value, setValue] = useState(""); 
@@ -287,48 +287,7 @@ function InboxPosts({displayName, title, description, text, image, avatar, visib
         <div className='post_body'>
             <div className='post_header'>
                
-            {/* <React.Fragment>
-                    {
-                        showForm ? (
-                        <form>
-                            <div>
-                            <input onChange={e => setPostTitle(e.target.value)} 
-                                value={updatetitle} 
-                                placeholder='Enter Title' 
-                                type = 'text'
-                                className='post_input'
-                                variant = 'outlined'
-                                label = "add title"
-                                size = "small"
-                             />  
-                            </div>  
-                            <div>
-                              
-                            <input onChange={e => setPostBody(e.target.value)} 
-                                value={updatebody} 
-                                placeholder='Enter Body' 
-                                type = 'text'
-                                className='post_input'
-                                variant = 'outlined'
-                                label = "add body"
-                                size = "small"
-                             />
-                            </div>
-                            <div>
-                              
-                              <select name="contenttype" id="contenttype">
-                                    <option value="">choose an option--</option>
-                                    <option value = {updatevisibility} onChange={e => setPostContentType(e.target.value)} >public</option>
-                                    <option value = {updatevisibility} onChange={e => setPostContentType(e.target.value)} >friends</option>
-                                </select>
-                                <button onClick = {UpdatePost}>Update</button>
-                                <button onClick = {() => setShowForm(false)} > Cancel</button>
-                            </div>
-                        </form>) 
-                        : (<Button onClick = {() => setShowForm(true)}  variant='contained' size = "small" endIcon= {<EditIcon/>} >Edit</Button>)
-                    }
-                     
-             </React.Fragment> */}
+          
                 
                 <div className='header_text'>
                 
